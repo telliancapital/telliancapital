@@ -1,0 +1,8 @@
+/* Fonts are now loaded via next/font/google in layout.tsx.
+   These CSS variable fallbacks ensure inline styles using
+   'Cormorant Garamond' and 'Inter' by name resolve to the
+   self-hosted next/font versions. */
+
+:root {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+}
