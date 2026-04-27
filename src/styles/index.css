@@ -1,0 +1,33 @@
+@import "./fonts.css";
+@import "./tailwind.css";
+@import "./theme.css";
+
+/* ── Global scrollbar hide ── */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ── GPU-accelerated transforms ── */
+.will-change-transform {
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ── Typography anti-aliasing for premium feel ── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Light mode selection color ── */
+::selection {
+  background: rgba(26, 25, 22, 0.08);
+  color: #1a1916;
+}
