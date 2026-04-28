@@ -29,7 +29,7 @@ const SECTION_WIDTH_VW = 110;
    progress 0.0  →  scale 1.00 (32px), quoteOpacity 0.40, overlay 0.00
    progress 0.5  →  scale 1.50 (48px), quoteOpacity 0.70, overlay 0.15
    progress 1.0  →  scale 2.00 (64px), quoteOpacity 1.00, overlay 0.35
-   ───────────────────────���──────────────────────────────────── */
+   ───────────────────────────────────────────────────────────── */
 function getAnimValues(scrollX: number) {
   const vw = typeof window !== "undefined" && window.innerWidth > 0 ? window.innerWidth : 1440;
   const start = (SECTION_START_VW * vw) / 100;
@@ -85,6 +85,13 @@ export function Section2Anlagephilosophie({
     .map((p: LocaleValue) => t(p, ""))
     .filter((p: string) => p.length > 0);
   const BODY_PARAGRAPHS = cmsParagraphs.length > 0 ? cmsParagraphs : FALLBACK_BODY;
+
+  /* Background image: prefer uploaded asset, then external URL, then bundled fallback */
+  const imageSrc: string =
+    homepage?.philosophyImageAsset?.url || homepage?.philosophyImageUrl || philosophyImg.src;
+  /* Alt text — kept for future a11y wiring; HeroExpandingImage doesn't currently
+     forward an `alt` prop, so unused for now. */
+  void t(homepage?.philosophyImageAlt, "");
 
   /* ── VERTICAL (Tablet / Mobile) ── */
   if (isVertical) {
@@ -157,12 +164,7 @@ export function Section2Anlagephilosophie({
             overflow: "hidden",
           }}
         >
-          <HeroExpandingImage
-            src={philosophyImg.src}
-            scrollX={0}
-            className="h-full w-full"
-            isVertical
-          />
+          <HeroExpandingImage src={imageSrc} scrollX={0} className="h-full w-full" isVertical />
           {/* Dark overlay */}
           <div
             style={{
@@ -199,7 +201,7 @@ export function Section2Anlagephilosophie({
                 letterSpacing: "-0.01em",
               }}
             >
-              {"\u00AB"}Ihr Vermögen verdient bessere Gründe als ein Bauchgefühl.{"\u00BB"}
+              «{quote}»
             </p>
           </div>
         </div>
@@ -216,7 +218,7 @@ export function Section2Anlagephilosophie({
       style={{ width: "110vw", backgroundColor: C.bg }}
     >
       <div className="absolute z-0" style={{ top: 0, bottom: 0, left: LAYOUT.imageLeft, right: 0 }}>
-        <HeroExpandingImage src={philosophyImg.src} scrollX={scrollX} className="h-full w-full" />
+        <HeroExpandingImage src={imageSrc} scrollX={scrollX} className="h-full w-full" />
         <div
           style={{
             position: "absolute",
@@ -255,7 +257,7 @@ export function Section2Anlagephilosophie({
               willChange: "opacity, transform",
             }}
           >
-            {"\u00AB"}Ihr Vermögen verdient bessere Gründe als ein Bauchgefühl.{"\u00BB"}
+            «{quote}»
           </p>
         </div>
       </div>

@@ -1,8 +1,10 @@
-import HomeClient from "./HomeClient";
-import { sanityFetch } from "@/sanity/lib/live";
-import { HOMEPAGE_QUERY } from "@/sanity/lib/queries";
+import { redirect } from "next/navigation";
 
-export default async function Page() {
-  const { data: homepage } = await sanityFetch({ query: HOMEPAGE_QUERY });
-  return <HomeClient homepage={homepage} />;
+/**
+ * The homepage is rendered under `/[lang]` (e.g. `/de`, `/en`).
+ * Visiting `/` always lands on the German variant; users switch language
+ * via the sidebar buttons, which navigate to `/de` or `/en`.
+ */
+export default function Page() {
+  redirect("/de");
 }

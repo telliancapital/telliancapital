@@ -5,6 +5,8 @@ import { RotateCcw } from "lucide-react";
 import { LAYOUT } from "../layout";
 import { AnlageprozessStepOrdinal, ORDINAL_FONT_SIZE } from "./AnlageprozessStepOrdinal";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ─── Design tokens ─── */
 const C = {
@@ -18,7 +20,16 @@ const serif = "var(--font-cormorant), serif";
 const sans = "var(--font-inter), sans-serif";
 
 /* ─── Step definitions ─── */
-const STEPS = [
+type Step = {
+  num: string;
+  title: string;
+  desc: string;
+  /** When true the step is rendered with the dark / charcoal palette
+   *  (steps 03–05 in the original design). Index-driven, not editor-controlled. */
+  accent: boolean;
+};
+
+const FALLBACK_STEPS: Step[] = [
   {
     num: "01",
     title: "Ihre Ziele definieren",
@@ -49,7 +60,7 @@ const STEPS = [
     desc: "Laufende Überwachung, Risikokontrolle, Reporting",
     accent: true,
   },
-] as const;
+];
 
 /* ─── Animation helpers ───────────────────────────────────────────────
    Trigger: the moment the timeline container's left edge enters the
@@ -79,11 +90,42 @@ interface Props {
   isVertical?: boolean;
   /** When true, step ordinals unmount so the detail-view overlay can own the FLIP targets */
   isDetailMode?: boolean;
+  homepage?: any;
 }
 
-export function Section3Timeline({ scrollX, isVertical = false, isDetailMode = false }: Props) {
+export function Section3Timeline({
+  scrollX,
+  isVertical = false,
+  isDetailMode = false,
+  homepage,
+}: Props) {
   const descriptionsFading = isDetailMode;
   const descriptionsHidden = isDetailMode;
+  const { t } = useLanguage();
+
+  /* ── Build the step list from CMS, fall back to original German ── */
+  type CmsStep = { title?: LocaleValue; description?: LocaleValue };
+  const cmsSteps: Step[] = (homepage?.methodTimelineSteps ?? [])
+    .slice(0, 5)
+    .map((s: CmsStep, i: number): Step | null => {
+      const title = t(s?.title, "");
+      const desc = t(s?.description, "");
+      if (!title && !desc) return null;
+      return {
+        num: String(i + 1).padStart(2, "0"),
+        title: title || FALLBACK_STEPS[i]?.title || "",
+        desc: desc || FALLBACK_STEPS[i]?.desc || "",
+        accent: i >= 2,
+      };
+    })
+    .filter((s: Step | null): s is Step => s !== null);
+  const STEPS: Step[] = cmsSteps.length > 0 ? cmsSteps : FALLBACK_STEPS;
+
+  const dividerLabel = t(homepage?.methodTimelineDividerLabel, "Tellian Capital übernimmt");
+  const footerLabel = t(
+    homepage?.methodTimelineFooterLabel,
+    "Vierteljährliches Reporting an den Kunden",
+  );
 
   const reducedMotion = usePrefersReducedMotion();
   /* FLIP runs only on desktop (horizontal) + when reduced-motion is OFF.
@@ -334,7 +376,7 @@ export function Section3Timeline({ scrollX, isVertical = false, isDetailMode = f
                         textTransform: "uppercase" as const,
                       }}
                     >
-                      Tellian Capital übernimmt
+                      {dividerLabel}
                     </span>
                   </div>
                 )}
@@ -463,7 +505,7 @@ export function Section3Timeline({ scrollX, isVertical = false, isDetailMode = f
                 fontStyle: "italic",
               }}
             >
-              Vierteljährliches Reporting an den Kunden
+              {footerLabel}
             </span>
           </div>
         </div>
