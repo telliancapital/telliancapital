@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LEGAL_PAGES, LEGAL_PATHS, type LegalPath } from "../data/legalPages";
+import {
+  LEGAL_PAGES,
+  LEGAL_PATHS,
+  type LegalPath,
+  type LegalPageContent,
+  type LegalSection,
+} from "../data/legalPages";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 const sans = "var(--font-inter), sans-serif";
 const serif = "var(--font-cormorant), serif";
@@ -60,14 +68,35 @@ export function useLegalRoute() {
   return { activePath, open, close };
 }
 
+/* ─── CMS field-name lookup per legal path ─── */
+const FIELD_KEYS: Record<LegalPath, { title: string; updated: string; sections: string }> = {
+  "/impressum": {
+    title: "legalImpressumTitle",
+    updated: "legalImpressumUpdated",
+    sections: "legalImpressumSections",
+  },
+  "/datenschutz": {
+    title: "legalDatenschutzTitle",
+    updated: "legalDatenschutzUpdated",
+    sections: "legalDatenschutzSections",
+  },
+  "/kundeninformation": {
+    title: "legalKundeninformationTitle",
+    updated: "legalKundeninformationUpdated",
+    sections: "legalKundeninformationSections",
+  },
+};
+
 interface LegalPageProps {
   activePath: LegalPath | null;
   onClose: () => void;
+  homepage?: any;
 }
 
-export function LegalPage({ activePath, onClose }: LegalPageProps) {
+export function LegalPage({ activePath, onClose, homepage }: LegalPageProps) {
   const backRef = useRef<HTMLAnchorElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (activePath) {
@@ -97,7 +126,30 @@ export function LegalPage({ activePath, onClose }: LegalPageProps) {
   }, [activePath]);
 
   if (typeof document === "undefined" || !activePath) return null;
-  const content = LEGAL_PAGES[activePath];
+
+  /* ── Build the rendered content from CMS, falling back per-field to the
+        bundled `LEGAL_PAGES` so a partial CMS entry still renders cleanly. ── */
+  const fallback: LegalPageContent = LEGAL_PAGES[activePath];
+  const keys = FIELD_KEYS[activePath];
+
+  const cmsSections: LocaleSection[] | undefined = homepage?.[keys.sections];
+  const renderedSections: LegalSection[] =
+    cmsSections && cmsSections.length > 0
+      ? cmsSections.map((s, i): LegalSection => {
+          const fb = fallback.sections[i];
+          const heading = t(s?.heading, fb?.heading ?? "");
+          const paragraphs = (s?.paragraphs ?? []).map((p) => t(p, "")).filter((p) => p.length > 0);
+          const list = (s?.list ?? []).map((l) => t(l, "")).filter((l) => l.length > 0);
+          return {
+            heading,
+            paragraphs: paragraphs.length > 0 ? paragraphs : fb?.paragraphs,
+            list: list.length > 0 ? list : fb?.list,
+          };
+        })
+      : fallback.sections;
+
+  const title = t(homepage?.[keys.title], fallback.title);
+  const updated = t(homepage?.[keys.updated], fallback.updated ?? "");
 
   return createPortal(
     <div
@@ -171,10 +223,10 @@ export function LegalPage({ activePath, onClose }: LegalPageProps) {
             marginBottom: "12px",
           }}
         >
-          {content.title}
+          {title}
         </h1>
 
-        {content.updated && (
+        {updated && (
           <p
             style={{
               fontFamily: sans,
@@ -186,11 +238,11 @@ export function LegalPage({ activePath, onClose }: LegalPageProps) {
               marginBottom: "clamp(40px, 5vh, 72px)",
             }}
           >
-            {content.updated}
+            {updated}
           </p>
         )}
 
-        {content.sections.map((section, i) => (
+        {renderedSections.map((section, i) => (
           <section key={i} style={{ marginTop: i === 0 ? 0 : "clamp(36px, 5vh, 56px)" }}>
             <h2
               style={{
@@ -224,7 +276,7 @@ export function LegalPage({ activePath, onClose }: LegalPageProps) {
               </p>
             ))}
 
-            {section.list && (
+            {section.list && section.list.length > 0 && (
               <ul
                 style={{
                   fontFamily: sans,
@@ -251,3 +303,9 @@ export function LegalPage({ activePath, onClose }: LegalPageProps) {
     document.body,
   );
 }
+
+type LocaleSection = {
+  heading?: LocaleValue;
+  paragraphs?: LocaleValue[];
+  list?: LocaleValue[];
+};

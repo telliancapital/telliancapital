@@ -76,6 +76,24 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   strategyBottomUpEyebrow,
   strategyBottomUpTitle,
   strategyBottomUpBullets,
+  strategyTopDownDetailEyebrow,
+  strategyTopDownDetailSubline,
+  strategyTopDownDetailBody,
+  strategyTopDownDetailBullets,
+  strategyTopDownDetailClosing,
+  strategyBottomUpDetailEyebrow,
+  strategyBottomUpDetailSubline,
+  strategyBottomUpDetailBody,
+  strategyBottomUpDetailBullets,
+  strategyBottomUpDetailClosing,
+  strategyFaqItems[]{ question, answer },
+  strategyDetailCtaEyebrow,
+  strategyDetailCtaHeadingPrefix,
+  strategyDetailCtaHeadingItalic,
+  strategyDetailCtaHeadingSuffix,
+  strategyDetailCtaDescription,
+  strategyDetailCtaButtonLabel,
+  strategyDetailFooterTagline,
 
   // 05 — Team
   teamEyebrow,
@@ -111,7 +129,29 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   contactPhone,
   contactEmail,
   contactMapLinkLabel,
-  contactFooterTagline
+  contactFooterTagline,
+
+  // 07 — Legal pages (Impressum / Datenschutz / Kundeninformation)
+  legalImpressumLinkLabel,
+  legalImpressumTitle,
+  legalImpressumUpdated,
+  legalImpressumSections[]{ heading, paragraphs, list },
+  legalDatenschutzLinkLabel,
+  legalDatenschutzTitle,
+  legalDatenschutzUpdated,
+  legalDatenschutzSections[]{ heading, paragraphs, list },
+  legalKundeninformationLinkLabel,
+  legalKundeninformationTitle,
+  legalKundeninformationUpdated,
+  legalKundeninformationSections[]{ heading, paragraphs, list },
+
+  // 08 — Sidebar / Navigation
+  navBrandPrimary,
+  navBrandSecondary,
+  navItems[]{ label, sub },
+  navLoginButtonLabel,
+  navKundenportalLabel,
+  navKundenportalCaption
 }`);
 
 /**

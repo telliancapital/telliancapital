@@ -23,6 +23,8 @@ export const homepageType = defineType({
     { name: "strategy", title: "4. Strategie  ·  Anlagestrategien" },
     { name: "team", title: "5. Team  ·  Über uns" },
     { name: "contact", title: "6. Kontakt" },
+    { name: "legal", title: "7. Rechtliches" },
+    { name: "navigation", title: "8. Sidebar  ·  Navigation" },
   ],
 
   /* Collapsible groupings within each tab.
@@ -160,6 +162,31 @@ export const homepageType = defineType({
       title: "Card 2 — Bottom-Up (light card, bottom half)",
       options: { collapsible: true, collapsed: false },
     },
+    {
+      name: "strategyDetailTopDownSet",
+      title: "Detail Page — Top-Down section",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "strategyDetailBottomUpSet",
+      title: "Detail Page — Bottom-Up section",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "strategyDetailFaqSet",
+      title: "Detail Page — FAQ",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "strategyDetailCtaSet",
+      title: "Detail Page — Final CTA",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "strategyDetailFooterSet",
+      title: "Detail Page — Footer",
+      options: { collapsible: true, collapsed: false },
+    },
 
     /* Team */
     {
@@ -202,6 +229,40 @@ export const homepageType = defineType({
     {
       name: "contactFooterSet",
       title: "Footer / Map Link",
+      options: { collapsible: true, collapsed: false },
+    },
+
+    /* Legal pages */
+    {
+      name: "legalImpressumSet",
+      title: "Impressum",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "legalDatenschutzSet",
+      title: "Datenschutz",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "legalKundeninformationSet",
+      title: "Kundeninformation",
+      options: { collapsible: true, collapsed: false },
+    },
+
+    /* Sidebar / Navigation */
+    {
+      name: "navBrandSet",
+      title: "Brand / Logo",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "navItemsSet",
+      title: "Nav items (6 sections)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "navPortalSet",
+      title: "Login / Kundenportal",
       options: { collapsible: true, collapsed: false },
     },
   ],
@@ -828,6 +889,201 @@ export const homepageType = defineType({
       fieldset: "strategyBottomUpSet",
     }),
 
+    /* ─── Detail page — Top-Down section ─── */
+    defineField({
+      name: "strategyTopDownDetailEyebrow",
+      title: "Eyebrow",
+      description:
+        'Tiny uppercase line above the FLIP\'d "Top-Down" headline on the detail page. Example: "Globale Perspektive".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailTopDownSet",
+    }),
+    defineField({
+      name: "strategyTopDownDetailSubline",
+      title: "Subline",
+      description:
+        'Grey line directly under the headline. Example: "Makroanalyse und strategische Allokation mit Horizont 3–5 Jahre".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailTopDownSet",
+    }),
+    defineField({
+      name: "strategyTopDownDetailBody",
+      title: "Body paragraphs",
+      description: "One entry per paragraph (in order). Each is rendered as its own paragraph.",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "strategy",
+      fieldset: "strategyDetailTopDownSet",
+    }),
+    defineField({
+      name: "strategyTopDownDetailBullets",
+      title: "Bullets (em-dash list)",
+      description: 'Each entry is rendered as one em-dash list item ("— text").',
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "strategy",
+      fieldset: "strategyDetailTopDownSet",
+    }),
+    defineField({
+      name: "strategyTopDownDetailClosing",
+      title: "Closing paragraph (optional)",
+      description: "Final paragraph, shown after the bullets. Leave empty to omit.",
+      type: "localeText",
+      group: "strategy",
+      fieldset: "strategyDetailTopDownSet",
+    }),
+
+    /* ─── Detail page — Bottom-Up section ─── */
+    defineField({
+      name: "strategyBottomUpDetailEyebrow",
+      title: "Eyebrow",
+      description:
+        'Tiny uppercase line above the FLIP\'d "Bottom-Up" headline on the detail page. Example: "Einzeltitel-Perspektive".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailBottomUpSet",
+    }),
+    defineField({
+      name: "strategyBottomUpDetailSubline",
+      title: "Subline",
+      description:
+        'Grey line directly under the headline. Example: "Quantitative Selektion und taktische Positionen innerhalb der Allokation".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailBottomUpSet",
+    }),
+    defineField({
+      name: "strategyBottomUpDetailBody",
+      title: "Body paragraphs",
+      description: "One entry per paragraph (in order).",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "strategy",
+      fieldset: "strategyDetailBottomUpSet",
+    }),
+    defineField({
+      name: "strategyBottomUpDetailBullets",
+      title: "Bullets (em-dash list)",
+      description: 'Each entry is rendered as one em-dash list item ("— text").',
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "strategy",
+      fieldset: "strategyDetailBottomUpSet",
+    }),
+    defineField({
+      name: "strategyBottomUpDetailClosing",
+      title: "Closing paragraph (optional)",
+      description: "Final paragraph, shown after the bullets. Leave empty to omit.",
+      type: "localeText",
+      group: "strategy",
+      fieldset: "strategyDetailBottomUpSet",
+    }),
+
+    /* ─── Detail page — FAQ ─── */
+    defineField({
+      name: "strategyFaqItems",
+      title: "FAQ items",
+      description:
+        "Questions & answers shown at the bottom of the detail page. Add as many as you like; each becomes a collapsible accordion row.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "strategyFaqItem",
+          title: "FAQ item",
+          fields: [
+            {
+              name: "question",
+              title: "Question",
+              description: 'Example: "Welche Strategie passt zu mir?".',
+              type: "localeString",
+            },
+            {
+              name: "answer",
+              title: "Answer",
+              description: "The expanded answer when the row is opened.",
+              type: "localeText",
+            },
+          ],
+          preview: {
+            select: { title: "question.de", subtitle: "answer.de" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Question (untitled)",
+                subtitle: subtitle || "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "strategy",
+      fieldset: "strategyDetailFaqSet",
+    }),
+
+    /* ─── Detail page — Final CTA block ─── */
+    defineField({
+      name: "strategyDetailCtaEyebrow",
+      title: "CTA — Eyebrow",
+      description: 'Tiny uppercase label above the heading. Example: "Nächster Schritt".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailCtaSet",
+    }),
+    defineField({
+      name: "strategyDetailCtaHeadingPrefix",
+      title: "CTA — Heading (regular, before italic word)",
+      description: 'Example: "Reden wir über".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailCtaSet",
+    }),
+    defineField({
+      name: "strategyDetailCtaHeadingItalic",
+      title: "CTA — Heading (italic word/phrase)",
+      description: 'Italic part inserted between prefix and suffix. Example: "Ihre".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailCtaSet",
+    }),
+    defineField({
+      name: "strategyDetailCtaHeadingSuffix",
+      title: "CTA — Heading (regular, after italic word)",
+      description: 'Example: "Strategie."',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailCtaSet",
+    }),
+    defineField({
+      name: "strategyDetailCtaDescription",
+      title: "CTA — Description",
+      description:
+        'Body sentence under the CTA heading. Example: "Jede Strategie beginnt mit einer Frage: Was wollen Sie erreichen? …".',
+      type: "localeText",
+      group: "strategy",
+      fieldset: "strategyDetailCtaSet",
+    }),
+    defineField({
+      name: "strategyDetailCtaButtonLabel",
+      title: "CTA — Button label",
+      description: 'Label on the dark button. Example: "Gespräch vereinbaren".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailCtaSet",
+    }),
+
+    /* ─── Detail page — Footer tagline ─── */
+    defineField({
+      name: "strategyDetailFooterTagline",
+      title: "Footer tagline",
+      description:
+        'Tiny uppercase line at the very bottom of the detail page. Example: "Tellian Capital AG — Est. 1996 — Zürich".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyDetailFooterSet",
+    }),
+
     /* ──────────────────────────────────────────────────────────
        05 — TEAM · ÜBER TELLIAN
        Text column on the left, portrait filmstrip on the right.
@@ -1092,6 +1348,323 @@ export const homepageType = defineType({
       type: "localeString",
       group: "contact",
       fieldset: "contactFooterSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       07 — RECHTLICHES
+       Three legal pages opened from the footer of the contact section:
+       /impressum  ·  /datenschutz  ·  /kundeninformation
+       Each page has its own link label, page title, "Stand: …" line,
+       and an array of sections (heading + paragraphs + optional list).
+       ────────────────────────────────────────────────────────── */
+
+    /* ─── Impressum ─── */
+    defineField({
+      name: "legalImpressumLinkLabel",
+      title: "Link label",
+      description:
+        'Label of the link in the contact footer that opens this page. Example: "Impressum".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalImpressumSet",
+    }),
+    defineField({
+      name: "legalImpressumTitle",
+      title: "Page title (H1)",
+      description: 'Big serif heading at the top of the page. Example: "Impressum".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalImpressumSet",
+    }),
+    defineField({
+      name: "legalImpressumUpdated",
+      title: '"Stand: …" line',
+      description:
+        'Small uppercase line under the H1 indicating the last update. Example: "Stand: April 2026".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalImpressumSet",
+    }),
+    defineField({
+      name: "legalImpressumSections",
+      title: "Sections",
+      description:
+        "One entry per section. Each section has a heading, optional paragraphs (each rendered as a separate <p>), and an optional bullet list (each entry one bullet).",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "legalSection",
+          title: "Section",
+          fields: [
+            {
+              name: "heading",
+              title: "Heading",
+              description: 'Example: "Anbieter und verantwortliche Stelle".',
+              type: "localeString",
+            },
+            {
+              name: "paragraphs",
+              title: "Paragraphs",
+              description: "One entry per paragraph. Each becomes its own block under the heading.",
+              type: "array",
+              of: [{ type: "localeText" }],
+            },
+            {
+              name: "list",
+              title: "Bullet list (optional)",
+              description: "Each entry is rendered as one bullet under the paragraphs.",
+              type: "array",
+              of: [{ type: "localeString" }],
+            },
+          ],
+          preview: {
+            select: { title: "heading.de" },
+            prepare({ title }) {
+              return { title: title || "Section (untitled)" };
+            },
+          },
+        },
+      ],
+      group: "legal",
+      fieldset: "legalImpressumSet",
+    }),
+
+    /* ─── Datenschutz ─── */
+    defineField({
+      name: "legalDatenschutzLinkLabel",
+      title: "Link label",
+      description:
+        'Label of the link in the contact footer that opens this page. Example: "Datenschutz".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalDatenschutzSet",
+    }),
+    defineField({
+      name: "legalDatenschutzTitle",
+      title: "Page title (H1)",
+      description: 'Big serif heading at the top of the page. Example: "Datenschutzerklärung".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalDatenschutzSet",
+    }),
+    defineField({
+      name: "legalDatenschutzUpdated",
+      title: '"Stand: …" line',
+      description: 'Example: "Stand: April 2026".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalDatenschutzSet",
+    }),
+    defineField({
+      name: "legalDatenschutzSections",
+      title: "Sections",
+      description:
+        "One entry per section. Each section has a heading, optional paragraphs, and an optional bullet list.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "legalSectionDatenschutz",
+          title: "Section",
+          fields: [
+            {
+              name: "heading",
+              title: "Heading",
+              description: 'Example: "Erhobene Daten".',
+              type: "localeString",
+            },
+            {
+              name: "paragraphs",
+              title: "Paragraphs",
+              description: "One entry per paragraph.",
+              type: "array",
+              of: [{ type: "localeText" }],
+            },
+            {
+              name: "list",
+              title: "Bullet list (optional)",
+              description: "Each entry is rendered as one bullet.",
+              type: "array",
+              of: [{ type: "localeString" }],
+            },
+          ],
+          preview: {
+            select: { title: "heading.de" },
+            prepare({ title }) {
+              return { title: title || "Section (untitled)" };
+            },
+          },
+        },
+      ],
+      group: "legal",
+      fieldset: "legalDatenschutzSet",
+    }),
+
+    /* ─── Kundeninformation ─── */
+    defineField({
+      name: "legalKundeninformationLinkLabel",
+      title: "Link label",
+      description:
+        'Label of the link in the contact footer that opens this page. Example: "Kundeninformation".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalKundeninformationSet",
+    }),
+    defineField({
+      name: "legalKundeninformationTitle",
+      title: "Page title (H1)",
+      description: 'Big serif heading at the top of the page. Example: "Kundeninformation".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalKundeninformationSet",
+    }),
+    defineField({
+      name: "legalKundeninformationUpdated",
+      title: '"Stand: …" line',
+      description: 'Example: "Stand: April 2026".',
+      type: "localeString",
+      group: "legal",
+      fieldset: "legalKundeninformationSet",
+    }),
+    defineField({
+      name: "legalKundeninformationSections",
+      title: "Sections",
+      description:
+        "One entry per section. Each section has a heading, optional paragraphs, and an optional bullet list.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "legalSectionKundeninformation",
+          title: "Section",
+          fields: [
+            {
+              name: "heading",
+              title: "Heading",
+              description: 'Example: "Unsere Dienstleistungen".',
+              type: "localeString",
+            },
+            {
+              name: "paragraphs",
+              title: "Paragraphs",
+              description: "One entry per paragraph.",
+              type: "array",
+              of: [{ type: "localeText" }],
+            },
+            {
+              name: "list",
+              title: "Bullet list (optional)",
+              description: "Each entry is rendered as one bullet.",
+              type: "array",
+              of: [{ type: "localeString" }],
+            },
+          ],
+          preview: {
+            select: { title: "heading.de" },
+            prepare({ title }) {
+              return { title: title || "Section (untitled)" };
+            },
+          },
+        },
+      ],
+      group: "legal",
+      fieldset: "legalKundeninformationSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       08 — SIDEBAR / NAVIGATION
+       Drives the sidebar (desktop) + top bar (mobile/tablet):
+       brand text, the 6 navigation items, login/portal buttons.
+       The DE/EN language toggle stays in code — not part of the CMS.
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "navBrandPrimary",
+      title: "Brand — bold word",
+      description: 'First word of the logo, rendered in bold uppercase. Example: "TELLIAN".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navBrandSet",
+    }),
+    defineField({
+      name: "navBrandSecondary",
+      title: "Brand — regular word",
+      description:
+        'Second word of the logo, rendered in regular weight after a non-breaking space. Example: "CAPITAL".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navBrandSet",
+    }),
+
+    defineField({
+      name: "navItems",
+      title: "Nav items (1 – 6)",
+      description:
+        "The six items shown in the expanded sidebar (desktop) and the full-screen menu (mobile/tablet). Number prefixes (01, 02, …) are rendered automatically based on order. Items 1–6 map to: 1 Hero · 2 Anlagephilosophie · 3 Vermögensverwaltung · 4 Anlagestrategien · 5 Über uns · 6 Kontakt — keep that order so each entry scrolls to the right section.",
+      type: "array",
+      validation: (Rule) => Rule.max(6),
+      of: [
+        {
+          type: "object",
+          name: "navItem",
+          title: "Nav item",
+          fields: [
+            {
+              name: "label",
+              title: "Label",
+              description:
+                'Big serif label of the item. Example: "Vermögen mit Methode" / "Haltung" / "Kontakt".',
+              type: "localeString",
+            },
+            {
+              name: "sub",
+              title: "Sub label",
+              description:
+                'Small grey caption shown under the label. Example: "Einführung" / "Anlagephilosophie".',
+              type: "localeString",
+            },
+          ],
+          preview: {
+            select: { title: "label.de", subtitle: "sub.de" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Nav item (untitled)",
+                subtitle: subtitle || "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "navigation",
+      fieldset: "navItemsSet",
+    }),
+
+    defineField({
+      name: "navLoginButtonLabel",
+      title: "Login button label (collapsed sidebar)",
+      description:
+        'Label under the lock icon at the bottom of the collapsed sidebar. Example: "Login".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navPortalSet",
+    }),
+    defineField({
+      name: "navKundenportalLabel",
+      title: "Kundenportal button label (expanded sidebar / mobile menu)",
+      description:
+        'Label of the dark button shown in the expanded sidebar and mobile menu. Example: "Kundenportal".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navPortalSet",
+    }),
+    defineField({
+      name: "navKundenportalCaption",
+      title: "Kundenportal caption",
+      description:
+        'Small grey caption shown beneath the Kundenportal button. Example: "Zugang für bestehende Kunden".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navPortalSet",
     }),
   ],
 

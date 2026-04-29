@@ -1,9 +1,16 @@
+"use client";
+
 import { motion } from "motion/react";
-import { ANLAGESTRATEGIEN_SECTIONS } from "../data/anlagestrategienSections";
+import {
+  ANLAGESTRATEGIEN_SECTIONS,
+  type AnlagestrategienSection,
+} from "../data/anlagestrategienSections";
 import { CtaButton } from "./CtaButton";
 import { FaqAccordion, type FaqItem } from "./FaqAccordion";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
-const ANLAGESTRATEGIEN_FAQ: readonly FaqItem[] = [
+const FALLBACK_FAQ: readonly FaqItem[] = [
   {
     question: "Welche Strategie passt zu mir?",
     answer:
@@ -41,7 +48,18 @@ interface AnlagestrategienDetailProps {
   reducedMotion: boolean;
   /** Called when the user clicks "Gespräch vereinbaren" */
   onContactClick: () => void;
+  homepage?: any;
 }
+
+type RenderSection = {
+  key: "topdown" | "bottomup";
+  title: string;
+  detailEyebrow: string;
+  detailSubline: string;
+  detailBody: string[];
+  detailBullets: string[];
+  detailClosing?: string;
+};
 
 /**
  * Long-scroll detail body for /anlagestrategien.
@@ -53,8 +71,87 @@ export function AnlagestrategienDetail({
   isDetail,
   reducedMotion,
   onContactClick,
+  homepage,
 }: AnlagestrategienDetailProps) {
   const enableFlip = !isMobile && !reducedMotion;
+  const { t } = useLanguage();
+
+  /* ── Build per-section content from CMS, with per-field fallback to the
+        bundled `ANLAGESTRATEGIEN_SECTIONS` so a partial CMS entry still
+        renders cleanly. ── */
+  const arrToStrings = (arr: LocaleValue[] | undefined, fallback: string[]) => {
+    const cms = (arr ?? []).map((v) => t(v, "")).filter((s) => s.length > 0);
+    return cms.length > 0 ? cms : fallback;
+  };
+
+  const fbTop: AnlagestrategienSection | undefined = ANLAGESTRATEGIEN_SECTIONS.find(
+    (s) => s.key === "topdown",
+  );
+  const fbBot: AnlagestrategienSection | undefined = ANLAGESTRATEGIEN_SECTIONS.find(
+    (s) => s.key === "bottomup",
+  );
+
+  const SECTIONS: RenderSection[] = [
+    {
+      key: "topdown",
+      title: t(homepage?.strategyTopDownTitle, fbTop?.title ?? "Top-Down"),
+      detailEyebrow: t(
+        homepage?.strategyTopDownDetailEyebrow,
+        fbTop?.detailEyebrow ?? "Globale Perspektive",
+      ),
+      detailSubline: t(homepage?.strategyTopDownDetailSubline, fbTop?.detailSubline ?? ""),
+      detailBody: arrToStrings(homepage?.strategyTopDownDetailBody, fbTop?.detailBody ?? []),
+      detailBullets: arrToStrings(
+        homepage?.strategyTopDownDetailBullets,
+        fbTop?.detailBullets ?? [],
+      ),
+      detailClosing:
+        t(homepage?.strategyTopDownDetailClosing, fbTop?.detailClosing ?? "") || undefined,
+    },
+    {
+      key: "bottomup",
+      title: t(homepage?.strategyBottomUpTitle, fbBot?.title ?? "Bottom-Up"),
+      detailEyebrow: t(
+        homepage?.strategyBottomUpDetailEyebrow,
+        fbBot?.detailEyebrow ?? "Einzeltitel-Perspektive",
+      ),
+      detailSubline: t(homepage?.strategyBottomUpDetailSubline, fbBot?.detailSubline ?? ""),
+      detailBody: arrToStrings(homepage?.strategyBottomUpDetailBody, fbBot?.detailBody ?? []),
+      detailBullets: arrToStrings(
+        homepage?.strategyBottomUpDetailBullets,
+        fbBot?.detailBullets ?? [],
+      ),
+      detailClosing:
+        t(homepage?.strategyBottomUpDetailClosing, fbBot?.detailClosing ?? "") || undefined,
+    },
+  ];
+
+  /* ── FAQ items ── */
+  type CmsFaq = { question?: LocaleValue; answer?: LocaleValue };
+  const cmsFaq: FaqItem[] = (homepage?.strategyFaqItems ?? [])
+    .map((f: CmsFaq): FaqItem | null => {
+      const question = t(f?.question, "");
+      const answer = t(f?.answer, "");
+      if (!question && !answer) return null;
+      return { question, answer };
+    })
+    .filter((f: FaqItem | null): f is FaqItem => f !== null);
+  const FAQ_ITEMS: readonly FaqItem[] = cmsFaq.length > 0 ? cmsFaq : FALLBACK_FAQ;
+
+  /* ── Final CTA + footer ── */
+  const ctaEyebrow = t(homepage?.strategyDetailCtaEyebrow, "Nächster Schritt");
+  const ctaPrefix = t(homepage?.strategyDetailCtaHeadingPrefix, "Reden wir über");
+  const ctaItalic = t(homepage?.strategyDetailCtaHeadingItalic, "Ihre");
+  const ctaSuffix = t(homepage?.strategyDetailCtaHeadingSuffix, "Strategie.");
+  const ctaDescription = t(
+    homepage?.strategyDetailCtaDescription,
+    "Jede Strategie beginnt mit einer Frage: Was wollen Sie erreichen? Lassen Sie uns die Antwort zusammen finden.",
+  );
+  const ctaButtonLabel = t(homepage?.strategyDetailCtaButtonLabel, "Gespräch vereinbaren");
+  const footerTagline = t(
+    homepage?.strategyDetailFooterTagline,
+    "Tellian Capital AG — Est. 1996 — Zürich",
+  );
 
   return (
     <div
@@ -66,7 +163,7 @@ export function AnlagestrategienDetail({
         color: C.dark,
       }}
     >
-      {ANLAGESTRATEGIEN_SECTIONS.map((section, i) => (
+      {SECTIONS.map((section, i) => (
         <section
           key={section.key}
           style={{
@@ -186,7 +283,7 @@ export function AnlagestrategienDetail({
           paddingBottom: isMobile ? "8px" : "16px",
         }}
       >
-        <FaqAccordion items={ANLAGESTRATEGIEN_FAQ} schemaId="anlagestrategien" />
+        <FaqAccordion items={FAQ_ITEMS} schemaId="anlagestrategien" />
       </div>
 
       {/* ═══ Final CTA ═══ */}
@@ -209,7 +306,7 @@ export function AnlagestrategienDetail({
             color: C.stone,
           }}
         >
-          Nächster Schritt
+          {ctaEyebrow}
         </span>
         <h3
           style={{
@@ -222,7 +319,8 @@ export function AnlagestrategienDetail({
             color: C.dark,
           }}
         >
-          Reden wir über <em style={{ fontStyle: "italic", fontWeight: 400 }}>Ihre</em> Strategie.
+          {ctaPrefix} <em style={{ fontStyle: "italic", fontWeight: 400 }}>{ctaItalic}</em>{" "}
+          {ctaSuffix}
         </h3>
         <p
           style={{
@@ -234,8 +332,7 @@ export function AnlagestrategienDetail({
             margin: 0,
           }}
         >
-          Jede Strategie beginnt mit einer Frage: Was wollen Sie erreichen? Lassen Sie uns die
-          Antwort zusammen finden.
+          {ctaDescription}
         </p>
         <CtaButton
           href="/#contact"
@@ -244,7 +341,7 @@ export function AnlagestrategienDetail({
             onContactClick();
           }}
         >
-          Gespräch vereinbaren
+          {ctaButtonLabel}
         </CtaButton>
       </div>
 
@@ -272,7 +369,7 @@ export function AnlagestrategienDetail({
             textAlign: "center",
           }}
         >
-          Tellian Capital AG &mdash; Est. 1996 &mdash; Zürich
+          {footerTagline}
         </span>
       </div>
     </div>

@@ -306,21 +306,29 @@ function AnlagestrategienMobileOverlay({
   isOpen,
   onClose,
   onContactClick,
+  homepage,
+  detailEyebrow,
+  detailHeadingLine1,
+  detailHeadingLine2,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onContactClick: () => void;
+  homepage?: any;
+  detailEyebrow: string;
+  detailHeadingLine1: string;
+  detailHeadingLine2: string;
 }) {
   return (
     <SubpageOverlay
       isOpen={isOpen}
       onClose={onClose}
-      eyebrow="Anlagestrategien"
+      eyebrow={detailEyebrow}
       headline={
         <>
-          Zwei Perspektiven,
+          {detailHeadingLine1}
           <br />
-          <em style={{ fontStyle: "italic", fontWeight: 400 }}>ein Portfolio.</em>
+          <em style={{ fontStyle: "italic", fontWeight: 400 }}>{detailHeadingLine2}</em>
         </>
       }
     >
@@ -329,6 +337,7 @@ function AnlagestrategienMobileOverlay({
         isDetail={isOpen}
         reducedMotion={true}
         onContactClick={onContactClick}
+        homepage={homepage}
       />
     </SubpageOverlay>
   );
@@ -898,6 +907,9 @@ function Section4Anlagestrategien({
   const headingLine1 = t(homepage?.strategyHeadingLine1, "Zwei Perspektiven.");
   const headingLine2 = t(homepage?.strategyHeadingLine2, "Ein Portfolio.");
   const ctaLabel = t(homepage?.strategyCtaLabel, "Mehr zu den Strategien");
+  const detailEyebrow = t(homepage?.strategyDetailEyebrow, "Anlagestrategien");
+  const detailHeadingLine1 = t(homepage?.strategyDetailHeadingLine1, "Zwei Perspektiven,");
+  const detailHeadingLine2 = t(homepage?.strategyDetailHeadingLine2, "ein Portfolio.");
 
   if (isVertical) {
     return (
@@ -975,6 +987,10 @@ function Section4Anlagestrategien({
           isOpen={isDetail}
           onClose={() => onCloseDetail?.()}
           onContactClick={() => onContactClick?.()}
+          homepage={homepage}
+          detailEyebrow={detailEyebrow}
+          detailHeadingLine1={detailHeadingLine1}
+          detailHeadingLine2={detailHeadingLine2}
         />
       </section>
     );
@@ -1141,6 +1157,7 @@ function Section4Anlagestrategien({
             isDetail={isDetail}
             reducedMotion={false}
             onContactClick={onContactClick || (() => {})}
+            homepage={homepage}
           />
         </div>
       </div>,
@@ -1226,6 +1243,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           onNavigate={() => {}}
           introComplete={introComplete}
           breakpoint={breakpoint}
+          homepage={homepage}
         />
 
         <main>
@@ -1280,7 +1298,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           onSupportClick={navigateToContact}
         />
 
-        <LegalPage activePath={legal.activePath} onClose={legal.close} />
+        <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
       </div>
     );
   }
@@ -1295,6 +1313,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
         onNavigate={scrollTo}
         introComplete={introComplete}
         breakpoint={breakpoint}
+        homepage={homepage}
       />
 
       <DotNavigation scrollProgress={scrollProgress} onNavigate={scrollTo} />
@@ -1538,7 +1557,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
         onSupportClick={navigateToContact}
       />
 
-      <LegalPage activePath={legal.activePath} onClose={legal.close} />
+      <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
     </div>
   );
 }
