@@ -580,9 +580,11 @@ interface Section6Props {
 function LegalLinksRow({
   onOpenLegal,
   align = "left",
+  labels,
 }: {
   onOpenLegal?: (path: LegalPath) => void;
   align?: "left" | "center";
+  labels?: Record<LegalPath, string>;
 }) {
   return (
     <div
@@ -635,7 +637,7 @@ function LegalLinksRow({
             onFocus={(e) => (e.currentTarget.style.color = C.textPrimary)}
             onBlur={(e) => (e.currentTarget.style.color = C.textTertiary)}
           >
-            {LEGAL_LINK_LABELS[path]}
+            {labels?.[path] || LEGAL_LINK_LABELS[path]}
           </a>
         </span>
       ))}
@@ -707,7 +709,13 @@ function MapLinkMobile({
 }
 
 /* ─── Mobile-only: vertical stacked legal links, each with its own accent-line ─── */
-function LegalLinksStackedMobile({ onOpenLegal }: { onOpenLegal?: (path: LegalPath) => void }) {
+function LegalLinksStackedMobile({
+  onOpenLegal,
+  labels,
+}: {
+  onOpenLegal?: (path: LegalPath) => void;
+  labels?: Record<LegalPath, string>;
+}) {
   return (
     <div
       style={{
@@ -722,7 +730,7 @@ function LegalLinksStackedMobile({ onOpenLegal }: { onOpenLegal?: (path: LegalPa
         <LegalLinkMobileRow
           key={path}
           path={path}
-          label={LEGAL_LINK_LABELS[path]}
+          label={labels?.[path] || LEGAL_LINK_LABELS[path]}
           onOpenLegal={onOpenLegal}
         />
       ))}
@@ -850,6 +858,15 @@ export function Section6Kontakt({
     responseTime: content.formResponseTime,
     thanksTitle: content.formThanksTitle,
     thanksBody: content.formThanksBody,
+  };
+
+  /* Legal-link labels — sourced from the full homepage doc (`initialData`),
+     since the live `data` returned by useLiveQuery is the contact subset only. */
+  const legalSource: any = initialData ?? cms;
+  const legalLabels: Record<LegalPath, string> = {
+    "/impressum": t(legalSource?.legalImpressumLinkLabel, "Impressum"),
+    "/datenschutz": t(legalSource?.legalDatenschutzLinkLabel, "Datenschutz"),
+    "/kundeninformation": t(legalSource?.legalKundeninformationLinkLabel, "Kundeninformation"),
   };
 
   /* ═══ VERTICAL MODE (mobile + tablet) — stacked, no card-in-card ═══ */
@@ -1031,7 +1048,7 @@ export function Section6Kontakt({
         </div>
 
         {/* Legal links — vertical stack, separated from address block by top border */}
-        <LegalLinksStackedMobile onOpenLegal={onOpenLegal} />
+        <LegalLinksStackedMobile onOpenLegal={onOpenLegal} labels={legalLabels} />
 
         {/* Footer */}
         <div
@@ -1223,7 +1240,7 @@ export function Section6Kontakt({
           </div>
 
           {/* Legal links — below contact row */}
-          <LegalLinksRow onOpenLegal={onOpenLegal} />
+          <LegalLinksRow onOpenLegal={onOpenLegal} labels={legalLabels} />
         </div>
       </div>
 
