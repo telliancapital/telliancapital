@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import React from "react";
 import type { Breakpoint } from "./useBreakpoint";
 import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ─── Typography ─── */
 const serif = "var(--font-cormorant), serif";
@@ -120,6 +121,7 @@ interface NavigationProps {
   breakpoint: Breakpoint;
   isVertical: boolean;
   onLoginClick: () => void;
+  homepage?: any;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -135,10 +137,11 @@ export function Navigation({
   breakpoint,
   isVertical,
   onLoginClick,
+  homepage,
 }: NavigationProps) {
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(true);
-  const { lang: ctxLang, setLang: setCtxLang } = useLanguage();
+  const { lang: ctxLang, setLang: setCtxLang, t } = useLanguage();
   const lang: "DE" | "EN" = ctxLang === "en" ? "EN" : "DE";
   const setLang = (l: "DE" | "EN") => setCtxLang(l === "EN" ? "en" : "de");
   const [loginHover, setLoginHover] = useState(false);
@@ -146,6 +149,26 @@ export function Navigation({
   const [liHover, setLiHover] = useState(false);
   const activeIndex = getActiveIndex(scrollProgress);
   const hideTimer = useRef<number>(0);
+
+  /* ── CMS-driven nav copy with fallback to the original German ──
+        Scroll progress + section IDs stay in code (they're structural).
+        Only labels/sub-labels and brand/portal copy are editable. */
+  type CmsNavItem = { label?: LocaleValue; sub?: LocaleValue };
+  const cmsItems: CmsNavItem[] = (homepage?.navItems ?? []).slice(0, NAV_ITEMS.length);
+  const navItems = NAV_ITEMS.map((fb, i) => {
+    const cms = cmsItems[i];
+    return {
+      num: fb.num,
+      progress: fb.progress,
+      label: t(cms?.label, fb.label),
+      sub: t(cms?.sub, fb.sub),
+    };
+  });
+  const brandPrimary = t(homepage?.navBrandPrimary, "TELLIAN");
+  const brandSecondary = t(homepage?.navBrandSecondary, "CAPITAL");
+  const loginLabel = t(homepage?.navLoginButtonLabel, "Login");
+  const kundenportalLabel = t(homepage?.navKundenportalLabel, "Kundenportal");
+  const kundenportalCaption = t(homepage?.navKundenportalCaption, "Zugang für bestehende Kunden");
 
   /* Show / hide bar based on scroll direction */
   useEffect(() => {
@@ -246,8 +269,11 @@ export function Navigation({
                 userSelect: "none",
               }}
             >
-              TELLIAN
-              <span style={{ fontWeight: 400 }}>{"\u00A0"}CAPITAL</span>
+              {brandPrimary}
+              <span style={{ fontWeight: 400 }}>
+                {"\u00A0"}
+                {brandSecondary}
+              </span>
             </span>
           </button>
 
@@ -334,7 +360,11 @@ export function Navigation({
                     userSelect: "none",
                   }}
                 >
-                  TELLIAN<span style={{ fontWeight: 400 }}>{"\u00A0"}CAPITAL</span>
+                  {brandPrimary}
+                  <span style={{ fontWeight: 400 }}>
+                    {"\u00A0"}
+                    {brandSecondary}
+                  </span>
                 </span>
                 <button
                   onClick={() => setExpanded(false)}
@@ -390,7 +420,7 @@ export function Navigation({
                     gap: breakpoint === "mobile" ? 24 : 28,
                   }}
                 >
-                  {NAV_ITEMS.map((item, i) => {
+                  {navItems.map((item, i) => {
                     const isActive = activeIndex === i;
                     return (
                       <motion.button
@@ -527,7 +557,7 @@ export function Navigation({
                     }}
                   >
                     <LockIcon size={14} color="#F2F1EC" strokeWidth={1.5} />
-                    Login
+                    {loginLabel}
                   </button>
                 </div>
               </div>
@@ -583,7 +613,7 @@ export function Navigation({
               userSelect: "none",
             }}
           >
-            TELLIAN
+            {brandPrimary}
           </span>
         </button>
 
@@ -696,7 +726,7 @@ export function Navigation({
                 userSelect: "none",
               }}
             >
-              Login
+              {loginLabel}
             </span>
           </button>
         </div>
@@ -771,9 +801,9 @@ export function Navigation({
                       userSelect: "none",
                     }}
                   >
-                    <span style={{ fontWeight: 700 }}>TELLIAN</span>
+                    <span style={{ fontWeight: 700 }}>{brandPrimary}</span>
                     {"\u00A0"}
-                    <span style={{ fontWeight: 400 }}>CAPITAL</span>
+                    <span style={{ fontWeight: 400 }}>{brandSecondary}</span>
                   </span>
                 </button>
 
@@ -818,7 +848,7 @@ export function Navigation({
               {/* Nav items */}
               <nav style={{ flex: 1, overflowY: "auto", padding: "0 28px" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                  {NAV_ITEMS.map((item, i) => {
+                  {navItems.map((item, i) => {
                     const isActive = activeIndex === i;
                     return (
                       <motion.button
@@ -997,7 +1027,7 @@ export function Navigation({
                       }}
                     >
                       <LockIcon size={14} color="#F2F1EC" strokeWidth={1.5} />
-                      Kundenportal
+                      {kundenportalLabel}
                     </button>
                     <span
                       style={{
@@ -1009,7 +1039,7 @@ export function Navigation({
                         userSelect: "none",
                       }}
                     >
-                      Zugang für bestehende Kunden
+                      {kundenportalCaption}
                     </span>
                   </div>
                 </div>
