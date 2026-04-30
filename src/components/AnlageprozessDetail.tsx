@@ -1,8 +1,12 @@
-import { ANLAGEPROZESS_STEPS } from "../data/anlageprozessSteps";
+"use client";
+
+import { ANLAGEPROZESS_STEPS, type AnlageprozessStep } from "../data/anlageprozessSteps";
 import { CtaButton } from "./CtaButton";
 import { FaqAccordion, type FaqItem } from "./FaqAccordion";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
-const VERMOEGENSVERWALTUNG_FAQ: readonly FaqItem[] = [
+const FALLBACK_FAQ: readonly FaqItem[] = [
   {
     question: "Wie funktioniert die Vermögensverwaltung auf Mandatsbasis?",
     answer:
@@ -37,6 +41,7 @@ interface AnlageprozessDetailProps {
   isMobile: boolean;
   /** Called when the user clicks the "Gespräch vereinbaren" CTA — should close detail mode. */
   onContactClick: () => void;
+  homepage?: any;
 }
 
 /**
@@ -46,7 +51,96 @@ interface AnlageprozessDetailProps {
  * Does NOT include: header-bar, back-link, stepper (those live in the
  * overlay shell so the steps can share DOM with Section3Timeline).
  */
-export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessDetailProps) {
+export function AnlageprozessDetail({
+  isMobile,
+  onContactClick,
+  homepage,
+}: AnlageprozessDetailProps) {
+  const { t } = useLanguage();
+
+  /* ── Build the per-step detail content from `methodDetailSteps[]`.
+        Each missing field is filled from the bundled `ANLAGEPROZESS_STEPS`
+        at the same index, so a partial CMS entry still renders cleanly. ── */
+  type CmsDetailStep = {
+    shortLabel?: LocaleValue;
+    eyebrow?: LocaleValue;
+    headline?: LocaleValue;
+    subline?: LocaleValue;
+    body?: LocaleValue[];
+    bullets?: LocaleValue[];
+    closing?: LocaleValue;
+  };
+
+  type RenderStep = {
+    num: string;
+    detailEyebrow: string;
+    detailHeadline: string;
+    detailSubline: string;
+    detailBody: string[];
+    detailBullets: string[];
+    detailClosing?: string;
+  };
+
+  const cmsSteps: CmsDetailStep[] = (homepage?.methodDetailSteps ?? []).slice(0, 5);
+  const STEPS: RenderStep[] = cmsSteps.map((s: CmsDetailStep, i: number): RenderStep => {
+    const fb: AnlageprozessStep | undefined = ANLAGEPROZESS_STEPS[i];
+    const num = String(i + 1).padStart(2, "0");
+    const arrToStrings = (arr: LocaleValue[] | undefined, fallback: string[]) => {
+      const cms = (arr ?? []).map((v) => t(v, "")).filter((s) => s.length > 0);
+      return cms.length > 0 ? cms : fallback;
+    };
+    return {
+      num,
+      detailEyebrow: t(s.eyebrow, fb?.detailEyebrow ?? `Schritt ${num}`),
+      detailHeadline: t(s.headline, fb?.detailHeadline ?? ""),
+      detailSubline: t(s.subline, fb?.detailSubline ?? ""),
+      detailBody: arrToStrings(s.body, fb?.detailBody ?? []),
+      detailBullets: arrToStrings(s.bullets, fb?.detailBullets ?? []),
+      detailClosing: t(s.closing, fb?.detailClosing ?? "") || undefined,
+    };
+  });
+
+  /* If the CMS has no detail steps at all, render the original 5 hardcoded
+     ones so the page never appears empty. */
+  const RENDER_STEPS: RenderStep[] =
+    STEPS.length > 0
+      ? STEPS
+      : ANLAGEPROZESS_STEPS.map((fb) => ({
+          num: fb.num,
+          detailEyebrow: fb.detailEyebrow,
+          detailHeadline: fb.detailHeadline,
+          detailSubline: fb.detailSubline,
+          detailBody: fb.detailBody,
+          detailBullets: fb.detailBullets,
+          detailClosing: fb.detailClosing,
+        }));
+
+  /* ── FAQ items ── */
+  type CmsFaq = { question?: LocaleValue; answer?: LocaleValue };
+  const cmsFaq: FaqItem[] = (homepage?.methodFaqItems ?? [])
+    .map((f: CmsFaq): FaqItem | null => {
+      const question = t(f?.question, "");
+      const answer = t(f?.answer, "");
+      if (!question && !answer) return null;
+      return { question, answer };
+    })
+    .filter((f: FaqItem | null): f is FaqItem => f !== null);
+  const FAQ_ITEMS: readonly FaqItem[] = cmsFaq.length > 0 ? cmsFaq : FALLBACK_FAQ;
+
+  /* ── Final CTA + footer ── */
+  const ctaEyebrow = t(homepage?.methodDetailCtaEyebrow, "Nächster Schritt");
+  const ctaHeading1 = t(homepage?.methodDetailCtaHeadingLine1, "Ein Gespräch ist");
+  const ctaHeading2 = t(homepage?.methodDetailCtaHeadingLine2, "der Anfang.");
+  const ctaDescription = t(
+    homepage?.methodDetailCtaDescription,
+    "Wenn Sie unseren Prozess bis hierher verfolgt haben — sprechen wir über Ihren. Ein erstes Gespräch ist unverbindlich, persönlich und vertraulich.",
+  );
+  const ctaButtonLabel = t(homepage?.methodDetailCtaButtonLabel, "Gespräch vereinbaren");
+  const footerTagline = t(
+    homepage?.methodDetailFooterTagline,
+    "Tellian Capital AG — Est. 1996 — Zürich",
+  );
+
   return (
     <div
       style={{
@@ -57,7 +151,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
         color: C.dark,
       }}
     >
-      {ANLAGEPROZESS_STEPS.map((step, i) => (
+      {RENDER_STEPS.map((step, i) => (
         <section
           key={step.num}
           style={{
@@ -178,7 +272,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
           paddingBottom: isMobile ? "8px" : "16px",
         }}
       >
-        <FaqAccordion items={VERMOEGENSVERWALTUNG_FAQ} schemaId="vermoegensverwaltung" />
+        <FaqAccordion items={FAQ_ITEMS} schemaId="vermoegensverwaltung" />
       </div>
 
       {/* ═══ Final CTA ═══ */}
@@ -201,7 +295,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
             color: C.stone,
           }}
         >
-          Nächster Schritt
+          {ctaEyebrow}
         </span>
         <h3
           style={{
@@ -214,7 +308,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
             color: C.dark,
           }}
         >
-          Ein Gespräch ist <em style={{ fontStyle: "italic", fontWeight: 400 }}>der Anfang.</em>
+          {ctaHeading1} <em style={{ fontStyle: "italic", fontWeight: 400 }}>{ctaHeading2}</em>
         </h3>
         <p
           style={{
@@ -226,8 +320,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
             margin: 0,
           }}
         >
-          Wenn Sie unseren Prozess bis hierher verfolgt haben — sprechen wir über Ihren. Ein erstes
-          Gespräch ist unverbindlich, persönlich und vertraulich.
+          {ctaDescription}
         </p>
         <CtaButton
           href="/#contact"
@@ -236,7 +329,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
             onContactClick();
           }}
         >
-          Gespräch vereinbaren
+          {ctaButtonLabel}
         </CtaButton>
       </div>
 
@@ -264,7 +357,7 @@ export function AnlageprozessDetail({ isMobile, onContactClick }: AnlageprozessD
             textAlign: "center",
           }}
         >
-          Tellian Capital AG &mdash; Est. 1996 &mdash; Zürich
+          {footerTagline}
         </span>
       </div>
     </div>

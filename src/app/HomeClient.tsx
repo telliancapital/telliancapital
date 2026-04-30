@@ -271,25 +271,33 @@ function VermoegensverwaltungMobileOverlay({
   isOpen,
   onClose,
   onContactClick,
+  homepage,
+  detailEyebrow,
+  detailHeadingLine1,
+  detailHeadingLine2,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onContactClick: () => void;
+  homepage?: any;
+  detailEyebrow: string;
+  detailHeadingLine1: string;
+  detailHeadingLine2: string;
 }) {
   return (
     <SubpageOverlay
       isOpen={isOpen}
       onClose={onClose}
-      eyebrow="Anlageprozess"
+      eyebrow={detailEyebrow}
       headline={
         <>
-          Die Methode hinter
+          {detailHeadingLine1}
           <br />
-          <em style={{ fontStyle: "italic", fontWeight: 400 }}>jedem Entscheid.</em>
+          <em style={{ fontStyle: "italic", fontWeight: 400 }}>{detailHeadingLine2}</em>
         </>
       }
     >
-      <AnlageprozessDetail isMobile={true} onContactClick={onContactClick} />
+      <AnlageprozessDetail isMobile={true} onContactClick={onContactClick} homepage={homepage} />
     </SubpageOverlay>
   );
 }
@@ -400,6 +408,24 @@ function Section3Vermoegensverwaltung({
   const detailHeadingLine1 = t(homepage?.methodDetailHeadingLine1, "Die Methode hinter");
   const detailHeadingLine2 = t(homepage?.methodDetailHeadingLine2, "jedem Entscheid.");
 
+  /* Horizontal stepper at the top of the detail overlay.
+     Prefer the localized `shortLabel` from `methodDetailSteps[]`; fall back
+     to the bundled ANLAGEPROZESS_STEPS entry per index. */
+  type CmsStepperEntry = { shortLabel?: LocaleValue; headline?: LocaleValue };
+  const cmsStepperSteps: CmsStepperEntry[] = (homepage?.methodDetailSteps ?? []).slice(0, 5);
+  const stepperItems: { num: string; shortLabel: string }[] =
+    cmsStepperSteps.length > 0
+      ? cmsStepperSteps.map((s, i) => {
+          const fallback = ANLAGEPROZESS_STEPS[i];
+          const cmsLabel = t(s.shortLabel, "");
+          const cmsHeadline = t(s.headline, "");
+          return {
+            num: String(i + 1).padStart(2, "0"),
+            shortLabel: cmsLabel || fallback?.shortLabel || cmsHeadline || "",
+          };
+        })
+      : ANLAGEPROZESS_STEPS.map((s) => ({ num: s.num, shortLabel: s.shortLabel }));
+
   if (isVertical) {
     return (
       <section id="section-vermoegensverwaltung" style={{ backgroundColor: C.bg }}>
@@ -480,13 +506,17 @@ function Section3Vermoegensverwaltung({
             position: "relative",
           }}
         >
-          <Section3Timeline scrollX={0} isVertical />
+          <Section3Timeline scrollX={0} isVertical homepage={homepage} />
         </div>
         {/* Detail overlay for mobile/tablet — plain fade (no FLIP) */}
         <VermoegensverwaltungMobileOverlay
           isOpen={isDetail}
           onClose={() => onCloseDetail?.()}
           onContactClick={() => onContactClick?.()}
+          homepage={homepage}
+          detailEyebrow={detailEyebrow}
+          detailHeadingLine1={detailHeadingLine1}
+          detailHeadingLine2={detailHeadingLine2}
         />
       </section>
     );
@@ -498,7 +528,7 @@ function Section3Vermoegensverwaltung({
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
     >
-      <Section3Timeline scrollX={scrollX} isDetailMode={isDetail} />
+      <Section3Timeline scrollX={scrollX} isDetailMode={isDetail} homepage={homepage} />
 
       <div
         className="relative z-10 flex h-full flex-col"
@@ -718,7 +748,7 @@ function Section3Vermoegensverwaltung({
               margin: "0 auto",
             }}
           >
-            {ANLAGEPROZESS_STEPS.map((step, i) => (
+            {stepperItems.map((step, i) => (
               <div
                 key={step.num}
                 style={{
@@ -766,7 +796,7 @@ function Section3Vermoegensverwaltung({
                   </span>
                 </div>
 
-                {i < ANLAGEPROZESS_STEPS.length - 1 && (
+                {i < stepperItems.length - 1 && (
                   <div
                     aria-hidden
                     style={{
@@ -793,7 +823,11 @@ function Section3Vermoegensverwaltung({
             transition: `opacity 500ms ease-out ${isDetail ? "900ms" : "0ms"}, transform 500ms ${EASE} ${isDetail ? "900ms" : "0ms"}`,
           }}
         >
-          <AnlageprozessDetail isMobile={false} onContactClick={handleContactClick} />
+          <AnlageprozessDetail
+            isMobile={false}
+            onContactClick={handleContactClick}
+            homepage={homepage}
+          />
         </div>
       </div>,
       document.body,
@@ -934,7 +968,7 @@ function Section4Anlagestrategien({
         </div>
 
         <div style={{ width: "100%", padding: "0 16px 64px" }}>
-          <Section4TopDownBottomUp scrollX={0} isVertical />
+          <Section4TopDownBottomUp scrollX={0} isVertical homepage={homepage} />
         </div>
 
         <AnlagestrategienMobileOverlay
@@ -951,7 +985,7 @@ function Section4Anlagestrategien({
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
     >
-      <Section4TopDownBottomUp scrollX={scrollX} isDetailMode={isDetail} />
+      <Section4TopDownBottomUp scrollX={scrollX} isDetailMode={isDetail} homepage={homepage} />
 
       <div
         className="relative z-10 flex h-full flex-col"
@@ -1141,6 +1175,9 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const heroLine2 = t(homepage?.startHeadingLine2, "mit Methode");
   const heroCta = t(homepage?.startCtaLabel, "Gespräch vereinbaren");
   const heroBottomLabel = t(homepage?.startBottomLabel, "FINMA-LIZENZIERT · ZÜRICH");
+  // Hero image: prefer uploaded asset, then external URL, then bundled fallback.
+  const heroImageSrc: string =
+    homepage?.startImageAsset?.url || homepage?.startImageUrl || IMG.hero.src;
 
   const { scrollX, scrollProgress, scrollDirection, containerRef, scrollTo } = useHorizontalScroll({
     disabled: isVertical || !introComplete,
@@ -1193,7 +1230,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
 
         <main>
           <HeroVertical
-            imageSrc={IMG.hero.src}
+            imageSrc={heroImageSrc}
             introComplete={introComplete}
             breakpoint={breakpoint}
             onCtaClick={navigateToContact}
@@ -1281,7 +1318,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
             className="absolute z-0"
             style={{ top: 0, bottom: 0, left: layout.imageLeft, right: 0 }}
           >
-            <HeroExpandingImage src={IMG.hero.src} scrollX={scrollX} className="h-full w-full" />
+            <HeroExpandingImage src={heroImageSrc} scrollX={scrollX} className="h-full w-full" />
           </div>
 
           <div

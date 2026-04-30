@@ -4,6 +4,8 @@ import { CtaButton } from "./CtaButton";
 import { ScrollFade } from "./ScrollAnimations";
 import { ExpandableBody } from "./ExpandableBody";
 import type { Breakpoint } from "./useBreakpoint";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ═══════════════════════════════════════════════════════════
    SECTION 5 — ÜBER TELLIAN CAPITAL
@@ -34,7 +36,7 @@ interface TeamMember {
   img: string;
 }
 
-const TEAM: TeamMember[] = [
+const FALLBACK_TEAM: TeamMember[] = [
   {
     name: "Dr. Thomas Keller",
     role: "Geschäftsleitung & Gründer",
@@ -85,7 +87,7 @@ const TEAM: TeamMember[] = [
   },
 ];
 
-const BODY = [
+const FALLBACK_BODY = [
   "Tellian Capital ist eine unabhängige Vermögensverwaltung mit Sitz in Zürich und einem Standort in Balzers, Liechtenstein. Die Firma ist FINMA-lizenziert und verwaltet Vermögen für private und institutionelle Anleger auf Mandatsbasis.",
   "Das Team ist bewusst klein. Jeder Kunde hat einen persönlichen Relationship Manager, der sein Portfolio kennt und seine Anlageziele versteht. Die Entscheidungswege sind kurz. Wer bei Tellian Capital anruft, erreicht die Menschen, die sein Vermögen verwalten.",
   "Die Firma wurde 1996 gegründet — als eine der ersten Schweizer Vermögensverwaltungen mit einem quantitativen Investmentansatz. Damals war datengestützte Analyse in der Branche kaum verbreitet. Tellian Capital hat diesen Ansatz über fast drei Jahrzehnte weiterentwickelt, durch Marktkrisen hindurch und über mehrere regulatorische Umbrüche hinweg.",
@@ -299,16 +301,53 @@ export function Section5UeberTellian({
   scrollX,
   isVertical = false,
   breakpoint = "desktop",
+  homepage,
 }: {
   scrollX?: number;
   isVertical?: boolean;
   breakpoint?: Breakpoint;
+  homepage?: any;
 }) {
   // scrollX is kept as optional prop for API compatibility but unused
   void scrollX;
 
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
+  const { t } = useLanguage();
+
+  /* ── Localized headline copy ── */
+  const eyebrow = t(homepage?.teamEyebrow, "Über Tellian Capital");
+  const headingLine1 = t(homepage?.teamHeadingLine1, "Wer hinter den");
+  const headingLine2 = t(homepage?.teamHeadingLine2, "Entscheiden steht");
+  const ctaLabel = t(homepage?.teamCtaLabel, "Gespräch vereinbaren");
+
+  /* ── Body paragraphs from CMS, fallback to original German ── */
+  const cmsParagraphs: string[] = (homepage?.teamParagraphs ?? [])
+    .map((p: LocaleValue) => t(p, ""))
+    .filter((p: string) => p.length > 0);
+  const BODY = cmsParagraphs.length > 0 ? cmsParagraphs : FALLBACK_BODY;
+
+  /* ── Team members from CMS (each name, role, photo); else fallback ── */
+  type CmsTeamMember = {
+    name?: string;
+    role?: LocaleValue;
+    bio?: LocaleValue;
+    imageAsset?: { url?: string };
+    imageUrl?: string;
+  };
+  const cmsTeam: TeamMember[] = (homepage?.teamMembers ?? [])
+    .map((m: CmsTeamMember): TeamMember | null => {
+      const name = m?.name?.trim();
+      if (!name) return null;
+      return {
+        name,
+        role: t(m.role, ""),
+        bio: t(m.bio, ""),
+        img: m.imageAsset?.url || m.imageUrl || "",
+      };
+    })
+    .filter((m: TeamMember | null): m is TeamMember => m !== null);
+  const TEAM: TeamMember[] = cmsTeam.length > 0 ? cmsTeam : FALLBACK_TEAM;
 
   /* ═══ VERTICAL MODE ═══ */
   if (isVertical) {
@@ -326,7 +365,7 @@ export function Section5UeberTellian({
                 textTransform: "uppercase",
               }}
             >
-              Über Tellian Capital
+              {eyebrow}
             </span>
 
             <div
@@ -351,9 +390,9 @@ export function Section5UeberTellian({
                 marginTop: SPACING.accentToHeadline,
               }}
             >
-              Wer hinter den
+              {headingLine1}
               <br />
-              <em>Entscheiden steht</em>
+              <em>{headingLine2}</em>
             </h2>
           </ScrollFade>
 
@@ -372,7 +411,7 @@ export function Section5UeberTellian({
 
           <ScrollFade scrollX={0} isVertical yOffset={16}>
             <div style={{ marginTop: SPACING.bodyToCta }}>
-              <CtaButton href="#contact">Gespräch vereinbaren</CtaButton>
+              <CtaButton href="#contact">{ctaLabel}</CtaButton>
             </div>
           </ScrollFade>
         </div>
@@ -446,7 +485,7 @@ export function Section5UeberTellian({
           }}
           className="uppercase"
         >
-          Über Tellian Capital
+          {eyebrow}
         </span>
 
         <div
@@ -468,9 +507,9 @@ export function Section5UeberTellian({
             marginTop: SPACING.accentToHeadline,
           }}
         >
-          Wer hinter den
+          {headingLine1}
           <br />
-          <em>Entscheiden steht</em>
+          <em>{headingLine2}</em>
         </h2>
 
         <div
@@ -501,7 +540,7 @@ export function Section5UeberTellian({
         </div>
 
         <div style={{ marginTop: SPACING.bodyToCta, flexShrink: 0 }}>
-          <CtaButton href="#contact">Gespräch vereinbaren</CtaButton>
+          <CtaButton href="#contact">{ctaLabel}</CtaButton>
         </div>
       </div>
 
