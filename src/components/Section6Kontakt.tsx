@@ -9,6 +9,7 @@ import { LEGAL_PATHS, LEGAL_LINK_LABELS, type LegalPath } from "../data/legalPag
 import { client } from "@/sanity/lib/client";
 import { CONTACT_QUERY } from "@/sanity/lib/queries";
 import { useLiveQuery } from "@sanity/preview-kit";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 /* ─── Design tokens ─── */
 const C = {
@@ -181,9 +182,10 @@ interface MapOverlayProps {
   onClose: () => void;
   /** Element to return focus to after close */
   returnFocusRef: React.RefObject<HTMLButtonElement | null>;
+  address: string;
 }
 
-function MapOverlay({ open, onClose, returnFocusRef }: MapOverlayProps) {
+function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverlayProps) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const isAnimatingRef = useRef(false);
   const [rendered, setRendered] = useState(open);
@@ -353,7 +355,7 @@ function MapOverlay({ open, onClose, returnFocusRef }: MapOverlayProps) {
               color: "rgba(255, 255, 255, 0.45)",
             }}
           >
-            Löwenstrasse 1, 8001 Zürich
+            {address}
           </span>
         </div>
       </div>
@@ -365,7 +367,19 @@ function MapOverlay({ open, onClose, returnFocusRef }: MapOverlayProps) {
 /* ═══════════════════════════════════════════════════════════
    CONTACT FORM (Card content)
    ═══════════════════════════════════════════════════════════ */
-function ContactForm({ stack = false }: { stack?: boolean } = {}) {
+interface ContactFormLabels {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+  submit: string;
+  responseTime: string;
+  thanksTitle: string;
+  thanksBody: string;
+}
+
+function ContactForm({ stack = false, labels }: { stack?: boolean; labels: ContactFormLabels }) {
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
@@ -407,7 +421,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
             lineHeight: 1.15,
           }}
         >
-          Vielen Dank.
+          {labels.thanksTitle}
         </span>
         <span
           style={{
@@ -419,7 +433,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
             lineHeight: 1.6,
           }}
         >
-          Wir melden uns innerhalb von 24 Stunden.
+          {labels.thanksBody}
         </span>
       </div>
     );
@@ -436,7 +450,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
       <div style={pairStyle}>
         <input
           type="text"
-          placeholder="Vorname"
+          placeholder={labels.firstName}
           required
           value={form.firstName}
           onChange={(e) => setForm({ ...form, firstName: e.target.value })}
@@ -445,7 +459,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
         />
         <input
           type="text"
-          placeholder="Nachname"
+          placeholder={labels.lastName}
           required
           value={form.lastName}
           onChange={(e) => setForm({ ...form, lastName: e.target.value })}
@@ -456,7 +470,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
       <div style={pairStyle}>
         <input
           type="email"
-          placeholder="E-Mail"
+          placeholder={labels.email}
           required
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -465,7 +479,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
         />
         <input
           type="tel"
-          placeholder="Telefon"
+          placeholder={labels.phone}
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           style={fieldStyle}
@@ -473,7 +487,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
         />
       </div>
       <textarea
-        placeholder="Nachricht"
+        placeholder={labels.message}
         required
         value={form.message}
         onChange={(e) => setForm({ ...form, message: e.target.value })}
@@ -503,7 +517,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
             }}
             className="hover:bg-[#3A3835]"
           >
-            Anfrage senden →
+            {labels.submit}
           </button>
           <span
             style={{
@@ -515,7 +529,7 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
               marginTop: "10px",
             }}
           >
-            Antwort innert 24h
+            {labels.responseTime}
           </span>
         </div>
       ) : (
@@ -538,10 +552,10 @@ function ContactForm({ stack = false }: { stack?: boolean } = {}) {
             }}
             className="hover:bg-[#3A3835]"
           >
-            Anfrage senden →
+            {labels.submit}
           </button>
           <span style={{ fontFamily: sans, fontSize: "10px", color: C.textTertiary }}>
-            Antwort innert 24h
+            {labels.responseTime}
           </span>
         </div>
       )}
@@ -566,9 +580,11 @@ interface Section6Props {
 function LegalLinksRow({
   onOpenLegal,
   align = "left",
+  labels,
 }: {
   onOpenLegal?: (path: LegalPath) => void;
   align?: "left" | "center";
+  labels?: Record<LegalPath, string>;
 }) {
   return (
     <div
@@ -621,7 +637,7 @@ function LegalLinksRow({
             onFocus={(e) => (e.currentTarget.style.color = C.textPrimary)}
             onBlur={(e) => (e.currentTarget.style.color = C.textTertiary)}
           >
-            {LEGAL_LINK_LABELS[path]}
+            {labels?.[path] || LEGAL_LINK_LABELS[path]}
           </a>
         </span>
       ))}
@@ -634,10 +650,12 @@ function MapLinkMobile({
   onClick,
   ariaExpanded,
   buttonRef,
+  label,
 }: {
   onClick: () => void;
   ariaExpanded: boolean;
   buttonRef: React.RefObject<HTMLButtonElement | null>;
+  label: string;
 }) {
   const [hover, setHover] = useState(false);
   const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -684,14 +702,20 @@ function MapLinkMobile({
           lineHeight: 1,
         }}
       >
-        Auf Karte anzeigen
+        {label}
       </span>
     </button>
   );
 }
 
 /* ─── Mobile-only: vertical stacked legal links, each with its own accent-line ─── */
-function LegalLinksStackedMobile({ onOpenLegal }: { onOpenLegal?: (path: LegalPath) => void }) {
+function LegalLinksStackedMobile({
+  onOpenLegal,
+  labels,
+}: {
+  onOpenLegal?: (path: LegalPath) => void;
+  labels?: Record<LegalPath, string>;
+}) {
   return (
     <div
       style={{
@@ -706,7 +730,7 @@ function LegalLinksStackedMobile({ onOpenLegal }: { onOpenLegal?: (path: LegalPa
         <LegalLinkMobileRow
           key={path}
           path={path}
-          label={LEGAL_LINK_LABELS[path]}
+          label={labels?.[path] || LEGAL_LINK_LABELS[path]}
           onOpenLegal={onOpenLegal}
         />
       ))}
@@ -782,19 +806,67 @@ export function Section6Kontakt({
 }: Section6Props = {}) {
   const [mapOpen, setMapOpen] = useState(false);
   const openBtnRef = useRef<HTMLButtonElement>(null);
+  const { t } = useLanguage();
 
   // Live preview using @sanity/preview-kit
   const [data] = useLiveQuery(initialData, CONTACT_QUERY);
 
-  // Use live data if available, otherwise fallback to initialData or defaults
+  // Both `data` (live) and `initialData` (full homepage doc) use the same
+  // field names, so a single fall-through reads either source.
+  const cms: any = data ?? initialData ?? {};
+
   const content = {
-    subheading: data?.subheading || initialData?.subheading || "Kontakt",
-    heading: data?.heading || initialData?.heading || "Ein Gespräch ist der Anfang.",
-    description:
-      data?.description ||
-      initialData?.description ||
+    /* Editorial column */
+    subheading: t(cms.contactSubheading, "Kontakt"),
+    heading: t(cms.contactHeading, "Ein Gespräch ist der Anfang."),
+    description: t(
+      cms.contactDescription,
       "Wenn Sie wissen möchten, ob unsere Arbeitsweise zu Ihren Erwartungen passt, laden wir Sie zu einem unverbindlichen Erstgespräch ein. Persönlich, vertraulich, in unseren Räumen an der Löwenstrasse oder digital.",
-    formHeading: data?.formHeading || initialData?.formHeading || "Schreiben Sie uns",
+    ),
+
+    /* Form labels */
+    formHeading: t(cms.contactFormHeading, "Schreiben Sie uns"),
+    formFirstName: t(cms.contactFormFirstName, "Vorname"),
+    formLastName: t(cms.contactFormLastName, "Nachname"),
+    formEmail: t(cms.contactFormEmail, "E-Mail"),
+    formPhone: t(cms.contactFormPhone, "Telefon"),
+    formMessage: t(cms.contactFormMessage, "Nachricht"),
+    formSubmit: t(cms.contactFormSubmit, "Anfrage senden →"),
+    formResponseTime: t(cms.contactFormResponseTime, "Antwort innert 24h"),
+    formThanksTitle: t(cms.contactFormThanksTitle, "Vielen Dank."),
+    formThanksBody: t(cms.contactFormThanksBody, "Wir melden uns innerhalb von 24 Stunden."),
+
+    /* Company / address (plain string fields, no locale) */
+    companyName: cms.contactCompanyName || "Tellian Capital",
+    companyTagline: t(cms.contactCompanyTagline, "Vermögensverwaltung Zürich AG"),
+    address: cms.contactAddress || "Löwenstrasse 1, CH-8001 Zürich",
+    phone: cms.contactPhone || "+41 44 224 40 24",
+    email: cms.contactEmail || "info@telliancapital.ch",
+
+    /* Footer / overlay link */
+    mapLinkLabel: t(cms.contactMapLinkLabel, "Auf Karte anzeigen"),
+    footerTagline: t(cms.contactFooterTagline, "Tellian Capital AG — Est. 1996 — Zürich"),
+  };
+
+  const formLabels: ContactFormLabels = {
+    firstName: content.formFirstName,
+    lastName: content.formLastName,
+    email: content.formEmail,
+    phone: content.formPhone,
+    message: content.formMessage,
+    submit: content.formSubmit,
+    responseTime: content.formResponseTime,
+    thanksTitle: content.formThanksTitle,
+    thanksBody: content.formThanksBody,
+  };
+
+  /* Legal-link labels — sourced from the full homepage doc (`initialData`),
+     since the live `data` returned by useLiveQuery is the contact subset only. */
+  const legalSource: any = initialData ?? cms;
+  const legalLabels: Record<LegalPath, string> = {
+    "/impressum": t(legalSource?.legalImpressumLinkLabel, "Impressum"),
+    "/datenschutz": t(legalSource?.legalDatenschutzLinkLabel, "Datenschutz"),
+    "/kundeninformation": t(legalSource?.legalKundeninformationLinkLabel, "Kundeninformation"),
   };
 
   /* ═══ VERTICAL MODE (mobile + tablet) — stacked, no card-in-card ═══ */
@@ -885,7 +957,7 @@ export function Section6Kontakt({
           >
             {content.formHeading}
           </span>
-          <ContactForm stack />
+          <ContactForm stack labels={formLabels} />
         </div>
 
         {/* Address */}
@@ -907,7 +979,7 @@ export function Section6Kontakt({
               display: "block",
             }}
           >
-            Tellian Capital
+            {content.companyName}
           </span>
           <span
             style={{
@@ -918,7 +990,7 @@ export function Section6Kontakt({
               marginTop: "2px",
             }}
           >
-            Vermögensverwaltung Zürich AG
+            {content.companyTagline}
           </span>
           <span
             style={{
@@ -929,7 +1001,7 @@ export function Section6Kontakt({
               marginTop: "4px",
             }}
           >
-            Löwenstrasse 1, CH-8001 Zürich
+            {content.address}
           </span>
 
           {/* Map link — directly under address, part of the address block */}
@@ -937,12 +1009,13 @@ export function Section6Kontakt({
             buttonRef={openBtnRef}
             onClick={() => setMapOpen(true)}
             ariaExpanded={mapOpen}
+            label={content.mapLinkLabel}
           />
 
           {/* Tel + Mail as touch-friendly rows (44px min height) */}
           <div style={{ display: "flex", flexDirection: "column", marginTop: "8px" }}>
             <a
-              href="tel:+41442244024"
+              href={`tel:${content.phone.replace(/\s+/g, "")}`}
               style={{
                 fontFamily: sans,
                 fontSize: "13px",
@@ -954,10 +1027,10 @@ export function Section6Kontakt({
               }}
               className="transition-colors duration-300 hover:text-[#1A1916]"
             >
-              +41 44 224 40 24
+              {content.phone}
             </a>
             <a
-              href="mailto:info@telliancapital.ch"
+              href={`mailto:${content.email}`}
               style={{
                 fontFamily: sans,
                 fontSize: "13px",
@@ -969,13 +1042,13 @@ export function Section6Kontakt({
               }}
               className="transition-colors duration-300 hover:text-[#1A1916]"
             >
-              info@telliancapital.ch
+              {content.email}
             </a>
           </div>
         </div>
 
         {/* Legal links — vertical stack, separated from address block by top border */}
-        <LegalLinksStackedMobile onOpenLegal={onOpenLegal} />
+        <LegalLinksStackedMobile onOpenLegal={onOpenLegal} labels={legalLabels} />
 
         {/* Footer */}
         <div
@@ -999,12 +1072,17 @@ export function Section6Kontakt({
               textAlign: "center",
             }}
           >
-            Tellian Capital AG &mdash; Est. 1996 &mdash; Zürich
+            {content.footerTagline}
           </span>
         </div>
 
         {/* Shared overlay (portal) */}
-        <MapOverlay open={mapOpen} onClose={() => setMapOpen(false)} returnFocusRef={openBtnRef} />
+        <MapOverlay
+          open={mapOpen}
+          onClose={() => setMapOpen(false)}
+          returnFocusRef={openBtnRef}
+          address={content.address}
+        />
       </section>
     );
   }
@@ -1112,7 +1190,7 @@ export function Section6Kontakt({
               display: "block",
             }}
           >
-            Tellian Capital
+            {content.companyName}
           </span>
           <span
             style={{
@@ -1123,7 +1201,7 @@ export function Section6Kontakt({
               marginTop: "2px",
             }}
           >
-            Vermögensverwaltung Zürich AG
+            {content.companyTagline}
           </span>
           <span
             style={{
@@ -1134,7 +1212,7 @@ export function Section6Kontakt({
               marginTop: "4px",
             }}
           >
-            Löwenstrasse 1, CH-8001 Zürich
+            {content.address}
           </span>
 
           {/* Contact row */}
@@ -1146,23 +1224,23 @@ export function Section6Kontakt({
             }}
           >
             <a
-              href="tel:+41442244024"
+              href={`tel:${content.phone.replace(/\s+/g, "")}`}
               style={{ fontFamily: sans, fontSize: "11px", color: C.textSecondary }}
               className="transition-colors duration-300 hover:text-[#1A1916]"
             >
-              +41 44 224 40 24
+              {content.phone}
             </a>
             <a
-              href="mailto:info@telliancapital.ch"
+              href={`mailto:${content.email}`}
               style={{ fontFamily: sans, fontSize: "11px", color: C.textSecondary }}
               className="transition-colors duration-300 hover:text-[#1A1916]"
             >
-              info@telliancapital.ch
+              {content.email}
             </a>
           </div>
 
           {/* Legal links — below contact row */}
-          <LegalLinksRow onOpenLegal={onOpenLegal} />
+          <LegalLinksRow onOpenLegal={onOpenLegal} labels={legalLabels} />
         </div>
       </div>
 
@@ -1204,7 +1282,7 @@ export function Section6Kontakt({
           >
             {content.formHeading}
           </span>
-          <ContactForm />
+          <ContactForm labels={formLabels} />
         </div>
 
         {/* "Auf Karte anzeigen" — bottom right, triggers overlay */}
@@ -1243,12 +1321,17 @@ export function Section6Kontakt({
             }}
             aria-hidden
           />
-          Auf Karte anzeigen
+          {content.mapLinkLabel}
         </button>
       </div>
 
       {/* ═══ OVERLAY — rendered via portal to document.body ═══ */}
-      <MapOverlay open={mapOpen} onClose={() => setMapOpen(false)} returnFocusRef={openBtnRef} />
+      <MapOverlay
+        open={mapOpen}
+        onClose={() => setMapOpen(false)}
+        returnFocusRef={openBtnRef}
+        address={content.address}
+      />
     </div>
   );
 }

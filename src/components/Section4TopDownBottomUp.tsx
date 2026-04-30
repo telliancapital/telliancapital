@@ -3,6 +3,8 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 const serif = "var(--font-cormorant), serif";
 const sans = "var(--font-inter), sans-serif";
@@ -39,17 +41,54 @@ interface Props {
   /** When true (Anlagestrategien subpage open), the FLIP'd headlines unmount
    *  so the subpage's detail instances become the Framer Motion targets. */
   isDetailMode?: boolean;
+  homepage?: any;
 }
 
 export function Section4TopDownBottomUp({
   scrollX,
   isVertical = false,
   isDetailMode = false,
+  homepage,
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
   const enableFlip = !isVertical && !reducedMotion;
+  const { t } = useLanguage();
+
+  /* ── Localized copy from CMS (fallbacks preserve original German) ── */
+  const topDownEyebrow = t(homepage?.strategyTopDownEyebrow, "Globale Perspektive");
+  const topDownTitle = t(homepage?.strategyTopDownTitle, "Top-Down");
+  const topDownFallback = [
+    "Makroindikatoren und Konjunkturzyklen",
+    "Systematische Bewertung der Anlageklassen",
+    "Strategischer Horizont: 3–5 Jahre",
+  ];
+  const topDownBullets: string[] = (() => {
+    const cms: LocaleValue[] = homepage?.strategyTopDownBullets ?? [];
+    const resolved = cms.map((b) => t(b, "")).filter((s) => s.length > 0);
+    const merged = [...resolved];
+    while (merged.length < 3) merged.push(topDownFallback[merged.length]);
+    return merged.slice(0, 3);
+  })();
+
+  const decisionLabel = t(homepage?.strategyDecisionLabel, "Anlageentscheid");
+  const committeeLabel = t(homepage?.strategyCommitteeLabel, "Anlagekomitee");
+
+  const bottomUpTitle = t(homepage?.strategyBottomUpTitle, "Bottom-Up");
+  const bottomUpEyebrow = t(homepage?.strategyBottomUpEyebrow, "Einzeltitel-Perspektive");
+  const bottomUpFallback = [
+    "Quantitative Modelle und Datenanalyse",
+    "Technische Analyse und Marktpsychologie",
+    "Kurzfristige Trends und Opportunitäten",
+  ];
+  const bottomUpBullets: string[] = (() => {
+    const cms: LocaleValue[] = homepage?.strategyBottomUpBullets ?? [];
+    const resolved = cms.map((b) => t(b, "")).filter((s) => s.length > 0);
+    const merged = [...resolved];
+    while (merged.length < 3) merged.push(bottomUpFallback[merged.length]);
+    return merged.slice(0, 3);
+  })();
 
   useEffect(() => {
     if (visible || !panelRef.current) return;
@@ -138,7 +177,7 @@ export function Section4TopDownBottomUp({
               marginBottom: "20px",
             }}
           >
-            Globale Perspektive
+            {topDownEyebrow}
           </span>
 
           {/* FLIP anchor — unmounts in detail mode so the sub-page instance
@@ -157,7 +196,7 @@ export function Section4TopDownBottomUp({
                   display: "block",
                 }}
               >
-                Top-Down
+                {topDownTitle}
               </motion.span>
             ) : (
               <span
@@ -170,7 +209,7 @@ export function Section4TopDownBottomUp({
                   display: "block",
                 }}
               >
-                Top-Down
+                {topDownTitle}
               </span>
             ))}
 
@@ -183,9 +222,9 @@ export function Section4TopDownBottomUp({
               gap: "14px",
             }}
           >
-            <AccentRow text="Makroindikatoren und Konjunkturzyklen" lineColor="#989071" />
-            <AccentRow text="Systematische Bewertung der Anlageklassen" lineColor="#989071" />
-            <AccentRow text="Strategischer Horizont: 3–5 Jahre" lineColor="#989071" />
+            <AccentRow text={topDownBullets[0]} lineColor="#989071" />
+            <AccentRow text={topDownBullets[1]} lineColor="#989071" />
+            <AccentRow text={topDownBullets[2]} lineColor="#989071" />
           </div>
         </div>
 
@@ -214,7 +253,7 @@ export function Section4TopDownBottomUp({
               lineHeight: 1,
             }}
           >
-            Anlageentscheid
+            {decisionLabel}
           </span>
 
           <span
@@ -227,7 +266,7 @@ export function Section4TopDownBottomUp({
               whiteSpace: "nowrap",
             }}
           >
-            Anlagekomitee
+            {committeeLabel}
           </span>
         </div>
 
@@ -260,7 +299,7 @@ export function Section4TopDownBottomUp({
                   display: "block",
                 }}
               >
-                Bottom-Up
+                {bottomUpTitle}
               </motion.span>
             ) : (
               <span
@@ -273,7 +312,7 @@ export function Section4TopDownBottomUp({
                   display: "block",
                 }}
               >
-                Bottom-Up
+                {bottomUpTitle}
               </span>
             ))}
 
@@ -289,7 +328,7 @@ export function Section4TopDownBottomUp({
               marginTop: "20px",
             }}
           >
-            Einzeltitel-Perspektive
+            {bottomUpEyebrow}
           </span>
 
           {/* Drei Zeilen */}
@@ -301,9 +340,9 @@ export function Section4TopDownBottomUp({
               gap: "14px",
             }}
           >
-            <AccentRow text="Quantitative Modelle und Datenanalyse" lineColor="#D8D5CF" />
-            <AccentRow text="Technische Analyse und Marktpsychologie" lineColor="#D8D5CF" />
-            <AccentRow text="Kurzfristige Trends und Opportunitäten" lineColor="#D8D5CF" />
+            <AccentRow text={bottomUpBullets[0]} lineColor="#D8D5CF" />
+            <AccentRow text={bottomUpBullets[1]} lineColor="#D8D5CF" />
+            <AccentRow text={bottomUpBullets[2]} lineColor="#D8D5CF" />
           </div>
         </div>
       </div>

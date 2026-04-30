@@ -12,5 +12,7 @@ export async function GET(request: Request) {
   }
 
   (await draftMode()).enable();
-  redirect("/");
+  // Redirect straight to the localized homepage so the Studio's preview
+  // iframe lands on a real page (no `/` → `/de` redirect chain).
+  redirect("/de");
 }
