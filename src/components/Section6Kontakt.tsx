@@ -1326,7 +1326,12 @@ export function Section6Kontakt({
       </div>
 
       {/* ═══ OVERLAY — rendered via portal to document.body ═══ */}
-      <MapOverlay open={mapOpen} onClose={() => setMapOpen(false)} returnFocusRef={openBtnRef} address={content.address} />
+      <MapOverlay
+        open={mapOpen}
+        onClose={() => setMapOpen(false)}
+        returnFocusRef={openBtnRef}
+        address={content.address}
+      />
     </div>
   );
 }
