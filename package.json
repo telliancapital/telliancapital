@@ -44,6 +44,8 @@
     "@sanity/presentation": "^2.0.0",
     "@sanity/preview-kit": "^6.2.0",
     "@sanity/vision": "^5.22.0",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.1",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
