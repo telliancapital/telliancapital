@@ -13,7 +13,6 @@ import { ANLAGEPROZESS_STEPS } from "@/data/anlageprozessSteps";
 import { AnlageprozessStepOrdinal, ORDINAL_FONT_SIZE } from "@/components/AnlageprozessStepOrdinal";
 import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
 import { Navigation } from "@/components/Navigation";
-import { LoginOverlay } from "@/components/LoginOverlay";
 import { LegalPage, useLegalRoute } from "@/components/LegalPage";
 import { useHorizontalScroll } from "@/components/useHorizontalScroll";
 import { useBreakpoint } from "@/components/useBreakpoint";
@@ -39,6 +38,7 @@ import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.png";
 import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.png";
 import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.png";
 import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.png";
+import { useRouter } from "next/navigation";
 
 /* ═════════════════════════════════════════════════════════
    LIGHT MODE — SWISS LUXURY PALETTE
@@ -1177,7 +1177,6 @@ function Section4Anlagestrategien({
    ═══════════════════════════════════════════════════════════ */
 export default function HomeClient({ homepage }: { homepage: any }) {
   const [introComplete, setIntroComplete] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
   const { breakpoint, isVertical } = useBreakpoint();
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
@@ -1199,6 +1198,11 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const { scrollX, scrollProgress, scrollDirection, containerRef, scrollTo } = useHorizontalScroll({
     disabled: isVertical || !introComplete,
   });
+
+  const router = useRouter();
+  const handleLogin = () => {
+    router.push("/portal/login");
+  };
 
   const vvw = useSubpageMode("/vermoegensverwaltung");
   const ast = useSubpageMode("/anlagestrategien");
@@ -1237,7 +1241,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
       <div style={{ backgroundColor: C.bg, minHeight: "100vh" }}>
         <Navigation
           isVertical={true}
-          onLoginClick={() => setLoginOpen(true)}
+          onLoginClick={handleLogin}
           scrollProgress={0}
           scrollDirection="idle"
           onNavigate={() => {}}
@@ -1292,12 +1296,6 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           </div>
         </main>
 
-        <LoginOverlay
-          open={loginOpen}
-          onClose={() => setLoginOpen(false)}
-          onSupportClick={navigateToContact}
-        />
-
         <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
       </div>
     );
@@ -1307,7 +1305,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
     <div className="relative h-screen w-full overflow-hidden" style={{ backgroundColor: C.bg }}>
       <Navigation
         isVertical={false}
-        onLoginClick={() => setLoginOpen(true)}
+        onLoginClick={handleLogin}
         scrollProgress={scrollProgress}
         scrollDirection={scrollDirection}
         onNavigate={scrollTo}
@@ -1550,12 +1548,6 @@ export default function HomeClient({ homepage }: { homepage: any }) {
 
         <Section6Kontakt onOpenLegal={legal.open} initialData={homepage} />
       </div>
-
-      <LoginOverlay
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onSupportClick={navigateToContact}
-      />
 
       <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
     </div>

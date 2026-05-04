@@ -2,6 +2,31 @@
 
 :root {
   --font-size: 16px;
+
+  /* ── Tellian Capital Portal — brand palette ── */
+  --tellian-bg: #f9f9f7;
+  --tellian-bg-secondary: #f2f1ec;
+  --tellian-dark: #1a1916;
+  --tellian-charcoal: #3a3835;
+  --tellian-stone: #8a857c;
+  --tellian-muted: #b0aca5;
+  --tellian-line: #d8d5cf;
+  --tellian-warm: #989071;
+  --tellian-subtle: #e8e6e1;
+  --tellian-accent: #6b665e;
+
+  /* ── Portal form states ── */
+  --tellian-error: #b5453a;
+  --tellian-error-bg: #fdf2f1;
+  --tellian-success: #3d7b5f;
+  --tellian-success-bg: #f0f7f3;
+  --tellian-warning: #a68b3c;
+  --tellian-warning-bg: #fbf7ee;
+
+  /* ── Portal shadows ── */
+  --tellian-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --tellian-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --tellian-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
@@ -117,6 +142,27 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Portal brand tokens ── */
+  --color-tellian-bg: var(--tellian-bg);
+  --color-tellian-bg-secondary: var(--tellian-bg-secondary);
+  --color-tellian-dark: var(--tellian-dark);
+  --color-tellian-charcoal: var(--tellian-charcoal);
+  --color-tellian-stone: var(--tellian-stone);
+  --color-tellian-muted: var(--tellian-muted);
+  --color-tellian-line: var(--tellian-line);
+  --color-tellian-warm: var(--tellian-warm);
+  --color-tellian-subtle: var(--tellian-subtle);
+  --color-tellian-accent: var(--tellian-accent);
+  --color-tellian-error: var(--tellian-error);
+  --color-tellian-error-bg: var(--tellian-error-bg);
+  --color-tellian-success: var(--tellian-success);
+  --color-tellian-success-bg: var(--tellian-success-bg);
+  --color-tellian-warning: var(--tellian-warning);
+  --color-tellian-warning-bg: var(--tellian-warning-bg);
+  --shadow-tellian-sm: var(--tellian-shadow-sm);
+  --shadow-tellian-md: var(--tellian-shadow-md);
+  --shadow-tellian-lg: var(--tellian-shadow-lg);
 }
 
 @layer base {
