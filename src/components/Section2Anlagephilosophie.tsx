@@ -6,15 +6,7 @@ import type { Breakpoint } from "./useBreakpoint";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
 
-/* ─── Design tokens ─── */
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-};
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
+import { C, serif, sans } from "@/tokens";
 
 /* ─── Section geometry ────────────────────────────────────────
    Layout order: Hero(110) + Breathing(8)
@@ -60,8 +52,6 @@ interface Props {
 const FALLBACK_BODY = [
   "Tellian Capital verwaltet Vermögen nach einem quantitativen Prozess. Anlageentscheide entstehen aus Daten, Modellen und systematischer Marktanalyse — nicht aus Prognosen einzelner Personen und nicht aus der Nachrichtenlage einer Woche.",
   "Wir nehmen Positionen ein, wenn unsere Analyse sie stützt. Und wir halten sie, solange die Grundlage trägt. Das erfordert Disziplin — besonders dann, wenn die Märkte nervös werden und der Impuls zum Handeln am grössten ist.",
-  "Diese Arbeitsweise ist kein Zufall. Tellian Capital wurde 1996 als eine der ersten Schweizer Vermögensverwaltungen mit quantitativem Ansatz gegründet. Seither haben wir den Prozess verfeinert, aber das Prinzip nicht verändert: Methodik vor Meinung.",
-  "Wir sind unabhängig von Banken, Produktanbietern und Vertriebsinteressen. Das bedeutet: Jede Anlageentscheidung dient einem Interesse — dem des Kunden.",
 ];
 
 export function Section2Anlagephilosophie({
@@ -77,10 +67,7 @@ export function Section2Anlagephilosophie({
   const eyebrow = t(homepage?.philosophyEyebrow, "Anlagephilosophie");
   const headingLine1 = t(homepage?.philosophyHeadingLine1, "Analyse entscheidet.");
   const headingLine2 = t(homepage?.philosophyHeadingLine2, "Nicht Stimmung.");
-  const quote = t(
-    homepage?.philosophyQuote,
-    "Ihr Vermögen verdient bessere Gründe als ein Bauchgefühl.",
-  );
+  const quote = t(homepage?.philosophyQuote, "Manche Dinge entstehen nicht über Nacht.");
   const cmsParagraphs: string[] = (homepage?.philosophyParagraphs ?? [])
     .map((p: LocaleValue) => t(p, ""))
     .filter((p: string) => p.length > 0);
@@ -89,9 +76,10 @@ export function Section2Anlagephilosophie({
   /* Background image: prefer uploaded asset, then external URL, then bundled fallback */
   const imageSrc: string =
     homepage?.philosophyImageAsset?.url || homepage?.philosophyImageUrl || philosophyImg.src;
-  /* Alt text — kept for future a11y wiring; HeroExpandingImage doesn't currently
-     forward an `alt` prop, so unused for now. */
-  void t(homepage?.philosophyImageAlt, "");
+  const imageAlt = t(
+    homepage?.philosophyImageAlt,
+    "Tektonikarena Sardona — UNESCO-Welterbe im Kanton Glarus.",
+  );
 
   /* ── VERTICAL (Tablet / Mobile) ── */
   if (isVertical) {
@@ -142,7 +130,7 @@ export function Section2Anlagephilosophie({
           </ScrollFade>
 
           <ScrollFade scrollX={0} isVertical yOffset={20}>
-            <div style={{ marginTop: SPACING.headlineToBody, paddingBottom: "32px" }}>
+            <div style={{ marginTop: SPACING.headlineToBody }}>
               <ExpandableBody
                 paragraphs={BODY_PARAGRAPHS}
                 visibleCount={1}
@@ -153,187 +141,171 @@ export function Section2Anlagephilosophie({
               />
             </div>
           </ScrollFade>
+
+          {/* Quote — in text column, after body */}
+          <ScrollFade scrollX={0} isVertical yOffset={16}>
+            <div style={{ marginTop: "48px", paddingBottom: "32px" }}>
+              <div style={{ width: "28px", height: "1.5px", backgroundColor: C.dark }} />
+              <p
+                style={{
+                  fontFamily: serif,
+                  fontSize: breakpoint === "mobile" ? "20px" : "24px",
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  color: C.dark,
+                  lineHeight: 1.4,
+                  maxWidth: "320px",
+                  margin: 0,
+                  marginTop: "20px",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {"«"}
+                {quote}
+                {"»"}
+              </p>
+            </div>
+          </ScrollFade>
         </div>
 
-        {/* Image with quote overlay — comes AFTER text on mobile/tablet */}
+        {/* Image — clean, no overlay */}
         <div
           style={{
             width: "100%",
-            height: breakpoint === "mobile" ? "50vh" : "55vh",
-            position: "relative",
+            height: breakpoint === "mobile" ? "60vh" : "55vh",
             overflow: "hidden",
           }}
         >
-          <HeroExpandingImage src={imageSrc} scrollX={0} className="h-full w-full" isVertical />
-          {/* Dark overlay */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.35)",
-              pointerEvents: "none",
-              zIndex: 2,
-            }}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className="h-full w-full"
+            style={{ objectFit: "cover", objectPosition: "center" }}
           />
-          {/* Quote */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              pointerEvents: "none",
-              zIndex: 3,
-              padding: breakpoint === "mobile" ? "0 24px" : "0 10%",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: serif,
-                fontSize: breakpoint === "mobile" ? "28px" : "36px",
-                fontStyle: "italic",
-                color: "#ffffff",
-                lineHeight: 1.3,
-                maxWidth: breakpoint === "mobile" ? "90%" : "70%",
-                textAlign: "center",
-                margin: 0,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              «{quote}»
-            </p>
-          </div>
         </div>
       </section>
     );
   }
 
   /* ── DESKTOP (horizontal) ── */
-  const { scale, quoteOpacity, overlayAlpha } = getAnimValues(scrollX);
+  void getAnimValues(scrollX);
 
   return (
     <div
       className="relative h-screen flex-shrink-0"
       style={{ width: "110vw", backgroundColor: C.bg }}
     >
+      {/* Image — right, clean (no overlay, no quote) */}
       <div className="absolute z-0" style={{ top: 0, bottom: 0, left: LAYOUT.imageLeft, right: 0 }}>
         <HeroExpandingImage src={imageSrc} scrollX={scrollX} className="h-full w-full" />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: `rgba(0,0,0,${overlayAlpha.toFixed(4)})`,
-            pointerEvents: "none",
-            zIndex: 2,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "none",
-            zIndex: 3,
-            padding: "0 10%",
-          }}
-        >
-          <p
-            style={{
-              fontFamily: serif,
-              fontSize: "48px",
-              fontStyle: "italic",
-              color: "#ffffff",
-              lineHeight: 1.3,
-              maxWidth: "45%",
-              textAlign: "center",
-              margin: 0,
-              letterSpacing: "-0.01em",
-              opacity: quoteOpacity,
-              transform: `scale(${scale.toFixed(4)})`,
-              transformOrigin: "center center",
-              willChange: "opacity, transform",
-            }}
-          >
-            «{quote}»
-          </p>
-        </div>
       </div>
 
+      {/* Left column — eyebrow + headline + body + quote, vertically centered */}
       <div
-        className="relative z-10 flex h-full flex-col justify-end"
+        className="relative z-10 flex h-full flex-col justify-center"
         style={{
           width: LAYOUT.columnWidth,
-          paddingLeft: LAYOUT.paddingLeft,
-          paddingRight: LAYOUT.paddingRight,
-          paddingBottom: "clamp(56px, 8vh, 96px)",
+          paddingLeft: "clamp(36px, 8vw, 120px)",
+          paddingRight: "clamp(36px, 5vw, 80px)",
+          maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
         }}
       >
-        <div style={{ marginBottom: "clamp(100px, 18vh, 240px)" }}>
-          <span
-            style={{
-              fontFamily: sans,
-              fontSize: "10px",
-              letterSpacing: "0.22em",
-              color: C.stone,
-              display: "block",
-              textTransform: "uppercase",
-            }}
-          >
-            {eyebrow}
-          </span>
+        {/* Eyebrow */}
+        <span
+          style={{
+            fontFamily: sans,
+            fontSize: "14px",
+            letterSpacing: "0.15em",
+            color: C.stone,
+            display: "block",
+            textTransform: "uppercase",
+          }}
+        >
+          {eyebrow}
+        </span>
 
-          <div
-            style={{
-              width: "28px",
-              height: "1.5px",
-              backgroundColor: C.dark,
-              marginTop: SPACING.eyebrowToAccent,
-            }}
-          />
+        {/* Eyebrow divider */}
+        <div
+          style={{
+            width: "28px",
+            height: "1.5px",
+            backgroundColor: C.dark,
+            marginTop: "16px",
+          }}
+        />
 
-          <h2
-            style={{
-              fontFamily: serif,
-              fontSize: "clamp(48px, 7vh, 80px)",
-              lineHeight: 0.94,
-              color: C.dark,
-              letterSpacing: "-0.03em",
-              marginTop: SPACING.accentToHeadline,
-            }}
-          >
-            {headingLine1}
-            <br />
-            <em>{headingLine2}</em>
-          </h2>
+        {/* Headline */}
+        <h2
+          style={{
+            fontFamily: serif,
+            fontSize: "clamp(48px, 7vh, 80px)",
+            lineHeight: 0.94,
+            color: C.dark,
+            letterSpacing: "-0.03em",
+            marginTop: "32px",
+          }}
+        >
+          {headingLine1}
+          <br />
+          <em>{headingLine2}</em>
+        </h2>
 
-          <div
-            style={{
-              marginTop: SPACING.headlineToBody,
-              maxWidth: LAYOUT.bodyMaxWidth,
-              display: "flex",
-              flexDirection: "column",
-              gap: SPACING.bodyParagraphGap,
-            }}
-          >
-            {BODY_PARAGRAPHS.map((text, i) => (
-              <p
-                key={i}
-                style={{
-                  fontFamily: sans,
-                  fontSize: "clamp(10.5px, 1.3vh, 12px)",
-                  color: C.charcoal,
-                  lineHeight: 1.75,
-                  margin: 0,
-                }}
-              >
-                {text}
-              </p>
-            ))}
-          </div>
+        {/* Body */}
+        <div
+          style={{
+            marginTop: "32px",
+            maxWidth: "480px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+          }}
+        >
+          {BODY_PARAGRAPHS.map((text, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: sans,
+                fontSize: "clamp(10.5px, 1.3vh, 12px)",
+                color: C.charcoal,
+                lineHeight: 1.75,
+                margin: 0,
+              }}
+            >
+              {text}
+            </p>
+          ))}
         </div>
+
+        {/* Quote divider — reusable pattern (28px, 1.5px) */}
+        <div
+          style={{
+            width: "28px",
+            height: "1.5px",
+            backgroundColor: C.dark,
+            marginTop: "80px",
+          }}
+        />
+
+        {/* Pullquote */}
+        <p
+          style={{
+            fontFamily: serif,
+            fontSize: "24px",
+            fontStyle: "italic",
+            fontWeight: 400,
+            color: C.dark,
+            lineHeight: 1.4,
+            maxWidth: "320px",
+            margin: 0,
+            marginTop: "20px",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {"«"}
+          {quote}
+          {"»"}
+        </p>
       </div>
     </div>
   );

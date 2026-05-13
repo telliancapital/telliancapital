@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, useEffect, useState } from "react";
 import { LAYOUT, getLayout, getTextColumnStyle, SPACING } from "../layout";
 import { CtaButton } from "./CtaButton";
@@ -16,17 +18,7 @@ import type { LocaleValue } from "@/i18n/types";
    Tablet/Mobile: stacked text + 1- or 2-column team grid.
    ═══════════════════════════════════════════════════════════ */
 
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-  muted: "#B0ACA5",
-  line: "#D8D5CF",
-};
-
-const serif = "'Cormorant Garamond', serif";
-const sans = "'Inter', sans-serif";
+import { C, serif, sans } from "@/tokens";
 
 /* ── Team data ── */
 interface TeamMember {
@@ -88,11 +80,8 @@ const FALLBACK_TEAM: TeamMember[] = [
 ];
 
 const FALLBACK_BODY = [
-  "Tellian Capital ist eine unabhängige Vermögensverwaltung mit Sitz in Zürich und einem Standort in Balzers, Liechtenstein. Die Firma ist FINMA-lizenziert und verwaltet Vermögen für private und institutionelle Anleger auf Mandatsbasis.",
-  "Das Team ist bewusst klein. Jeder Kunde hat einen persönlichen Relationship Manager, der sein Portfolio kennt und seine Anlageziele versteht. Die Entscheidungswege sind kurz. Wer bei Tellian Capital anruft, erreicht die Menschen, die sein Vermögen verwalten.",
-  "Die Firma wurde 1996 gegründet — als eine der ersten Schweizer Vermögensverwaltungen mit einem quantitativen Investmentansatz. Damals war datengestützte Analyse in der Branche kaum verbreitet. Tellian Capital hat diesen Ansatz über fast drei Jahrzehnte weiterentwickelt, durch Marktkrisen hindurch und über mehrere regulatorische Umbrüche hinweg.",
-  "Das Anlagekomitee bringt verschiedene Perspektiven zusammen: Geschäftsleitung, Chef Anlagestrategie, internationale Partner Asset Manager und Spezialisten für alternative Anlageklassen. Bei Bedarf werden externe Finanzexperten hinzugezogen. Die Breite im Komitee stellt sicher, dass Anlageentscheide nicht aus einer einzelnen Sichtweise entstehen.",
-  "Tellian Capital war bis 2026 unter dem Namen Dr. Blumer & Partner bekannt. Der neue Name steht für den Anspruch, mit dem die Firma heute arbeitet: methodisch, unabhängig und mit klarer Überzeugung. Was sich nicht verändert hat, ist die Art, wie wir Kundenbeziehungen verstehen — persönlich, verbindlich und auf lange Sicht angelegt.",
+  "Tellian Capital ist eine unabhängige Vermögensverwaltung mit Sitz in Zürich. Das Team ist bewusst klein. Jeder Kunde hat einen persönlichen Ansprechpartner, der sein Portfolio kennt und seine Anlageziele versteht. Wer bei uns anruft, erreicht die Menschen, die sein Vermögen verwalten.",
+  "Die Firma wurde 1996 gegründet — als eine der ersten Schweizer Vermögensverwaltungen mit einem quantitativen Investmentansatz. Was uns seither getragen hat, ist die Verbindung aus methodischer Arbeit und persönlicher Verbindlichkeit. Anlageentscheide entstehen im Anlagekomitee, nicht aus einer einzelnen Sichtweise. Kundenbeziehungen sind auf lange Sicht angelegt, nicht auf das nächste Quartal.",
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -115,45 +104,45 @@ function teamEmail(name: string): string {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SEND MESSAGE LINK — accent-line + label, mailto: action
+   SEND MESSAGE LINK — label + arrow, mailto: action
    ═══════════════════════════════════════════════════════════ */
 function SendMessageLink({ email }: { email: string }) {
   const [hover, setHover] = useState(false);
-  const accent = hover ? C.dark : C.stone;
+  const color = hover ? C.dark : C.stone;
   return (
     <a
       href={`mailto:${email}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        gap: "6px",
+        gap: "8px",
         textDecoration: "none",
+        cursor: "pointer",
       }}
     >
       <span
-        aria-hidden
-        style={{
-          display: "inline-block",
-          width: hover ? "24px" : "14px",
-          height: "0.5px",
-          backgroundColor: accent,
-          transition:
-            "width 300ms cubic-bezier(0.16, 1, 0.3, 1), background-color 300ms cubic-bezier(0.16, 1, 0.3, 1)",
-        }}
-      />
-      <span
         style={{
           fontFamily: sans,
-          fontSize: "10px",
+          fontSize: "13px",
           letterSpacing: "0.1em",
           textTransform: "uppercase",
-          color: accent,
-          transition: "color 300ms cubic-bezier(0.16, 1, 0.3, 1)",
+          color,
+          transition: "color 200ms ease",
         }}
       >
         Nachricht senden
+      </span>
+      <span
+        aria-hidden
+        style={{
+          color,
+          fontSize: "13px",
+          transition: "color 200ms ease",
+        }}
+      >
+        →
       </span>
     </a>
   );
@@ -165,23 +154,20 @@ function SendMessageLink({ email }: { email: string }) {
 function PortraitCard({
   member,
   width,
-  nameSize = "16px",
-  roleSize = "13px",
-  /** Aspect ratio (height/width %). Default 3:4 portrait (133.333%). */
-  aspectPct = "133.333%",
+  nameSize = "18px",
+  roleSize = "14px",
   nameWeight = 600,
 }: {
   member: TeamMember;
   width: string;
   nameSize?: string;
   roleSize?: string;
-  aspectPct?: string;
   nameWeight?: number;
 }) {
   return (
     <div style={{ width, flexShrink: 0 }}>
-      {/* Photo */}
-      <div className="relative w-full overflow-hidden" style={{ paddingBottom: aspectPct }}>
+      {/* Photo — 4:5 aspect, head in upper third */}
+      <div className="relative w-full overflow-hidden" style={{ paddingBottom: "125%" }}>
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
@@ -192,8 +178,8 @@ function PortraitCard({
         />
       </div>
 
-      {/* Name */}
-      <div style={{ marginTop: "12px" }}>
+      {/* Caption */}
+      <div style={{ marginTop: "24px" }}>
         <span
           style={{
             fontFamily: sans,
@@ -213,22 +199,15 @@ function PortraitCard({
             fontWeight: 400,
             color: C.stone,
             display: "block",
-            marginTop: "4px",
+            marginTop: "5px",
             lineHeight: 1.3,
           }}
         >
           {member.role}
         </span>
 
-        {/* Divider + Send-message mailto link */}
-        <div
-          style={{
-            height: "0.5px",
-            backgroundColor: C.line,
-            marginTop: "10px",
-          }}
-        />
-        <div style={{ marginTop: "8px" }}>
+        {/* Action link */}
+        <div style={{ marginTop: "18px" }}>
           <SendMessageLink email={teamEmail(member.name)} />
         </div>
       </div>
@@ -242,13 +221,11 @@ function PortraitCard({
    ═══════════════════════════════════════════════════════════ */
 function StaggeredPortrait({
   member,
-  aspectPct,
   nameSize,
   roleSize,
   delayMs,
 }: {
   member: TeamMember;
-  aspectPct: string;
   nameSize: string;
   roleSize: string;
   delayMs: number;
@@ -287,7 +264,6 @@ function StaggeredPortrait({
         width="100%"
         nameSize={nameSize}
         roleSize={roleSize}
-        aspectPct={aspectPct}
         nameWeight={500}
       />
     </div>
@@ -301,11 +277,13 @@ export function Section5UeberTellian({
   scrollX,
   isVertical = false,
   breakpoint = "desktop",
+  onContactClick,
   homepage,
 }: {
   scrollX?: number;
   isVertical?: boolean;
   breakpoint?: Breakpoint;
+  onContactClick?: () => void;
   homepage?: any;
 }) {
   // scrollX is kept as optional prop for API compatibility but unused
@@ -411,7 +389,15 @@ export function Section5UeberTellian({
 
           <ScrollFade scrollX={0} isVertical yOffset={16}>
             <div style={{ marginTop: SPACING.bodyToCta }}>
-              <CtaButton href="#contact">{ctaLabel}</CtaButton>
+              <CtaButton
+                href="#contact"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onContactClick?.();
+                }}
+              >
+                {ctaLabel}
+              </CtaButton>
             </div>
           </ScrollFade>
         </div>
@@ -420,7 +406,6 @@ export function Section5UeberTellian({
         {(() => {
           // Mobile: 2 cols, Tablet: 3 cols
           const cols = breakpoint === "mobile" ? 2 : 3;
-          const aspectPct = "125%"; // 4:5 ratio (height/width)
           return (
             <div
               style={{
@@ -435,7 +420,6 @@ export function Section5UeberTellian({
                 <StaggeredPortrait
                   key={member.name}
                   member={member}
-                  aspectPct={aspectPct}
                   nameSize={breakpoint === "mobile" ? "13px" : "14px"}
                   roleSize={breakpoint === "mobile" ? "11px" : "12px"}
                   delayMs={(i % cols) * 100}
@@ -463,15 +447,13 @@ export function Section5UeberTellian({
         backgroundColor: C.bg,
       }}
     >
-      {/* Text column — absolute, covers leftmost 56vw (first portrait starts at 60vw) */}
+      {/* Text column — absolute, covers leftmost 56vw, vertically centered */}
       <div
-        className="absolute top-0 left-0 z-10 flex h-full flex-col"
+        className="absolute top-0 left-0 z-10 flex h-full flex-col justify-center"
         style={{
           width: LAYOUT.columnWidth,
           paddingLeft: LAYOUT.paddingLeft,
           paddingRight: LAYOUT.paddingRight,
-          paddingTop: LAYOUT.paddingTop,
-          paddingBottom: LAYOUT.paddingBottom,
           backgroundColor: C.bg,
         }}
       >
@@ -500,7 +482,7 @@ export function Section5UeberTellian({
         <h2
           style={{
             fontFamily: serif,
-            fontSize: "clamp(36px, 5vh, 60px)",
+            fontSize: "clamp(48px, 7vh, 80px)",
             lineHeight: 0.94,
             color: C.dark,
             letterSpacing: "-0.03em",
@@ -519,8 +501,6 @@ export function Section5UeberTellian({
             display: "flex",
             flexDirection: "column",
             gap: SPACING.bodyParagraphGap,
-            flex: 1,
-            minHeight: 0,
           }}
         >
           {BODY.map((text, i) => (
@@ -537,10 +517,35 @@ export function Section5UeberTellian({
               {text}
             </p>
           ))}
-        </div>
 
-        <div style={{ marginTop: SPACING.bodyToCta, flexShrink: 0 }}>
-          <CtaButton href="#contact">{ctaLabel}</CtaButton>
+          {/* CTA — inline with body text, left-aligned */}
+          <a
+            href="#contact"
+            onClick={(e) => {
+              e.preventDefault();
+              onContactClick?.();
+            }}
+            className="inline-flex items-center gap-3 uppercase"
+            style={{
+              marginTop: "56px",
+              padding: "16px 24px",
+              border: `1px solid ${C.button}`,
+              borderRadius: 0,
+              backgroundColor: C.button,
+              fontFamily: sans,
+              fontSize: "11px",
+              fontWeight: 500,
+              letterSpacing: "0.18em",
+              color: C.dark,
+              textDecoration: "none",
+              lineHeight: 1,
+              alignSelf: "flex-start",
+              transition: "background-color 250ms ease-out",
+            }}
+          >
+            <span>{ctaLabel}</span>
+            <span aria-hidden>→</span>
+          </a>
         </div>
       </div>
 

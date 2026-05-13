@@ -2,7 +2,7 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
+  --background: #f8f6f2;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
@@ -31,6 +31,63 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
+
+  /* ── Tellian Capital — brand palette ── */
+  --tellian-bg: #f8f6f2;
+  --tellian-bg-secondary: #f2f1ec;
+  --tellian-dark: #191718;
+  --tellian-charcoal: #191718;
+  --tellian-stone: #8a857c;
+  --tellian-muted: #b0aca5;
+  --tellian-line: #d8d5cf;
+  --tellian-warm: #989071;
+  --tellian-subtle: #e8e6e1;
+  --tellian-accent: #6b665e;
+  --tellian-button: #c6d2d6;
+  --tellian-button-hover: #b3c1c6;
+  --tellian-dot-inactive: #c8c5bb;
+  --tellian-dot-active: #8a8575;
+
+  /* ── Form states ── */
+  --tellian-error: #b5453a;
+  --tellian-error-bg: #fdf2f1;
+  --tellian-success: #3d7b5f;
+  --tellian-success-bg: #f0f7f3;
+  --tellian-warning: #a68b3c;
+  --tellian-warning-bg: #fbf7ee;
+
+  /* ── Shadows ── */
+  --tellian-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --tellian-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --tellian-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+
+  /* ── Strategy cards (Section 4) — swap these for rebrand ── */
+  --tellian-card-bg: #3f212a;
+  --tellian-card-text: #f9f9f7;
+  --tellian-card-bullet: rgba(249, 249, 247, 0.7);
+  --tellian-card-eyebrow: rgba(249, 249, 247, 0.6);
+  --tellian-accent-gold: #c6d2d6;
+  --tellian-accent-gold-text: #191718;
+
+  /* ── Section navigation pill ── */
+  --tellian-nav-bg: rgba(255, 255, 255, 0.45);
+  --tellian-nav-text: rgba(26, 25, 22, 0.85);
+  --tellian-nav-text-inactive: rgba(26, 25, 22, 0.45);
+  --tellian-nav-indicator: rgba(26, 25, 22, 0.85);
+  --tellian-nav-indicator-inactive: rgba(26, 25, 22, 0.25);
+  --tellian-nav-border: rgba(26, 25, 22, 0.08);
+
+  /* ── Z-index scale ── */
+  --tellian-z-dropdown: 100;
+  --tellian-z-sticky: 200;
+  --tellian-z-modal: 900;
+  --tellian-z-overlay: 1000;
+  --tellian-z-toast: 1100;
+
+  /* REBRAND: pending — replace when final typeface is licensed */
+  --tellian-font-serif: "Cormorant Garamond", serif;
+  --tellian-font-sans: "Inter", sans-serif;
+
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: #030213;
@@ -40,7 +97,6 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
-
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -109,6 +165,39 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* ── Tellian brand colors → Tailwind utilities (bg-tellian-dark, text-tellian-stone, etc.) ── */
+  --color-tellian-bg: var(--tellian-bg);
+  --color-tellian-bg-secondary: var(--tellian-bg-secondary);
+  --color-tellian-dark: var(--tellian-dark);
+  --color-tellian-charcoal: var(--tellian-charcoal);
+  --color-tellian-stone: var(--tellian-stone);
+  --color-tellian-muted: var(--tellian-muted);
+  --color-tellian-line: var(--tellian-line);
+  --color-tellian-warm: var(--tellian-warm);
+  --color-tellian-subtle: var(--tellian-subtle);
+  --color-tellian-accent: var(--tellian-accent);
+  --color-tellian-button: var(--tellian-button);
+  --color-tellian-button-hover: var(--tellian-button-hover);
+  --color-tellian-dot-inactive: var(--tellian-dot-inactive);
+  --color-tellian-dot-active: var(--tellian-dot-active);
+
+  /* ── Form states → Tailwind (text-tellian-error, bg-tellian-success-bg, etc.) ── */
+  --color-tellian-error: var(--tellian-error);
+  --color-tellian-error-bg: var(--tellian-error-bg);
+  --color-tellian-success: var(--tellian-success);
+  --color-tellian-success-bg: var(--tellian-success-bg);
+  --color-tellian-warning: var(--tellian-warning);
+  --color-tellian-warning-bg: var(--tellian-warning-bg);
+
+  /* ── Shadows → Tailwind (shadow-tellian-sm, shadow-tellian-md, shadow-tellian-lg) ── */
+  --shadow-tellian-sm: var(--tellian-shadow-sm);
+  --shadow-tellian-md: var(--tellian-shadow-md);
+  --shadow-tellian-lg: var(--tellian-shadow-lg);
+
+  /* REBRAND: pending */
+  --font-tellian-serif: var(--tellian-font-serif);
+  --font-tellian-sans: var(--tellian-font-sans);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
