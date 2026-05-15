@@ -1,34 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import type { Breakpoint } from "./useBreakpoint";
+import { FloatingField } from "./FloatingField";
 import { LEGAL_PATHS, LEGAL_LINK_LABELS, type LegalPath } from "../data/legalPages";
-import { client } from "@/sanity/lib/client";
 import { CONTACT_QUERY } from "@/sanity/lib/queries";
 import { useLiveQuery } from "@sanity/preview-kit";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-/* ─── Design tokens ─── */
-const C = {
-  bgPrimary: "#F9F9F7",
-  bgSecondary: "#F2F1EC",
-  textPrimary: "#1A1916",
-  textSecondary: "#3A3835",
-  textTertiary: "#8A857C",
-  borderTertiary: "#D8D5CF",
-  line: "#D8D5CF",
-  muted: "#B0ACA5",
-  warm: "#989071",
-  road: "#E8E6E1",
-  water: "#D5DDD8",
-  green: "#E4E8E0",
-};
+import { C, serif, sans } from "@/tokens";
 
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
+/* Mapbox-specific colors (not design tokens — map theming only) */
+const MAP_COLORS = { road: "#E8E6E1", water: "#D5DDD8", green: "#E4E8E0" };
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
 const MAP_CENTER: [number, number] = [8.5387, 47.3769];
@@ -48,9 +34,9 @@ function applyStyleAndMarker(map: mapboxgl.Map) {
         map.setPaintProperty(id, "background-color", C.bgSecondary);
       } else if (type === "fill") {
         if (/water|river|stream|sea|lake/i.test(id)) {
-          map.setPaintProperty(id, "fill-color", C.water);
+          map.setPaintProperty(id, "fill-color", MAP_COLORS.water);
         } else if (/park|wood|grass|vegetation|landuse/i.test(id) && !/building/i.test(id)) {
-          map.setPaintProperty(id, "fill-color", C.green);
+          map.setPaintProperty(id, "fill-color", MAP_COLORS.green);
         } else if (/building/i.test(id)) {
           map.setPaintProperty(id, "fill-color", "#E8E6E1");
           map.setPaintProperty(id, "fill-outline-color", "#DCD8D0");
@@ -61,18 +47,18 @@ function applyStyleAndMarker(map: mapboxgl.Map) {
         if (/motorway|trunk|primary|main/i.test(id)) {
           map.setPaintProperty(id, "line-color", C.line);
         } else if (/road|street|secondary|tertiary|service|path|pedestrian/i.test(id)) {
-          map.setPaintProperty(id, "line-color", C.road);
+          map.setPaintProperty(id, "line-color", MAP_COLORS.road);
         } else if (/water|river/i.test(id)) {
-          map.setPaintProperty(id, "line-color", C.water);
+          map.setPaintProperty(id, "line-color", MAP_COLORS.water);
         } else {
-          map.setPaintProperty(id, "line-color", C.road);
+          map.setPaintProperty(id, "line-color", MAP_COLORS.road);
         }
       } else if (type === "symbol") {
         if (/poi|transit|airport|shield/i.test(id)) {
           map.setLayoutProperty(id, "visibility", "none");
         } else {
           try {
-            map.setPaintProperty(id, "text-color", C.textTertiary);
+            map.setPaintProperty(id, "text-color", C.stone);
             map.setPaintProperty(id, "text-halo-color", C.bgSecondary);
             map.setPaintProperty(id, "text-halo-width", 1.2);
           } catch {
@@ -196,7 +182,6 @@ function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverlayProps)
       setRendered(true);
       return;
     }
-    // Unmount after close animation finishes (250ms backdrop + 100ms delay = 350ms total)
     const t = setTimeout(() => setRendered(false), 400);
     return () => clearTimeout(t);
   }, [open]);
@@ -212,18 +197,14 @@ function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverlayProps)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  /* Focus management — only return focus AFTER overlay was actually opened.
-     Avoids page jumping on initial mount (calling .focus() scrolls the element
-     into view, which on mobile jumps the whole page down to the trigger). */
+  /* Focus management */
   const wasOpenRef = useRef(false);
   useEffect(() => {
     if (open) {
       wasOpenRef.current = true;
-      // Wait until close button is visually present (300ms delay + 250ms fade = 550ms)
       const t = setTimeout(() => closeBtnRef.current?.focus(), 550);
       return () => clearTimeout(t);
     } else if (wasOpenRef.current) {
-      // Only return focus if overlay was previously open — not on initial mount
       returnFocusRef.current?.focus({ preventScroll: true });
     }
   }, [open, returnFocusRef]);
@@ -341,7 +322,7 @@ function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverlayProps)
         <div
           style={{
             height: "48px",
-            backgroundColor: "#1A1A1A",
+            backgroundColor: C.dark,
             padding: "0 24px",
             display: "flex",
             alignItems: "center",
@@ -374,13 +355,16 @@ interface ContactFormLabels {
   phone: string;
   message: string;
   submit: string;
+  sending: string;
   responseTime: string;
   thanksTitle: string;
   thanksBody: string;
+  privacyText: ReactNode;
 }
 
 function ContactForm({ stack = false, labels }: { stack?: boolean; labels: ContactFormLabels }) {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -389,34 +373,23 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
     message: "",
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    // TODO: replace with real form submission
+    await new Promise((r) => setTimeout(r, 1000));
+    setLoading(false);
     setSubmitted(true);
-  };
-
-  const fieldStyle: React.CSSProperties = {
-    fontFamily: sans,
-    fontSize: stack ? "14px" : "13px",
-    color: C.textPrimary,
-    backgroundColor: "transparent",
-    border: `0.5px solid ${C.borderTertiary}`,
-    borderRadius: "6px",
-    padding: stack ? "12px 14px" : "10px 12px",
-    minHeight: stack ? "44px" : undefined, // Apple HIG touch target on mobile
-    outline: "none",
-    width: "100%",
-    transition: "border-color 0.3s ease",
-    appearance: "none",
   };
 
   if (submitted) {
     return (
-      <div style={{ padding: "20px 0" }}>
+      <div style={{ padding: "20px 0" }} role="status" aria-live="polite">
         <span
           style={{
             fontFamily: serif,
             fontSize: "24px",
-            color: C.textPrimary,
+            color: C.dark,
             display: "block",
             lineHeight: 1.15,
           }}
@@ -426,8 +399,8 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
         <span
           style={{
             fontFamily: sans,
-            fontSize: "12px",
-            color: C.textSecondary,
+            fontSize: "13px",
+            color: C.charcoal,
             display: "block",
             marginTop: "12px",
             lineHeight: 1.6,
@@ -439,135 +412,125 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
     );
   }
 
-  /* Stack mode: every field gets its own row (mobile / vertical).
-     Default mode: two-column pairs (Vorname+Nachname, E-Mail+Telefon). */
   const pairStyle: React.CSSProperties = stack
-    ? { display: "flex", flexDirection: "column", gap: "10px" }
-    : { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" };
+    ? { display: "flex", flexDirection: "column", gap: "16px" }
+    : { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <div style={pairStyle}>
-        <input
-          type="text"
-          placeholder={labels.firstName}
+        <FloatingField
+          label={labels.firstName}
           required
           value={form.firstName}
-          onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-          style={fieldStyle}
-          className="placeholder:text-[#B0ACA5] focus:border-[#1A1916]"
+          onChange={(v) => setForm({ ...form, firstName: v })}
         />
-        <input
-          type="text"
-          placeholder={labels.lastName}
+        <FloatingField
+          label={labels.lastName}
           required
           value={form.lastName}
-          onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-          style={fieldStyle}
-          className="placeholder:text-[#B0ACA5] focus:border-[#1A1916]"
+          onChange={(v) => setForm({ ...form, lastName: v })}
         />
       </div>
       <div style={pairStyle}>
-        <input
+        <FloatingField
+          label={labels.email}
           type="email"
-          placeholder={labels.email}
           required
           value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          style={fieldStyle}
-          className="placeholder:text-[#B0ACA5] focus:border-[#1A1916]"
+          onChange={(v) => setForm({ ...form, email: v })}
         />
-        <input
+        <FloatingField
+          label={labels.phone}
           type="tel"
-          placeholder={labels.phone}
           value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          style={fieldStyle}
-          className="placeholder:text-[#B0ACA5] focus:border-[#1A1916]"
+          onChange={(v) => setForm({ ...form, phone: v })}
         />
       </div>
-      <textarea
-        placeholder={labels.message}
+      <FloatingField
+        label={labels.message}
         required
+        multiline
+        rows={5}
         value={form.message}
-        onChange={(e) => setForm({ ...form, message: e.target.value })}
-        style={{ ...fieldStyle, height: stack ? "100px" : "80px", resize: "none" }}
-        className="placeholder:text-[#B0ACA5] focus:border-[#1A1916]"
+        onChange={(v) => setForm({ ...form, message: v })}
       />
 
-      {stack ? (
-        /* Mobile: full-width button + caption underneath, centered */
-        <div style={{ marginTop: "10px" }}>
-          <button
-            type="submit"
-            style={{
-              fontFamily: sans,
-              fontSize: "11px",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#FFFFFF",
-              backgroundColor: C.textPrimary,
-              border: "none",
-              borderRadius: "6px",
-              padding: "16px",
-              cursor: "pointer",
-              transition: "background-color 0.3s ease",
-              appearance: "none",
-              width: "100%",
-            }}
-            className="hover:bg-[#3A3835]"
-          >
-            {labels.submit}
-          </button>
-          <span
-            style={{
-              fontFamily: sans,
-              fontSize: "11px",
-              color: C.textTertiary,
-              display: "block",
-              textAlign: "center",
-              marginTop: "10px",
-            }}
-          >
-            {labels.responseTime}
-          </span>
-        </div>
-      ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "6px" }}>
-          <button
-            type="submit"
-            style={{
-              fontFamily: sans,
-              fontSize: "10px",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#FFFFFF",
-              backgroundColor: C.textPrimary,
-              border: "none",
-              borderRadius: "6px",
-              padding: "13px 28px",
-              cursor: "pointer",
-              transition: "background-color 0.3s ease",
-              appearance: "none",
-            }}
-            className="hover:bg-[#3A3835]"
-          >
-            {labels.submit}
-          </button>
-          <span style={{ fontFamily: sans, fontSize: "10px", color: C.textTertiary }}>
-            {labels.responseTime}
-          </span>
-        </div>
-      )}
+      {/* Datenschutz-Hinweis */}
+      <p
+        style={{
+          fontFamily: sans,
+          fontSize: "12px",
+          color: C.charcoal,
+          opacity: 0.65,
+          lineHeight: 1.5,
+          margin: 0,
+        }}
+      >
+        {labels.privacyText}
+      </p>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={loading}
+        style={{
+          fontFamily: sans,
+          fontSize: "11px",
+          fontWeight: 500,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: C.dark,
+          backgroundColor: C.button,
+          border: "none",
+          borderRadius: 0,
+          padding: "16px 24px",
+          cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.8 : 1,
+          transition: "background-color 200ms ease, opacity 200ms ease",
+          appearance: "none",
+          width: stack ? "100%" : undefined,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+        }}
+      >
+        {loading ? labels.sending : labels.submit}
+        {!loading && <span aria-hidden>→</span>}
+      </button>
+
+      {/* Response time hint */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span
+          style={{
+            display: "inline-block",
+            width: "12px",
+            height: "1px",
+            backgroundColor: C.stone,
+            opacity: 0.5,
+          }}
+          aria-hidden
+        />
+        <span
+          style={{
+            fontFamily: sans,
+            fontSize: "12px",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: C.stone,
+            opacity: 0.65,
+          }}
+        >
+          {labels.responseTime}
+        </span>
+      </div>
     </form>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════
    SECTION 6 — KONTAKT
-   Desktop: 2 columns (Editorial left | Form right on bg-secondary).
-   Mobile/Tablet: stacked single column, no card-in-card.
-   Map is rendered via MapOverlay (portal) — does NOT affect layout.
    ═══════════════════════════════════════════════════════════ */
 interface Section6Props {
   isVertical?: boolean;
@@ -591,7 +554,7 @@ function LegalLinksRow({
       style={{
         marginTop: "16px",
         paddingTop: "16px",
-        borderTop: `0.5px solid ${C.borderTertiary}`,
+        borderTop: `0.5px solid ${C.line}`,
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
@@ -627,15 +590,15 @@ function LegalLinksRow({
               fontSize: "10px",
               letterSpacing: "0.16em",
               textTransform: "uppercase",
-              color: C.textTertiary,
+              color: C.stone,
               textDecoration: "none",
               transition: "color 300ms cubic-bezier(0.16, 1, 0.3, 1)",
               outline: "none",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = C.textPrimary)}
-            onMouseLeave={(e) => (e.currentTarget.style.color = C.textTertiary)}
-            onFocus={(e) => (e.currentTarget.style.color = C.textPrimary)}
-            onBlur={(e) => (e.currentTarget.style.color = C.textTertiary)}
+            onMouseEnter={(e) => (e.currentTarget.style.color = C.dark)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = C.stone)}
+            onFocus={(e) => (e.currentTarget.style.color = C.dark)}
+            onBlur={(e) => (e.currentTarget.style.color = C.stone)}
           >
             {labels?.[path] || LEGAL_LINK_LABELS[path]}
           </a>
@@ -645,7 +608,7 @@ function LegalLinksRow({
   );
 }
 
-/* ─── Mobile-only: "Auf Karte anzeigen" as accent-line link (primary action) ─── */
+/* ─── Mobile-only: "Auf Karte anzeigen" as accent-line link ─── */
 function MapLinkMobile({
   onClick,
   ariaExpanded,
@@ -687,7 +650,7 @@ function MapLinkMobile({
           display: "inline-block",
           width: hover ? "24px" : "14px",
           height: "0.5px",
-          backgroundColor: hover ? C.textPrimary : C.textTertiary,
+          backgroundColor: hover ? C.dark : C.stone,
           transition: `width 300ms ${EASE}, background-color 300ms ${EASE}`,
           flexShrink: 0,
         }}
@@ -698,7 +661,7 @@ function MapLinkMobile({
           fontSize: "11px",
           letterSpacing: "0.16em",
           textTransform: "uppercase",
-          color: C.textPrimary,
+          color: C.dark,
           lineHeight: 1,
         }}
       >
@@ -708,7 +671,7 @@ function MapLinkMobile({
   );
 }
 
-/* ─── Mobile-only: vertical stacked legal links, each with its own accent-line ─── */
+/* ─── Mobile-only: vertical stacked legal links ─── */
 function LegalLinksStackedMobile({
   onOpenLegal,
   labels,
@@ -721,7 +684,7 @@ function LegalLinksStackedMobile({
       style={{
         marginTop: "24px",
         paddingTop: "20px",
-        borderTop: `0.5px solid ${C.borderTertiary}`,
+        borderTop: `0.5px solid ${C.line}`,
         display: "flex",
         flexDirection: "column",
       }}
@@ -737,6 +700,7 @@ function LegalLinksStackedMobile({
     </div>
   );
 }
+
 function LegalLinkMobileRow({
   path,
   label,
@@ -776,7 +740,7 @@ function LegalLinkMobileRow({
           display: "inline-block",
           width: hover ? "22px" : "14px",
           height: "0.5px",
-          backgroundColor: hover ? C.textSecondary : C.muted,
+          backgroundColor: hover ? C.charcoal : C.muted,
           transition: `width 300ms ${EASE}, background-color 300ms ${EASE}`,
           flexShrink: 0,
         }}
@@ -787,7 +751,7 @@ function LegalLinkMobileRow({
           fontSize: "10px",
           letterSpacing: "0.16em",
           textTransform: "uppercase",
-          color: hover ? C.textPrimary : C.textTertiary,
+          color: hover ? C.dark : C.stone,
           transition: `color 300ms ${EASE}`,
           lineHeight: 1,
         }}
@@ -810,18 +774,37 @@ export function Section6Kontakt({
 
   // Live preview using @sanity/preview-kit
   const [data] = useLiveQuery(initialData, CONTACT_QUERY);
-
-  // Both `data` (live) and `initialData` (full homepage doc) use the same
-  // field names, so a single fall-through reads either source.
   const cms: any = data ?? initialData ?? {};
+
+  /* Privacy link — opens legal modal if onOpenLegal is wired, otherwise plain href */
+  const privacyLinkLabel = t(cms.contactPrivacyLinkLabel, "Datenschutzbestimmungen");
+  const privacyTextNode: ReactNode = (
+    <>
+      Mit dem Absenden stimmen Sie unseren{" "}
+      <a
+        href="/datenschutz"
+        onClick={(e) => {
+          if (!onOpenLegal) return;
+          e.preventDefault();
+          onOpenLegal("/datenschutz");
+        }}
+        style={{ color: "inherit", textDecoration: "none" }}
+        onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+        onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+      >
+        {privacyLinkLabel}
+      </a>{" "}
+      zu.
+    </>
+  );
 
   const content = {
     /* Editorial column */
     subheading: t(cms.contactSubheading, "Kontakt"),
-    heading: t(cms.contactHeading, "Ein Gespräch ist der Anfang."),
+    heading: t(cms.contactHeading, ""),
     description: t(
       cms.contactDescription,
-      "Wenn Sie wissen möchten, ob unsere Arbeitsweise zu Ihren Erwartungen passt, laden wir Sie zu einem unverbindlichen Erstgespräch ein. Persönlich, vertraulich, in unseren Räumen an der Löwenstrasse oder digital.",
+      "Ein erstes Gespräch ist unverbindlich. Persönlich an der Löwenstrasse, oder digital.",
     ),
 
     /* Form labels */
@@ -831,17 +814,19 @@ export function Section6Kontakt({
     formEmail: t(cms.contactFormEmail, "E-Mail"),
     formPhone: t(cms.contactFormPhone, "Telefon"),
     formMessage: t(cms.contactFormMessage, "Nachricht"),
-    formSubmit: t(cms.contactFormSubmit, "Anfrage senden →"),
+    formSubmit: t(cms.contactFormSubmit, "Anfrage senden"),
+    formSending: t(cms.contactFormSendingLabel, "Wird gesendet..."),
     formResponseTime: t(cms.contactFormResponseTime, "Antwort innert 24h"),
     formThanksTitle: t(cms.contactFormThanksTitle, "Vielen Dank."),
-    formThanksBody: t(cms.contactFormThanksBody, "Wir melden uns innerhalb von 24 Stunden."),
+    formThanksBody: t(cms.contactFormThanksBody, "Wir melden uns innert 24 Stunden."),
 
-    /* Company / address (plain string fields, no locale) */
+    /* Company / address (plain string fields) */
     companyName: cms.contactCompanyName || "Tellian Capital",
     companyTagline: t(cms.contactCompanyTagline, "Vermögensverwaltung Zürich AG"),
     address: cms.contactAddress || "Löwenstrasse 1, CH-8001 Zürich",
     phone: cms.contactPhone || "+41 44 224 40 24",
     email: cms.contactEmail || "info@telliancapital.ch",
+    phoneHours: t(cms.contactPhoneHours, "Montag bis Freitag, 8 bis 18 Uhr"),
 
     /* Footer / overlay link */
     mapLinkLabel: t(cms.contactMapLinkLabel, "Auf Karte anzeigen"),
@@ -855,19 +840,31 @@ export function Section6Kontakt({
     phone: content.formPhone,
     message: content.formMessage,
     submit: content.formSubmit,
+    sending: content.formSending,
     responseTime: content.formResponseTime,
     thanksTitle: content.formThanksTitle,
     thanksBody: content.formThanksBody,
+    privacyText: privacyTextNode,
   };
 
-  /* Legal-link labels — sourced from the full homepage doc (`initialData`),
-     since the live `data` returned by useLiveQuery is the contact subset only. */
+  /* Legal-link labels — sourced from the full homepage doc (`initialData`) */
   const legalSource: any = initialData ?? cms;
   const legalLabels: Record<LegalPath, string> = {
     "/impressum": t(legalSource?.legalImpressumLinkLabel, "Impressum"),
     "/datenschutz": t(legalSource?.legalDatenschutzLinkLabel, "Datenschutz"),
     "/kundeninformation": t(legalSource?.legalKundeninformationLinkLabel, "Kundeninformation"),
   };
+
+  /* Headline fallback: "Sprechen wir." with italic "wir." */
+  const headingFallback = (
+    <>
+      Sprechen <em style={{ fontStyle: "italic", fontWeight: 400 }}>wir.</em>
+    </>
+  );
+  const headingNode: ReactNode = content.heading ? content.heading : headingFallback;
+
+  /* Phone in tel: URI (strip spaces) */
+  const phoneHref = `tel:${content.phone.replace(/\s+/g, "")}`;
 
   /* ═══ VERTICAL MODE (mobile + tablet) — stacked, no card-in-card ═══ */
   if (isVertical) {
@@ -877,7 +874,7 @@ export function Section6Kontakt({
       <section
         id="section-kontakt"
         style={{
-          backgroundColor: C.bgPrimary,
+          backgroundColor: C.bg,
           padding: `clamp(48px, 7vh, 80px) ${padX} 48px`,
         }}
       >
@@ -887,7 +884,7 @@ export function Section6Kontakt({
             fontFamily: sans,
             fontSize: "10px",
             letterSpacing: "2.5px",
-            color: C.textTertiary,
+            color: C.stone,
             display: "block",
             textTransform: "uppercase",
           }}
@@ -900,32 +897,24 @@ export function Section6Kontakt({
           style={{
             width: "28px",
             height: "1.5px",
-            backgroundColor: C.textPrimary,
+            backgroundColor: C.dark,
             margin: "12px 0",
           }}
         />
 
-        {/* Headline — same wording as desktop */}
+        {/* Headline */}
         <h2
           style={{
             fontFamily: serif,
             fontSize: isMobile ? "clamp(28px, 8vw, 36px)" : "clamp(36px, 5vw, 48px)",
             lineHeight: 1.12,
-            color: C.textPrimary,
+            color: C.dark,
             letterSpacing: "-0.02em",
             margin: "16px 0 0 0",
             fontWeight: 400,
           }}
         >
-          {content.heading === "Ein Gespräch ist der Anfang." ? (
-            <>
-              Ein Gespräch ist
-              <br />
-              <em style={{ fontStyle: "italic", fontWeight: 400 }}>der Anfang.</em>
-            </>
-          ) : (
-            content.heading
-          )}
+          {headingNode}
         </h2>
 
         {/* Body */}
@@ -933,7 +922,7 @@ export function Section6Kontakt({
           style={{
             fontFamily: sans,
             fontSize: isMobile ? "14px" : "15px",
-            color: C.textSecondary,
+            color: C.charcoal,
             lineHeight: 1.65,
             maxWidth: "520px",
             marginTop: "24px",
@@ -942,21 +931,74 @@ export function Section6Kontakt({
           {content.description}
         </p>
 
-        {/* Form section header — replaces the Card on mobile */}
-        <div style={{ marginTop: "32px" }}>
+        {/* Phone — prominent */}
+        <div style={{ marginTop: "28px" }}>
+          <a
+            href={phoneHref}
+            style={{
+              fontFamily: serif,
+              fontSize: "26px",
+              fontWeight: 400,
+              color: C.dark,
+              textDecoration: "none",
+              letterSpacing: "-0.01em",
+              display: "block",
+              lineHeight: 1.2,
+            }}
+          >
+            {content.phone}
+          </a>
+          <span
+            style={{
+              fontFamily: sans,
+              fontSize: "11px",
+              color: C.stone,
+              display: "block",
+              marginTop: "6px",
+            }}
+          >
+            {content.phoneHours}
+          </span>
+        </div>
+
+        {/* Email — secondary */}
+        <a
+          href={`mailto:${content.email}`}
+          style={{
+            fontFamily: sans,
+            fontSize: "13px",
+            color: C.charcoal,
+            textDecoration: "none",
+            display: "inline-block",
+            marginTop: "12px",
+          }}
+        >
+          {content.email}
+        </a>
+
+        {/* Form section — mobile */}
+        <div style={{ marginTop: "40px" }}>
           <span
             style={{
               fontFamily: sans,
               fontSize: "10px",
-              letterSpacing: "2px",
-              color: C.textTertiary,
+              letterSpacing: "0.2em",
+              color: C.stone,
               display: "block",
               textTransform: "uppercase",
-              marginBottom: "16px",
             }}
           >
             {content.formHeading}
           </span>
+          <div
+            style={{
+              width: "28px",
+              height: "1.5px",
+              backgroundColor: C.dark,
+              marginTop: "12px",
+              marginBottom: "24px",
+            }}
+          />
           <ContactForm stack labels={formLabels} />
         </div>
 
@@ -966,7 +1008,7 @@ export function Section6Kontakt({
             style={{
               width: "100%",
               height: "0.5px",
-              backgroundColor: C.borderTertiary,
+              backgroundColor: C.line,
               marginBottom: "20px",
             }}
           />
@@ -975,7 +1017,7 @@ export function Section6Kontakt({
               fontFamily: sans,
               fontSize: "13px",
               fontWeight: 500,
-              color: C.textPrimary,
+              color: C.dark,
               display: "block",
             }}
           >
@@ -985,7 +1027,7 @@ export function Section6Kontakt({
             style={{
               fontFamily: sans,
               fontSize: "12px",
-              color: C.textTertiary,
+              color: C.stone,
               display: "block",
               marginTop: "2px",
             }}
@@ -996,7 +1038,7 @@ export function Section6Kontakt({
             style={{
               fontFamily: sans,
               fontSize: "12px",
-              color: C.textTertiary,
+              color: C.stone,
               display: "block",
               marginTop: "4px",
             }}
@@ -1004,7 +1046,7 @@ export function Section6Kontakt({
             {content.address}
           </span>
 
-          {/* Map link — directly under address, part of the address block */}
+          {/* Map link */}
           <MapLinkMobile
             buttonRef={openBtnRef}
             onClick={() => setMapOpen(true)}
@@ -1012,20 +1054,19 @@ export function Section6Kontakt({
             label={content.mapLinkLabel}
           />
 
-          {/* Tel + Mail as touch-friendly rows (44px min height) */}
+          {/* Tel + Mail rows (44px touch target) */}
           <div style={{ display: "flex", flexDirection: "column", marginTop: "8px" }}>
             <a
-              href={`tel:${content.phone.replace(/\s+/g, "")}`}
+              href={phoneHref}
               style={{
                 fontFamily: sans,
                 fontSize: "13px",
-                color: C.textSecondary,
+                color: C.charcoal,
                 display: "flex",
                 alignItems: "center",
                 minHeight: "44px",
                 padding: "4px 0",
               }}
-              className="transition-colors duration-300 hover:text-[#1A1916]"
             >
               {content.phone}
             </a>
@@ -1034,20 +1075,19 @@ export function Section6Kontakt({
               style={{
                 fontFamily: sans,
                 fontSize: "13px",
-                color: C.textSecondary,
+                color: C.charcoal,
                 display: "flex",
                 alignItems: "center",
                 minHeight: "44px",
                 padding: "4px 0",
               }}
-              className="transition-colors duration-300 hover:text-[#1A1916]"
             >
               {content.email}
             </a>
           </div>
         </div>
 
-        {/* Legal links — vertical stack, separated from address block by top border */}
+        {/* Legal links stack */}
         <LegalLinksStackedMobile onOpenLegal={onOpenLegal} labels={legalLabels} />
 
         {/* Footer */}
@@ -1060,7 +1100,7 @@ export function Section6Kontakt({
             gap: "10px",
           }}
         >
-          <div style={{ width: "16px", height: "1px", backgroundColor: C.borderTertiary }} />
+          <div style={{ width: "16px", height: "1px", backgroundColor: C.line }} />
           <span
             style={{
               fontFamily: sans,
@@ -1093,7 +1133,7 @@ export function Section6Kontakt({
       className="flex h-screen flex-shrink-0"
       style={{
         width: "100vw",
-        backgroundColor: C.bgPrimary,
+        backgroundColor: C.bg,
       }}
     >
       {/* ═══ COLUMN 1 — Editorial ═══ */}
@@ -1105,141 +1145,189 @@ export function Section6Kontakt({
           padding: "clamp(36px, 5vh, 80px) clamp(36px, 5vw, 80px) clamp(24px, 3vh, 56px)",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: C.bgPrimary,
+          justifyContent: "space-between",
+          backgroundColor: C.bg,
         }}
       >
-        {/* Eyebrow */}
-        <span
-          style={{
-            fontFamily: sans,
-            fontSize: "10px",
-            letterSpacing: "2.5px",
-            color: C.textTertiary,
-            display: "block",
-            textTransform: "uppercase",
-          }}
-        >
-          {content.subheading}
-        </span>
-
-        {/* Accent line */}
+        {/* Main content — vertically centered */}
         <div
-          style={{
-            width: "28px",
-            height: "1.5px",
-            backgroundColor: C.textPrimary,
-            margin: "12px 0",
-          }}
-        />
-
-        {/* Headline */}
-        <h2
-          style={{
-            fontFamily: serif,
-            fontSize: "32px",
-            lineHeight: 1.12,
-            color: C.textPrimary,
-            letterSpacing: "-0.02em",
-            margin: 0,
-            fontWeight: 400,
-          }}
+          style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}
         >
-          {content.heading === "Ein Gespräch ist der Anfang." ? (
-            <>
-              Ein Gespräch ist
-              <br />
-              <em style={{ fontStyle: "italic", fontWeight: 400 }}>der Anfang.</em>
-            </>
-          ) : (
-            content.heading
-          )}
-        </h2>
-
-        {/* Body */}
-        <p
-          style={{
-            fontFamily: sans,
-            fontSize: "14px",
-            color: C.textSecondary,
-            lineHeight: 1.6,
-            maxWidth: "320px",
-            marginTop: "20px",
-          }}
-        >
-          {content.description}
-        </p>
-
-        {/* Bottom block — pushed down */}
-        <div style={{ marginTop: "auto", paddingTop: "24px" }}>
-          <div
+          {/* 1. Eyebrow */}
+          <span
             style={{
-              width: "100%",
-              height: "0.5px",
-              backgroundColor: C.borderTertiary,
-              marginBottom: "20px",
+              fontFamily: sans,
+              fontSize: "10px",
+              letterSpacing: "0.22em",
+              color: C.stone,
+              display: "block",
+              textTransform: "uppercase",
             }}
+          >
+            {content.subheading}
+          </span>
+
+          {/* 2. Eyebrow divider */}
+          <div
+            style={{ width: "28px", height: "1.5px", backgroundColor: C.dark, marginTop: "16px" }}
           />
 
-          {/* Company */}
-          <span
+          {/* 3. Headline */}
+          <h2
             style={{
-              fontFamily: sans,
-              fontSize: "13px",
-              fontWeight: 500,
-              color: C.textPrimary,
-              display: "block",
+              fontFamily: serif,
+              fontSize: "clamp(48px, 7vh, 80px)",
+              lineHeight: 0.94,
+              color: C.dark,
+              letterSpacing: "-0.03em",
+              margin: 0,
+              marginTop: "32px",
+              fontWeight: 400,
             }}
           >
-            {content.companyName}
-          </span>
-          <span
-            style={{
-              fontFamily: sans,
-              fontSize: "11px",
-              color: C.textTertiary,
-              display: "block",
-              marginTop: "2px",
-            }}
-          >
-            {content.companyTagline}
-          </span>
-          <span
-            style={{
-              fontFamily: sans,
-              fontSize: "11px",
-              color: C.textTertiary,
-              display: "block",
-              marginTop: "4px",
-            }}
-          >
-            {content.address}
-          </span>
+            {headingNode}
+          </h2>
 
-          {/* Contact row */}
-          <div
+          {/* 4. Body */}
+          <p
             style={{
-              display: "flex",
-              gap: "20px",
-              marginTop: "12px",
+              fontFamily: sans,
+              fontSize: "14px",
+              color: C.charcoal,
+              lineHeight: 1.6,
+              maxWidth: "320px",
+              margin: 0,
+              marginTop: "24px",
             }}
           >
+            {content.description}
+          </p>
+
+          {/* 5. Phone — prominent */}
+          <div style={{ marginTop: "48px" }}>
             <a
-              href={`tel:${content.phone.replace(/\s+/g, "")}`}
-              style={{ fontFamily: sans, fontSize: "11px", color: C.textSecondary }}
-              className="transition-colors duration-300 hover:text-[#1A1916]"
+              href={phoneHref}
+              style={{
+                fontFamily: serif,
+                fontSize: "28px",
+                fontWeight: 400,
+                color: C.dark,
+                textDecoration: "none",
+                letterSpacing: "-0.01em",
+                display: "block",
+                lineHeight: 1.2,
+                transition: "color 300ms ease-out",
+              }}
             >
               {content.phone}
             </a>
-            <a
-              href={`mailto:${content.email}`}
-              style={{ fontFamily: sans, fontSize: "11px", color: C.textSecondary }}
-              className="transition-colors duration-300 hover:text-[#1A1916]"
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: "14px",
+                color: C.charcoal,
+                opacity: 0.7,
+                display: "block",
+                marginTop: "8px",
+              }}
             >
-              {content.email}
-            </a>
+              {content.phoneHours}
+            </span>
           </div>
 
-          {/* Legal links — below contact row */}
+          {/* 6. Email */}
+          <a
+            href={`mailto:${content.email}`}
+            style={{
+              fontFamily: sans,
+              fontSize: "13px",
+              color: C.charcoal,
+              textDecoration: "none",
+              display: "inline-block",
+              marginTop: "32px",
+              transition: "color 300ms ease-out",
+            }}
+          >
+            {content.email}
+          </a>
+
+          {/* 7. Address block */}
+          <div style={{ marginTop: "64px" }}>
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: "13px",
+                fontWeight: 500,
+                color: C.dark,
+                display: "block",
+              }}
+            >
+              {content.companyName}
+            </span>
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: "11px",
+                color: C.stone,
+                display: "block",
+                marginTop: "4px",
+              }}
+            >
+              {content.companyTagline}
+            </span>
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: "11px",
+                color: C.stone,
+                display: "block",
+                marginTop: "4px",
+              }}
+            >
+              {content.address}
+            </span>
+
+            {/* "Auf Karte anzeigen" */}
+            <button
+              ref={openBtnRef}
+              onClick={() => setMapOpen(true)}
+              aria-expanded={mapOpen}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                marginTop: "16px",
+                fontFamily: sans,
+                fontSize: "13px",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: C.stone,
+                transition: "color 200ms ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = C.dark)}
+              onMouseLeave={(e) => (e.currentTarget.style.color = C.stone)}
+            >
+              <span>{content.mapLinkLabel}</span>
+              <span aria-hidden>→</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 8. Footer — anchored to bottom */}
+        <div style={{ paddingTop: "32px" }}>
+          <div
+            style={{
+              width: "100%",
+              height: "1px",
+              backgroundColor: C.dark,
+              opacity: 0.25,
+              marginBottom: "24px",
+            }}
+          />
           <LegalLinksRow onOpenLegal={onOpenLegal} labels={legalLabels} />
         </div>
       </div>
@@ -1255,74 +1343,41 @@ export function Section6Kontakt({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          position: "relative",
         }}
       >
-        {/* Form card */}
         <div
           style={{
             width: "100%",
-            maxWidth: "440px",
-            backgroundColor: C.bgPrimary,
-            border: `0.5px solid ${C.borderTertiary}`,
+            maxWidth: "480px",
+            backgroundColor: C.bg,
+            border: `0.5px solid ${C.line}`,
             borderRadius: "12px",
-            padding: "28px",
+            padding: "32px",
           }}
         >
           <span
             style={{
               fontFamily: sans,
               fontSize: "10px",
-              letterSpacing: "2px",
-              color: C.textTertiary,
+              letterSpacing: "0.2em",
+              color: C.stone,
               display: "block",
               textTransform: "uppercase",
-              marginBottom: "16px",
             }}
           >
             {content.formHeading}
           </span>
+          <div
+            style={{
+              width: "28px",
+              height: "1.5px",
+              backgroundColor: C.dark,
+              marginTop: "12px",
+              marginBottom: "24px",
+            }}
+          />
           <ContactForm labels={formLabels} />
         </div>
-
-        {/* "Auf Karte anzeigen" — bottom right, triggers overlay */}
-        <button
-          ref={openBtnRef}
-          onClick={() => setMapOpen(true)}
-          aria-expanded={mapOpen}
-          style={{
-            position: "absolute",
-            bottom: "clamp(24px, 3vh, 48px)",
-            right: "clamp(36px, 4vw, 64px)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            padding: "4px",
-            fontFamily: sans,
-            fontSize: "9px",
-            letterSpacing: "1px",
-            textTransform: "uppercase",
-            color: C.textTertiary,
-            transition: "color 0.3s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = C.textSecondary)}
-          onMouseLeave={(e) => (e.currentTarget.style.color = C.textTertiary)}
-        >
-          <span
-            style={{
-              display: "inline-block",
-              width: "4px",
-              height: "4px",
-              borderRadius: "50%",
-              backgroundColor: "currentColor",
-            }}
-            aria-hidden
-          />
-          {content.mapLinkLabel}
-        </button>
       </div>
 
       {/* ═══ OVERLAY — rendered via portal to document.body ═══ */}
