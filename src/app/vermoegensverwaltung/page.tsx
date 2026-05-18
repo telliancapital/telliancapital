@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import HomeClient from "../HomeClient";
 import { sanityFetch } from "@/sanity/lib/live";
 import { HOMEPAGE_QUERY } from "@/sanity/lib/queries";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Vermögensverwaltung — Anlageprozess",
+  description:
+    "Der Anlageprozess von Tellian Capital: persönliche Beratung, individuelle Portfoliolösungen und transparente Core/Satelliten-Struktur für Privatkunden in Zürich.",
+  path: "/vermoegensverwaltung",
+  lang: "de",
+});
 
 /**
  * Deep-link route for the Vermögensverwaltung (Anlageprozess) detail overlay.

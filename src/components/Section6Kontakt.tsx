@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+/* mapbox-gl is dynamic-imported inside ZurichMap below to keep it out of the
+   main bundle. The map only renders when the user opens the overlay. */
+import type mapboxgl from "mapbox-gl";
 import type { Breakpoint } from "./useBreakpoint";
 import { FloatingField } from "./FloatingField";
 import { LEGAL_PATHS, LEGAL_LINK_LABELS, type LegalPath } from "../data/legalPages";
@@ -22,7 +23,9 @@ const MAP_CENTER: [number, number] = [8.5387, 47.3769];
 /* ═══════════════════════════════════════════════════════════
    MAPBOX STYLING HELPERS
    ═══════════════════════════════════════════════════════════ */
-function applyStyleAndMarker(map: mapboxgl.Map) {
+type MapboxGL = typeof mapboxgl;
+
+function applyStyleAndMarker(mapboxgl: MapboxGL, map: mapboxgl.Map) {
   const style = map.getStyle();
   if (!style?.layers) return;
 
@@ -102,40 +105,51 @@ function ZurichMap() {
     const el = mapContainer.current;
     if (!el || mapRef.current || !MAPBOX_TOKEN) return;
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-
     let cancelled = false;
     let ro: ResizeObserver | null = null;
 
-    const initWhenReady = () => {
+    /* Lazy-load mapbox-gl + its CSS on first mount of this component.
+       Keeps ~700 KB of JS out of the main bundle so the homepage paints
+       faster — the user has to click the map button to land here anyway. */
+    (async () => {
+      const [{ default: mapboxgl }] = await Promise.all([
+        import("mapbox-gl"),
+        import("mapbox-gl/dist/mapbox-gl.css"),
+      ]);
       if (cancelled) return;
-      const rect = el.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) {
-        requestAnimationFrame(initWhenReady);
-        return;
-      }
 
-      const map = new mapboxgl.Map({
-        container: el,
-        style: "mapbox://styles/mapbox/light-v11",
-        center: MAP_CENTER,
-        zoom: 15.5,
-        pitch: 0,
-        bearing: 0,
-        interactive: false,
-        attributionControl: false,
-      });
+      mapboxgl.accessToken = MAPBOX_TOKEN;
 
-      mapRef.current = map;
-      map.on("load", () => map.resize());
-      map.on("style.load", () => applyStyleAndMarker(map));
-      map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
+      const initWhenReady = () => {
+        if (cancelled) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+          requestAnimationFrame(initWhenReady);
+          return;
+        }
 
-      ro = new ResizeObserver(() => map.resize());
-      ro.observe(el);
-    };
+        const map = new mapboxgl.Map({
+          container: el,
+          style: "mapbox://styles/mapbox/light-v11",
+          center: MAP_CENTER,
+          zoom: 15.5,
+          pitch: 0,
+          bearing: 0,
+          interactive: false,
+          attributionControl: false,
+        });
 
-    initWhenReady();
+        mapRef.current = map;
+        map.on("load", () => map.resize());
+        map.on("style.load", () => applyStyleAndMarker(mapboxgl, map));
+        map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
+
+        ro = new ResizeObserver(() => map.resize());
+        ro.observe(el);
+      };
+
+      initWhenReady();
+    })();
 
     return () => {
       cancelled = true;
@@ -819,7 +833,7 @@ export function Section6Kontakt({
 }: Section6Props = {}) {
   const [mapOpen, setMapOpen] = useState(false);
   const openBtnRef = useRef<HTMLButtonElement>(null);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   // Live preview using @sanity/preview-kit
   const [data] = useLiveQuery(initialData, CONTACT_QUERY);
@@ -903,12 +917,22 @@ export function Section6Kontakt({
     privacyText: privacyTextNode,
   };
 
-  /* Legal-link labels — sourced from the full homepage doc (`initialData`) */
+  /* Legal-link labels — sourced from the full homepage doc (`initialData`).
+     Hardcoded fallbacks are language-aware so the UI stays localized even
+     when the matching Sanity fields are empty. */
   const legalSource: any = initialData ?? cms;
+  const legalFallbacks: Record<LegalPath, Record<"de" | "en", string>> = {
+    "/impressum": { de: "Impressum", en: "Legal Notice" },
+    "/datenschutz": { de: "Datenschutz", en: "Privacy Policy" },
+    "/kundeninformation": { de: "Kundeninformation", en: "Client Information" },
+  };
   const legalLabels: Record<LegalPath, string> = {
-    "/impressum": t(legalSource?.legalImpressumLinkLabel, "Impressum"),
-    "/datenschutz": t(legalSource?.legalDatenschutzLinkLabel, "Datenschutz"),
-    "/kundeninformation": t(legalSource?.legalKundeninformationLinkLabel, "Kundeninformation"),
+    "/impressum": t(legalSource?.legalImpressumLinkLabel, legalFallbacks["/impressum"][lang]),
+    "/datenschutz": t(legalSource?.legalDatenschutzLinkLabel, legalFallbacks["/datenschutz"][lang]),
+    "/kundeninformation": t(
+      legalSource?.legalKundeninformationLinkLabel,
+      legalFallbacks["/kundeninformation"][lang],
+    ),
   };
 
   /* Headline fallback: "Sprechen wir." with italic "wir." */

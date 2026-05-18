@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
   },
+  async redirects() {
+    return [{ source: "/", destination: "/de", permanent: true }];
+  },
 };
 
 export default nextConfig;

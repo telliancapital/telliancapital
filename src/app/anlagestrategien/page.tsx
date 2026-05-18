@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import HomeClient from "../HomeClient";
 import { sanityFetch } from "@/sanity/lib/live";
 import { HOMEPAGE_QUERY } from "@/sanity/lib/queries";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Anlagestrategien — Tellian Capital",
+  description:
+    "Die Anlagestrategien von Tellian Capital: massgeschneiderte Portfoliolösungen mit klarer Core/Satelliten-Struktur, abgestimmt auf Risikoprofil und Ziele.",
+  path: "/anlagestrategien",
+  lang: "de",
+});
 
 /**
  * Deep-link route for the Anlagestrategien detail overlay.

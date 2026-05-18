@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import HomeClient from "../HomeClient";
 import { sanityFetch } from "@/sanity/lib/live";
 import { HOMEPAGE_QUERY } from "@/sanity/lib/queries";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildMetadata({
+  title: "Impressum",
+  description:
+    "Impressum und gesetzliche Angaben zur Tellian Capital Vermögensverwaltung Zürich AG, Löwenstrasse 1, 8001 Zürich.",
+  path: "/impressum",
+  lang: "de",
+});
 
 /**
  * Deep-link route for the Impressum legal page.

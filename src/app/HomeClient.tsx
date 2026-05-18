@@ -33,11 +33,11 @@ import { Section3Timeline } from "@/components/Section3Timeline";
 import { LAYOUT, TEXT_COLUMN_STYLE, getLayout, getTextColumnStyle, SPACING } from "@/layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
-import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.png";
-import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.png";
-import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.png";
-import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.png";
-import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.png";
+import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.webp";
+import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.webp";
+import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.webp";
+import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.webp";
+import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.webp";
 import { useRouter } from "next/navigation";
 import preloadLogo from "../../public/TellianCapital-Logo.png";
 import { C, serif, sans } from "../tokens";
@@ -1117,12 +1117,12 @@ function Section4Anlagestrategien({
       <SubpageOverlay
         isOpen={isDetail}
         onClose={() => onCloseDetail?.()}
-        eyebrow="Anlagestrategien"
+        eyebrow={detailEyebrow}
         headline={
           <>
-            Zwei Perspektiven,
+            {detailHeadingLine1}
             <br />
-            <em style={{ fontStyle: "italic", fontWeight: 400 }}>ein Portfolio.</em>
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{detailHeadingLine2}</em>
           </>
         }
       >
