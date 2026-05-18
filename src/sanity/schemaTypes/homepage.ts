@@ -1292,6 +1292,31 @@ export const homepageType = defineType({
       fieldset: "contactFormSet",
     }),
     defineField({
+      name: "contactPrivacyPrefix",
+      title: "Privacy notice — prefix",
+      description:
+        'Text before the privacy link, shown under the form. Example: "Mit dem Absenden stimmen Sie unseren ".',
+      type: "localeString",
+      group: "contact",
+      fieldset: "contactFormSet",
+    }),
+    defineField({
+      name: "contactPrivacyLinkLabel",
+      title: "Privacy notice — link label",
+      description: 'The inline link that opens /datenschutz. Example: "Datenschutzbestimmungen".',
+      type: "localeString",
+      group: "contact",
+      fieldset: "contactFormSet",
+    }),
+    defineField({
+      name: "contactPrivacySuffix",
+      title: "Privacy notice — suffix",
+      description: 'Text after the privacy link. Example: " zu.".',
+      type: "localeString",
+      group: "contact",
+      fieldset: "contactFormSet",
+    }),
+    defineField({
       name: "contactCompanyName",
       title: "Company name",
       description: 'Top line in the address block. Example: "Tellian Capital".',
@@ -1320,6 +1345,15 @@ export const homepageType = defineType({
       title: "Phone",
       description: "Click-to-call number. Use international format.",
       type: "string",
+      group: "contact",
+      fieldset: "contactCompanySet",
+    }),
+    defineField({
+      name: "contactPhoneHours",
+      title: "Phone hours",
+      description:
+        'Small caption shown below the phone number. Example: "Montag bis Freitag, 8 bis 18 Uhr".',
+      type: "localeString",
       group: "contact",
       fieldset: "contactCompanySet",
     }),

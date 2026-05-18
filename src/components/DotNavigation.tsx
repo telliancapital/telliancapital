@@ -1,13 +1,18 @@
+"use client";
+
 import { sans } from "../tokens";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const SECTIONS = [
-  { label: "Start", target: 0.0, threshold: 0.0 },
-  { label: "Haltung", target: 0.154, threshold: 0.08 },
-  { label: "Methode", target: 0.309, threshold: 0.23 },
-  { label: "Strategie", target: 0.463, threshold: 0.39 },
-  { label: "Team", target: 0.618, threshold: 0.54 },
-  { label: "Kontakt", target: 1.0, threshold: 0.94 },
+  { labels: { de: "Start", en: "Start" }, target: 0.0, threshold: 0.0 },
+  { labels: { de: "Haltung", en: "Approach" }, target: 0.154, threshold: 0.08 },
+  { labels: { de: "Methode", en: "Method" }, target: 0.309, threshold: 0.23 },
+  { labels: { de: "Strategie", en: "Strategy" }, target: 0.463, threshold: 0.39 },
+  { labels: { de: "Team", en: "Team" }, target: 0.618, threshold: 0.54 },
+  { labels: { de: "Kontakt", en: "Contact" }, target: 1.0, threshold: 0.94 },
 ];
+
+const NAV_ARIA_LABEL = { de: "Sektion-Navigation", en: "Section navigation" };
 
 const V = {
   bg: "var(--tellian-nav-bg)",
@@ -33,10 +38,11 @@ interface DotNavigationProps {
 
 export function DotNavigation({ scrollProgress, onNavigate }: DotNavigationProps) {
   const activeIndex = getActiveIndex(scrollProgress);
+  const { lang } = useLanguage();
 
   return (
     <nav
-      aria-label="Sektion-Navigation"
+      aria-label={NAV_ARIA_LABEL[lang]}
       style={{
         position: "fixed",
         bottom: "clamp(16px, 2.5vh, 24px)",
@@ -58,11 +64,12 @@ export function DotNavigation({ scrollProgress, onNavigate }: DotNavigationProps
     >
       {SECTIONS.map((section, i) => {
         const isActive = activeIndex === i;
+        const label = section.labels[lang];
         return (
           <button
             key={i}
             onClick={() => onNavigate(section.target)}
-            aria-label={section.label}
+            aria-label={label}
             aria-current={isActive ? "page" : undefined}
             style={{
               display: "flex",
@@ -104,7 +111,7 @@ export function DotNavigation({ scrollProgress, onNavigate }: DotNavigationProps
                 transition: "color 200ms ease",
               }}
             >
-              {section.label}
+              {label}
             </span>
           </button>
         );
@@ -113,7 +120,8 @@ export function DotNavigation({ scrollProgress, onNavigate }: DotNavigationProps
       {/* Fallback for browsers without backdrop-filter */}
       <style>{`
         @supports not (backdrop-filter: blur(24px)) {
-          nav[aria-label="Sektion-Navigation"] {
+          nav[aria-label="${NAV_ARIA_LABEL.de}"],
+          nav[aria-label="${NAV_ARIA_LABEL.en}"] {
             background: rgba(255, 255, 255, 0.8) !important;
           }
         }

@@ -108,7 +108,9 @@ function teamEmail(name: string): string {
    ═══════════════════════════════════════════════════════════ */
 function SendMessageLink({ email }: { email: string }) {
   const [hover, setHover] = useState(false);
+  const { lang } = useLanguage();
   const color = hover ? C.dark : C.stone;
+  const label = lang === "en" ? "Send message" : "Nachricht senden";
   return (
     <a
       href={`mailto:${email}`}
@@ -132,7 +134,7 @@ function SendMessageLink({ email }: { email: string }) {
           transition: "color 200ms ease",
         }}
       >
-        Nachricht senden
+        {label}
       </span>
       <span
         aria-hidden

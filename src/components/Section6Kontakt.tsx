@@ -365,6 +365,7 @@ interface ContactFormLabels {
 function ContactForm({ stack = false, labels }: { stack?: boolean; labels: ContactFormLabels }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -375,11 +376,43 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
-    // TODO: replace with real form submission
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setSubmitted(true);
+    setErrorMsg(null);
+
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    const messageBody = form.phone.trim()
+      ? `${form.message}\n\n—\nTelefon: ${form.phone}`
+      : form.message;
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fullName,
+          email: form.email,
+          subject: `Neue Kontaktanfrage von ${fullName}`,
+          message: messageBody,
+        }),
+      });
+
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
+
+      if (!res.ok || !data.ok) {
+        setErrorMsg(data.error || "Senden fehlgeschlagen. Bitte versuchen Sie es erneut.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setErrorMsg("Netzwerkfehler. Bitte versuchen Sie es erneut.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -469,6 +502,22 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
       >
         {labels.privacyText}
       </p>
+
+      {/* Error message */}
+      {errorMsg && (
+        <p
+          role="alert"
+          style={{
+            fontFamily: sans,
+            fontSize: "12px",
+            color: "#b3261e",
+            margin: 0,
+            lineHeight: 1.5,
+          }}
+        >
+          {errorMsg}
+        </p>
+      )}
 
       {/* Submit */}
       <button
@@ -776,11 +825,18 @@ export function Section6Kontakt({
   const [data] = useLiveQuery(initialData, CONTACT_QUERY);
   const cms: any = data ?? initialData ?? {};
 
+  if (typeof window !== "undefined") {
+    console.log("[contact debug] contactFormThanksBody =", cms.contactFormThanksBody);
+    console.log("[contact debug] contactFormThanksTitle =", cms.contactFormThanksTitle);
+  }
+
   /* Privacy link — opens legal modal if onOpenLegal is wired, otherwise plain href */
-  const privacyLinkLabel = t(cms.contactPrivacyLinkLabel, "Datenschutzbestimmungen");
+  const privacyPrefix = t(cms.contactPrivacyPrefix);
+  const privacyLinkLabel = t(cms.contactPrivacyLinkLabel);
+  const privacySuffix = t(cms.contactPrivacySuffix);
   const privacyTextNode: ReactNode = (
     <>
-      Mit dem Absenden stimmen Sie unseren{" "}
+      {privacyPrefix}
       <a
         href="/datenschutz"
         onClick={(e) => {
@@ -793,8 +849,8 @@ export function Section6Kontakt({
         onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
       >
         {privacyLinkLabel}
-      </a>{" "}
-      zu.
+      </a>
+      {privacySuffix}
     </>
   );
 
