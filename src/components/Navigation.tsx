@@ -1052,6 +1052,8 @@ export function Navigation({
                     <button
                       onMouseEnter={() => setPortalHover(true)}
                       onMouseLeave={() => setPortalHover(false)}
+                      onClick={onLoginClick}
+                      aria-haspopup="dialog"
                       style={{
                         display: "flex",
                         alignItems: "center",
