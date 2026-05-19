@@ -298,6 +298,11 @@ export const homepageType = defineType({
       title: "Kundeninformation — Meta tags",
       options: { collapsible: true, collapsed: true },
     },
+    {
+      name: "seoFaqSet",
+      title: "FAQ — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
   ],
 
   fields: [
@@ -1788,6 +1793,14 @@ export const homepageType = defineType({
       type: "seoMeta",
       group: "seo",
       fieldset: "seoKundeninformationSet",
+    }),
+    defineField({
+      name: "seoFaq",
+      title: "FAQ  ·  /faq",
+      description: "Meta tags for the dedicated FAQ page that lists all published FAQ documents.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoFaqSet",
     }),
   ],
 

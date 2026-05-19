@@ -152,6 +152,43 @@ export function resolveSeoMetadata({
   });
 }
 
+/**
+ * Build a schema.org FAQPage JSON-LD object from a list of FAQ items.
+ *
+ * Always emit server-side (in a `<script type="application/ld+json">` in the
+ * page's RSC output) so Google sees the structured data on the first crawl
+ * without executing JavaScript. Empty/blank items are filtered out — the
+ * spec requires `name` and `acceptedAnswer.text` to both be present.
+ *
+ * Returns `null` when no usable items remain, so callers can conditionally
+ * render the script tag.
+ */
+export interface FaqJsonLdItem {
+  question: string;
+  answer: string;
+}
+
+export function faqJsonLd(items: readonly FaqJsonLdItem[]): Record<string, unknown> | null {
+  const cleaned = items
+    .map(({ question, answer }) => ({
+      question: question?.trim() ?? "",
+      answer: answer?.trim() ?? "",
+    }))
+    .filter((item) => item.question.length > 0 && item.answer.length > 0);
+
+  if (cleaned.length === 0) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: cleaned.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  };
+}
+
 /** LocalBusiness / FinancialService JSON-LD for the homepage. */
 export function localBusinessJsonLd(): Record<string, unknown> {
   return {

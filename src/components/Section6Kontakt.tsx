@@ -840,8 +840,8 @@ export function Section6Kontakt({
   const cms: any = data ?? initialData ?? {};
 
   if (typeof window !== "undefined") {
-    console.log("[contact debug] contactFormThanksBody =", cms.contactFormThanksBody);
-    console.log("[contact debug] contactFormThanksTitle =", cms.contactFormThanksTitle);
+    console.log("[contact debug] contactFormThanksBody");
+    console.log("[contact debug] contactFormThanksTitle");
   }
 
   /* Privacy link — opens legal modal if onOpenLegal is wired, otherwise plain href */

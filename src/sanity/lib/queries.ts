@@ -159,6 +159,35 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
 }`);
 
 /**
+ * All published FAQs across every page bucket, ordered by `page` then `order`.
+ * Used by the dedicated /faq page (which groups client-side by the `page`
+ * field) and by the FAQ JSON-LD emitter.
+ */
+export const FAQ_ALL_QUERY = defineQuery(`*[
+  _type == "faq" && isPublished == true
+] | order(page asc, order asc, _createdAt asc){
+  _id,
+  question,
+  answer,
+  page,
+  order
+}`);
+
+/**
+ * Published FAQs for a single page bucket, e.g. "vermoegensverwaltung".
+ * Accepts `$page` as a GROQ parameter.
+ */
+export const FAQ_BY_PAGE_QUERY = defineQuery(`*[
+  _type == "faq" && isPublished == true && page == $page
+] | order(order asc, _createdAt asc){
+  _id,
+  question,
+  answer,
+  page,
+  order
+}`);
+
+/**
  * SEO-only query — returns just the per-page meta tag blocks from the
  * homepage doc, so `generateMetadata` doesn't have to fetch the full
  * document. Each block follows the `seoMeta` schema: localized title /
@@ -197,6 +226,12 @@ export const SEO_QUERY = defineQuery(`*[_type == "homepage"][0]{
     "ogImageUrl": ogImage.asset->url
   },
   "kundeninformation": seoKundeninformation{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "faq": seoFaq{
     title,
     description,
     keywords,

@@ -42,6 +42,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/faq`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+      alternates: {
+        languages: {
+          "de-CH": `${SITE_URL}/faq`,
+          "en-US": `${SITE_URL}/en/faq`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/en/faq`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+      alternates: {
+        languages: {
+          "de-CH": `${SITE_URL}/faq`,
+          "en-US": `${SITE_URL}/en/faq`,
+        },
+      },
+    },
+    {
       url: `${SITE_URL}/impressum`,
       lastModified: now,
       changeFrequency: "yearly",

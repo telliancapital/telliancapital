@@ -1,4 +1,6 @@
-import { useEffect, useId, useState } from "react";
+"use client";
+
+import { useId, useState } from "react";
 
 const sans = "'Inter', sans-serif";
 const serif = "'Cormorant Garamond', serif";
@@ -20,38 +22,38 @@ export interface FaqItem {
 
 interface FaqAccordionProps {
   items: readonly FaqItem[];
-  /** Unique identifier used on the injected JSON-LD script tag — avoids
-      collisions if multiple FAQ blocks are ever mounted at once. */
+  /** Accessibility / DOM id namespace for the heading. Required so multiple
+      FAQ blocks on the same page never share a heading id. */
   schemaId: string;
+  /** Uppercase label rendered above the list. Default: "Häufige Fragen". */
+  label?: string;
+  /** Index of the row open on first render. `null` keeps everything closed. */
+  defaultOpenIndex?: number | null;
+  /** Heading level used by screen readers for the label. */
+  headingLevel?: 2 | 3 | 4;
 }
 
-export function FaqAccordion({ items, schemaId }: FaqAccordionProps) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+/**
+ * Server-friendly accordion for FAQ rows. The accompanying `FAQPage` JSON-LD
+ * is emitted by the parent server component via `faqJsonLd()` so it ships
+ * with the initial HTML — Google does not have to execute JS to see it.
+ */
+export function FaqAccordion({
+  items,
+  schemaId,
+  label = "Häufige Fragen",
+  defaultOpenIndex = 0,
+  headingLevel = 2,
+}: FaqAccordionProps) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(defaultOpenIndex);
 
-  /* FAQPage JSON-LD — enables rich snippets in Google + AI search citations.
-     One script per FaqAccordion instance, keyed by schemaId. */
-  useEffect(() => {
-    const schema = {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: items.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: { "@type": "Answer", text: item.answer },
-      })),
-    };
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.setAttribute("data-faq-schema", schemaId);
-    script.textContent = JSON.stringify(schema);
-    document.head.appendChild(script);
-    return () => {
-      if (script.parentNode) script.parentNode.removeChild(script);
-    };
-  }, [items, schemaId]);
+  if (items.length === 0) return null;
+
+  const headingId = `faq-heading-${schemaId}`;
+  const Heading = `h${headingLevel}` as "h2" | "h3" | "h4";
 
   return (
-    <section aria-labelledby={`faq-heading-${schemaId}`}>
+    <section aria-labelledby={headingId}>
       {/* Label — accent line + uppercase meta label */}
       <div
         style={{
@@ -71,18 +73,20 @@ export function FaqAccordion({ items, schemaId }: FaqAccordionProps) {
             flexShrink: 0,
           }}
         />
-        <span
-          id={`faq-heading-${schemaId}`}
+        <Heading
+          id={headingId}
           style={{
             fontFamily: sans,
             fontSize: "10px",
             letterSpacing: "0.18em",
             color: C.stone,
             textTransform: "uppercase",
+            fontWeight: 500,
+            margin: 0,
           }}
         >
-          Häufige Fragen
-        </span>
+          {label}
+        </Heading>
       </div>
 
       {/* Accordion list */}
