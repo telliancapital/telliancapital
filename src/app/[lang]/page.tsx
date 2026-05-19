@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import HomeClient from "../HomeClient";
 import { sanityFetch } from "@/sanity/lib/live";
-import { HOMEPAGE_QUERY } from "@/sanity/lib/queries";
-import { buildMetadata, localBusinessJsonLd } from "@/lib/seo";
+import { HOMEPAGE_QUERY, SEO_QUERY } from "@/sanity/lib/queries";
+import { localBusinessJsonLd, resolveSeoMetadata } from "@/lib/seo";
 
 const SUPPORTED_LANGS = ["de", "en"] as const;
 type Lang = (typeof SUPPORTED_LANGS)[number];
@@ -34,10 +34,10 @@ export async function generateMetadata({
   const safeLang: Lang = (SUPPORTED_LANGS as readonly string[]).includes(lang)
     ? (lang as Lang)
     : "de";
-  const { title, description } = COPY[safeLang];
-  return buildMetadata({
-    title,
-    description,
+  const { data: seo } = await sanityFetch({ query: SEO_QUERY, stega: false });
+  return resolveSeoMetadata({
+    seo: seo?.home,
+    fallback: COPY[safeLang],
     path: `/${safeLang}`,
     lang: safeLang,
     alternates: { de: "/de", en: "/en" },

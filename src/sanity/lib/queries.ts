@@ -159,6 +159,52 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
 }`);
 
 /**
+ * SEO-only query — returns just the per-page meta tag blocks from the
+ * homepage doc, so `generateMetadata` doesn't have to fetch the full
+ * document. Each block follows the `seoMeta` schema: localized title /
+ * description (`{ de, en }`), a flat keywords array, and an optional
+ * Open Graph image (the asset URL is resolved with `->`).
+ */
+export const SEO_QUERY = defineQuery(`*[_type == "homepage"][0]{
+  "home": seoHome{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "vermoegensverwaltung": seoVermoegensverwaltung{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "anlagestrategien": seoAnlagestrategien{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "impressum": seoImpressum{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "datenschutz": seoDatenschutz{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "kundeninformation": seoKundeninformation{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  }
+}`);
+
+/**
  * Contact-only query, used by `Section6Kontakt` for in-Studio live preview.
  * Returns the same field names as the homepage doc so the component can
  * read identical keys whether the data comes from `initialData` (full doc

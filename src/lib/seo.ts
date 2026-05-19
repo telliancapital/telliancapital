@@ -31,6 +31,8 @@ interface PageMetaInput {
   alternates?: Partial<Record<Lang, string>>;
   /** Override the OG image; defaults to the site logo. */
   image?: string;
+  /** Keywords meta tag content. Empty/undefined omits the tag. */
+  keywords?: string[];
   /** Block indexing for legal/preview/draft pages. */
   noindex?: boolean;
 }
@@ -44,14 +46,20 @@ export function buildMetadata({
   lang = "de",
   alternates,
   image = DEFAULT_IMAGE,
+  keywords,
   noindex = false,
 }: PageMetaInput): Metadata {
   const url = `${SITE_URL}${path}`;
   const ogLocale = lang === "en" ? "en_US" : "de_CH";
+  const isAbsoluteImage = /^https?:\/\//i.test(image);
+  const ogImage = isAbsoluteImage
+    ? { url: image, alt: BUSINESS.name }
+    : { url: image, width: 1200, height: 630, alt: BUSINESS.name };
 
   return {
     title,
     description,
+    keywords: keywords && keywords.length > 0 ? keywords : undefined,
     alternates: {
       canonical: url,
       languages: alternates
@@ -70,7 +78,7 @@ export function buildMetadata({
       siteName: BUSINESS.name,
       locale: ogLocale,
       type: "website",
-      images: [{ url: image, width: 1200, height: 630, alt: BUSINESS.name }],
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
@@ -86,6 +94,62 @@ export function buildMetadata({
           googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
         },
   };
+}
+
+/**
+ * Shape of one per-page SEO block fetched from Sanity via `SEO_QUERY`.
+ * Title/description are localized ({ de, en }), keywords are flat, and
+ * `ogImageUrl` is the resolved CDN URL of the uploaded image (if any).
+ */
+export interface SanitySeoBlock {
+  title?: { de?: string | null; en?: string | null } | null;
+  description?: { de?: string | null; en?: string | null } | null;
+  keywords?: string[] | null;
+  ogImageUrl?: string | null;
+}
+
+interface ResolveSeoInput {
+  seo?: SanitySeoBlock | null;
+  /** Fallback values used when the corresponding Sanity field is empty. */
+  fallback: {
+    title: string;
+    description: string;
+  };
+  path: string;
+  lang?: Lang;
+  alternates?: Partial<Record<Lang, string>>;
+  noindex?: boolean;
+}
+
+/**
+ * Merge a Sanity SEO block with a static fallback and return a Next.js
+ * `Metadata` object. Empty Sanity values fall back to the static defaults
+ * so partial CMS data still produces valid head tags.
+ */
+export function resolveSeoMetadata({
+  seo,
+  fallback,
+  path,
+  lang = "de",
+  alternates,
+  noindex,
+}: ResolveSeoInput): Metadata {
+  const localeKey: Lang = lang === "en" ? "en" : "de";
+  const title = seo?.title?.[localeKey]?.trim() || fallback.title;
+  const description = seo?.description?.[localeKey]?.trim() || fallback.description;
+  const keywords = seo?.keywords?.filter((k): k is string => typeof k === "string" && k.length > 0);
+  const image = seo?.ogImageUrl?.trim() || undefined;
+
+  return buildMetadata({
+    title,
+    description,
+    path,
+    lang,
+    alternates,
+    keywords: keywords && keywords.length > 0 ? keywords : undefined,
+    image,
+    noindex,
+  });
 }
 
 /** LocalBusiness / FinancialService JSON-LD for the homepage. */
