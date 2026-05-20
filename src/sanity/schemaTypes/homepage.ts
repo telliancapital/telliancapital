@@ -25,6 +25,7 @@ export const homepageType = defineType({
     { name: "contact", title: "6. Kontakt" },
     { name: "legal", title: "7. Rechtliches" },
     { name: "navigation", title: "8. Sidebar  ·  Navigation" },
+    { name: "seo", title: "9. SEO  ·  Meta tags" },
   ],
 
   /* Collapsible groupings within each tab.
@@ -264,6 +265,43 @@ export const homepageType = defineType({
       name: "navPortalSet",
       title: "Login / Kundenportal",
       options: { collapsible: true, collapsed: false },
+    },
+
+    /* SEO — per-page meta tags */
+    {
+      name: "seoHomeSet",
+      title: "Homepage — Meta tags",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "seoVermoegensverwaltungSet",
+      title: "Vermögensverwaltung — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoAnlagestrategienSet",
+      title: "Anlagestrategien — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoImpressumSet",
+      title: "Impressum — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoDatenschutzSet",
+      title: "Datenschutz — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoKundeninformationSet",
+      title: "Kundeninformation — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoFaqSet",
+      title: "FAQ — Meta tags",
+      options: { collapsible: true, collapsed: true },
     },
   ],
 
@@ -1699,6 +1737,70 @@ export const homepageType = defineType({
       type: "localeString",
       group: "navigation",
       fieldset: "navPortalSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       09 — SEO · META TAGS
+       Per-page Open Graph + meta title/description/keywords + share image.
+       Title/description support DE/EN; keywords are a flat list of strings.
+       Falls back to the static defaults in src/lib/seo.ts when empty.
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "seoHome",
+      title: "Homepage  ·  /  ·  /de  ·  /en",
+      description:
+        "Meta tags for the main landing page. Used by Google, social shares (Open Graph / Twitter), and the browser tab.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoHomeSet",
+    }),
+    defineField({
+      name: "seoVermoegensverwaltung",
+      title: "Vermögensverwaltung  ·  /vermoegensverwaltung",
+      description: "Meta tags for the Vermögensverwaltung (Anlageprozess) deep-link page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoVermoegensverwaltungSet",
+    }),
+    defineField({
+      name: "seoAnlagestrategien",
+      title: "Anlagestrategien  ·  /anlagestrategien",
+      description: "Meta tags for the Anlagestrategien detail deep-link page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoAnlagestrategienSet",
+    }),
+    defineField({
+      name: "seoImpressum",
+      title: "Impressum  ·  /impressum",
+      description: "Meta tags for the Impressum legal page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoImpressumSet",
+    }),
+    defineField({
+      name: "seoDatenschutz",
+      title: "Datenschutz  ·  /datenschutz",
+      description: "Meta tags for the Datenschutz legal page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoDatenschutzSet",
+    }),
+    defineField({
+      name: "seoKundeninformation",
+      title: "Kundeninformation  ·  /kundeninformation",
+      description: "Meta tags for the Kundeninformation legal page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoKundeninformationSet",
+    }),
+    defineField({
+      name: "seoFaq",
+      title: "FAQ  ·  /faq",
+      description: "Meta tags for the dedicated FAQ page that lists all published FAQ documents.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoFaqSet",
     }),
   ],
 

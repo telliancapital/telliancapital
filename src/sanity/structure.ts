@@ -9,8 +9,19 @@ export const structure: StructureResolver = (S) =>
         .title("Homepage")
         .id("homepage")
         .child(S.document().schemaType("homepage").documentId("homepage")),
+      S.listItem()
+        .title("FAQs")
+        .id("faqs")
+        .child(
+          S.documentTypeList("faq")
+            .title("FAQs")
+            .defaultOrdering([
+              { field: "page", direction: "asc" },
+              { field: "order", direction: "asc" },
+            ]),
+        ),
       S.divider(),
       ...S.documentTypeListItems().filter(
-        (listItem) => !["homepage"].includes(listItem.getId() || ""),
+        (listItem) => !["homepage", "faq"].includes(listItem.getId() || ""),
       ),
     ]);
