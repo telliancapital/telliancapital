@@ -156,12 +156,14 @@ function SendMessageLink({ email }: { email: string }) {
 function PortraitCard({
   member,
   width,
+  aspectPct = "125%",
   nameSize = "18px",
   roleSize = "14px",
   nameWeight = 600,
 }: {
   member: TeamMember;
   width: string;
+  aspectPct?: string;
   nameSize?: string;
   roleSize?: string;
   nameWeight?: number;
@@ -169,7 +171,7 @@ function PortraitCard({
   return (
     <div style={{ width, flexShrink: 0 }}>
       {/* Photo — 4:5 aspect, head in upper third */}
-      <div className="relative w-full overflow-hidden" style={{ paddingBottom: "125%" }}>
+      <div className="relative w-full overflow-hidden" style={{ paddingBottom: aspectPct }}>
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
@@ -223,11 +225,13 @@ function PortraitCard({
    ═══════════════════════════════════════════════════════════ */
 function StaggeredPortrait({
   member,
+  aspectPct,
   nameSize,
   roleSize,
   delayMs,
 }: {
   member: TeamMember;
+  aspectPct: string;
   nameSize: string;
   roleSize: string;
   delayMs: number;
@@ -264,6 +268,7 @@ function StaggeredPortrait({
       <PortraitCard
         member={member}
         width="100%"
+        aspectPct={aspectPct}
         nameSize={nameSize}
         roleSize={roleSize}
         nameWeight={500}
@@ -422,6 +427,7 @@ export function Section5UeberTellian({
                 <StaggeredPortrait
                   key={member.name}
                   member={member}
+                  aspectPct="125%"
                   nameSize={breakpoint === "mobile" ? "13px" : "14px"}
                   roleSize={breakpoint === "mobile" ? "11px" : "12px"}
                   delayMs={(i % cols) * 100}

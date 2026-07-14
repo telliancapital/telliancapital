@@ -5,9 +5,9 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 const SECTIONS = [
   { labels: { de: "Start", en: "Start" }, target: 0.0, threshold: 0.0 },
-  { labels: { de: "Haltung", en: "Approach" }, target: 0.154, threshold: 0.08 },
-  { labels: { de: "Methode", en: "Method" }, target: 0.309, threshold: 0.23 },
-  { labels: { de: "Strategie", en: "Strategy" }, target: 0.463, threshold: 0.39 },
+  { labels: { de: "Philosophie", en: "Approach" }, target: 0.154, threshold: 0.08 },
+  { labels: { de: "Mandat", en: "Method" }, target: 0.309, threshold: 0.23 },
+  { labels: { de: "Portfolio", en: "Strategy" }, target: 0.463, threshold: 0.39 },
   { labels: { de: "Team", en: "Team" }, target: 0.618, threshold: 0.54 },
   { labels: { de: "Kontakt", en: "Contact" }, target: 1.0, threshold: 0.94 },
 ];

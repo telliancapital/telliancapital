@@ -1,7 +1,5 @@
 "use client";
 
-import { Section4CoreSatellite } from "@/components/Section4CoreSatellite";
-import { Section4TopDownBottomUp } from "@/components/Section4TopDownBottomUp";
 import { useEffect, useState, useCallback, useRef, FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
@@ -9,6 +7,7 @@ import { useSubpageMode } from "@/components/useSubpageMode";
 import { SubpageOverlay } from "@/components/SubpageOverlay";
 import { AnlageprozessDetail } from "@/components/AnlageprozessDetail";
 import { AnlagestrategienDetail } from "@/components/AnlagestrategienDetail";
+import { PortfolioManagementDetail } from "@/components/PortfolioManagementDetail";
 import { ANLAGEPROZESS_STEPS } from "@/data/anlageprozessSteps";
 import { AnlageprozessStepOrdinal, ORDINAL_FONT_SIZE } from "@/components/AnlageprozessStepOrdinal";
 import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
@@ -29,17 +28,18 @@ import { Section6Kontakt } from "@/components/Section6Kontakt";
 import { HeroVertical } from "@/components/HeroVertical";
 import { ExpandableBody } from "@/components/ExpandableBody";
 import { Section2Anlagephilosophie } from "@/components/Section2Anlagephilosophie";
-import { Section3Timeline } from "@/components/Section3Timeline";
+import { ParteiDreieck } from "@/components/ParteiDreieck";
 import { LAYOUT, TEXT_COLUMN_STYLE, getLayout, getTextColumnStyle, SPACING } from "@/layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
 import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.webp";
+import heroDesktopImg from "@/assets/zh-3.jpg";
 import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.webp";
 import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.webp";
 import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.webp";
 import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.webp";
 import { useRouter } from "next/navigation";
-import preloadLogo from "../../public/TellianCapital-Logo.png";
+import preloadLogo from "@/assets/logo/Tellian__archive white logo horizontal.svg";
 import { C, serif, sans } from "../tokens";
 import { EASE } from "../styles/motion";
 
@@ -464,27 +464,26 @@ function Section3Vermoegensverwaltung({
               />
             </div>
           </ScrollFade>
-
-          <ScrollFade scrollX={0} isVertical yOffset={16}>
-            <div style={{ marginTop: SPACING.bodyToCta, paddingBottom: "32px" }}>
-              <CtaButton href="/vermoegensverwaltung" onClick={handleAnlageprozess}>
-                {ctaLabel}
-              </CtaButton>
-            </div>
-          </ScrollFade>
         </div>
 
-        {/* Timeline visual — comes AFTER text on mobile/tablet */}
+        {/* Partei-Dreieck — comes AFTER text on mobile/tablet */}
         <div
           style={{
             width: "100%",
-            height: breakpoint === "mobile" ? "auto" : "60vh",
-            padding: breakpoint === "mobile" ? "32px 16px" : undefined,
-            position: "relative",
+            padding: breakpoint === "mobile" ? "32px 20px" : "40px 32px",
           }}
         >
-          <Section3Timeline scrollX={0} isVertical homepage={homepage} />
+          <ParteiDreieck compact onNavigate={() => onOpenDetail?.()} />
         </div>
+
+        {/* CTA — AFTER the visual element on mobile */}
+        <ScrollFade scrollX={0} isVertical yOffset={16}>
+          <div style={{ padding: breakpoint === "mobile" ? "0 20px 32px" : "0 32px 32px" }}>
+            <CtaButton href="/vermoegensverwaltung" onClick={handleAnlageprozess}>
+              {ctaLabel}
+            </CtaButton>
+          </div>
+        </ScrollFade>
         {/* Detail overlay for mobile/tablet — plain fade (no FLIP) */}
         <VermoegensverwaltungMobileOverlay
           isOpen={isDetail}
@@ -505,31 +504,35 @@ function Section3Vermoegensverwaltung({
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
     >
-      <Section3Timeline scrollX={scrollX} isDetailMode={isDetail} homepage={homepage} />
+      {/* Content wrapper — no sticky/scroll-lock, standard flow */}
+      <div style={{ position: "relative", width: layout.sectionWidth, height: "100%" }}>
+        <ParteiDreieck onNavigate={() => onOpenDetail?.()} />
 
-      <div
-        className="relative z-10 flex h-full flex-col justify-center"
-        style={{
-          ...textColStyle,
-          maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
-          opacity: isDetail ? 0 : 1,
-          transform: isDetail ? "translateX(-50px)" : "translateX(0)",
-          transition: `opacity 500ms ${EASE.standard}, transform 500ms ${EASE.standard}`,
-          pointerEvents: isDetail ? "none" : "auto",
-        }}
-      >
-        <span
+        <div
+          className="relative z-10 flex h-full flex-col justify-center"
           style={{
-            fontFamily: sans,
-            fontSize: "10px",
-            letterSpacing: "0.22em",
-            color: C.stone,
-            display: "block",
+            ...textColStyle,
+            width: "44vw" /* Narrowed from 56vw — aligns with dark panel edge at 44vw */,
+            backgroundColor: C.bg /* Opaque — prevents dark panel bleeding through */,
+            maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
+            opacity: isDetail ? 0 : 1,
+            transform: isDetail ? "translateX(-50px)" : "translateX(0)",
+            transition: `opacity 500ms ${EASE.standard}, transform 500ms ${EASE.standard}`,
+            pointerEvents: isDetail ? "none" : "auto",
           }}
-          className="uppercase"
         >
-          {eyebrowText}
-        </span>
+          <span
+            style={{
+              fontFamily: sans,
+              fontSize: "10px",
+              letterSpacing: "0.22em",
+              color: C.stone,
+              display: "block",
+            }}
+            className="uppercase"
+          >
+            {eyebrowText}
+          </span>
 
         <div
           style={{
@@ -607,6 +610,7 @@ function Section3Vermoegensverwaltung({
             <span aria-hidden>→</span>
           </a>
         </div>
+      </div>
       </div>
     </div>
   );
@@ -769,9 +773,9 @@ function Section3Vermoegensverwaltung({
                     minWidth: "80px",
                   }}
                 >
-                  {/* Step ordinal — FLIP target. Framer Motion animates from
-                    the previous position (in Section3Timeline) to this one
-                    via shared layoutId within LayoutGroup. */}
+                  {/* Step ordinal — kept as a FLIP target (shared layoutId) for when
+                    another overview element renders it; currently fades in on its own
+                    since the Partei-Dreieck visual has no matching ordinal. */}
                   {isDetail && (
                     <AnlageprozessStepOrdinal
                       num={step.num}
@@ -839,9 +843,9 @@ function Section3Vermoegensverwaltung({
       document.body,
     );
 
-  /* LayoutGroup enables Framer Motion's layoutId matching across React portals.
-     Without it, the ordinal in Section3Timeline and the ordinal in the Portal
-     overlay cannot be recognized as the same element → no FLIP. */
+  /* LayoutGroup enables Framer Motion's layoutId matching across React portals,
+     so any overview element sharing a layoutId with the Portal overlay's ordinals
+     can be recognized as the same element for a FLIP transition. */
   return (
     <LayoutGroup>
       {overviewMarkup}
@@ -861,6 +865,8 @@ interface Section4Props {
   onOpenDetail?: () => void;
   onCloseDetail?: () => void;
   onContactClick?: () => void;
+  /** Opens the Portfolio Management detail subpage (CTA "Mehr zum Anlageprozess") */
+  onNavigateToProcess?: () => void;
   homepage?: any;
 }
 
@@ -869,45 +875,31 @@ function Section4Anlagestrategien({
   isVertical = false,
   breakpoint = "desktop" as const,
   viewMode = "overview",
-  onOpenDetail,
   onCloseDetail,
   onContactClick,
+  onNavigateToProcess,
   homepage,
 }: Section4Props) {
+  void scrollX;
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
   const { t } = useLanguage();
   const isDetail = viewMode === "detail";
-  const [mounted, setMounted] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
-  const handleOpenDetail = (e: React.MouseEvent) => {
+  const handleNavigateToProcess = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    onOpenDetail?.();
+    onNavigateToProcess?.();
   };
 
-  const handleBackClick = () => {
-    onCloseDetail?.();
-  };
-
-  const fallbackParagraphs = [
-    "Die Anlagestrategien von Tellian Capital vereinen zwei wesentliche Ansätze: Wir analysieren die globalen Märkte nach ökonomischen Rahmendaten (Top-Down) und bewerten gleichzeitig einzelne Unternehmen auf Basis ihrer fundamentalen Stärke (Bottom-Up).",
-    "Dieser duale Prozess ermöglicht es uns, strukturelle Trends frühzeitig zu erkennen und gezielt in Geschäftsmodelle zu investieren, die auch in einem volatilen Umfeld bestehen können.",
-    "Jede Strategie wird individuell auf das Kundenprofil zugeschnitten. Wir setzen dabei auf Transparenz, Liquidität und eine disziplinierte Umsetzung der Anlageentscheide.",
+  /* Overview copy — reframed around Portfolio Management (see the new
+     /portfolio-management subpage). Not CMS-driven: this replaces the
+     previous Anlagestrategien overview copy/visual per the redesign. */
+  const bodyParagraphs = [
+    "Jede Anlageentscheidung bei Tellian Capital folgt einem klaren, nachvollziehbaren Prozess. Von den Leitprinzipien über Ihr persönliches Anlegerprofil bis zur strategischen und taktischen Allokation — nichts entsteht aus Marktstimmung, alles aus Methode.",
+    "Das Ergebnis ist eine individuelle Portfolio-Konstruktion, die laufend überwacht und transparent berichtet wird. So bleibt Ihr Portfolio jederzeit auf Ihre Ziele ausgerichtet.",
   ];
 
-  const cmsParagraphs: string[] = (homepage?.strategyParagraphs ?? [])
-    .map((p: LocaleValue) => t(p, ""))
-    .filter((p: string) => p.length > 0);
-  const bodyParagraphs = cmsParagraphs.length > 0 ? cmsParagraphs : fallbackParagraphs;
-
-  const eyebrowText = t(homepage?.strategyEyebrow, "Anlagestrategien");
-  const headingLine1 = t(homepage?.strategyHeadingLine1, "Zwei Perspektiven.");
-  const headingLine2 = t(homepage?.strategyHeadingLine2, "Ein Portfolio.");
-  const ctaLabel = t(homepage?.strategyCtaLabel, "Mehr zu den Strategien");
   const detailEyebrow = t(homepage?.strategyDetailEyebrow, "Anlagestrategien");
   const detailHeadingLine1 = t(homepage?.strategyDetailHeadingLine1, "Zwei Perspektiven,");
   const detailHeadingLine2 = t(homepage?.strategyDetailHeadingLine2, "ein Portfolio.");
@@ -927,7 +919,7 @@ function Section4Anlagestrategien({
               }}
               className="uppercase"
             >
-              {eyebrowText}
+              Portfolio Management
             </span>
 
             <div
@@ -952,9 +944,9 @@ function Section4Anlagestrategien({
                 marginTop: SPACING.accentToHeadline,
               }}
             >
-              {headingLine1}
+              Methode statt
               <br />
-              <em>{headingLine2}</em>
+              <em>Zufall.</em>
             </h2>
           </ScrollFade>
 
@@ -970,19 +962,147 @@ function Section4Anlagestrategien({
               />
             </div>
           </ScrollFade>
+        </div>
 
-          <ScrollFade scrollX={0} isVertical yOffset={16}>
-            <div style={{ marginTop: SPACING.bodyToCta, paddingBottom: "32px" }}>
-              <CtaButton href="/anlagestrategien" onClick={handleOpenDetail}>
-                {ctaLabel}
-              </CtaButton>
+        {/* Methodik-Schaubild — comes AFTER text on mobile/tablet */}
+        <div style={{ width: "100%", padding: "32px 16px" }}>
+          <figure
+            role="img"
+            aria-label="Flussdiagramm: Anlageprozess von Leitprinzipien bis Reporting."
+            style={{ maxWidth: 480, margin: "0 auto", padding: 0 }}
+          >
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {["Leitprinzipien", "Investment-Philosophie"].map((label) => (
+                <div
+                  key={label}
+                  style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
             </div>
-          </ScrollFade>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 10, borderLeft: `1px dashed ${C.line}` }} />
+              <span
+                style={{
+                  fontFamily: sans,
+                  fontSize: 7,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: C.stone,
+                  padding: "2px 8px",
+                }}
+              >
+                Anlegerprofil des Kunden
+              </span>
+              <div style={{ width: 0.5, height: 10, borderLeft: `1px dashed ${C.line}` }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
+              {[
+                "Innovatives Portfolio-Management",
+                "Zugang zu einzigartigen Investmentmöglichkeiten",
+                "Inhouse-Expertise & internationales Netzwerk",
+              ].map((label) => (
+                <div
+                  key={label}
+                  style={{ backgroundColor: C.purple, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 14, borderLeft: `1px dashed ${C.line}` }} />
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke={C.stone}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {["Strategische Allokation", "Taktische Allokation"].map((label) => (
+                <div
+                  key={label}
+                  style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 14, borderLeft: `1px dashed ${C.line}` }} />
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke={C.stone}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={{ backgroundColor: C.purple, padding: "14px 18px", textAlign: "center" }}>
+              <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+                Individuelle Portfolio-Konstruktion
+              </span>
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 14, borderLeft: `1px dashed ${C.line}` }} />
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke={C.stone}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {["Überwachung", "Reporting"].map((label) => (
+                <div
+                  key={label}
+                  style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </figure>
         </div>
 
-        <div style={{ width: "100%", padding: "0 16px 64px" }}>
-          <Section4TopDownBottomUp scrollX={0} isVertical homepage={homepage} />
-        </div>
+        {/* CTA — AFTER the visual element on mobile */}
+        <ScrollFade scrollX={0} isVertical yOffset={16}>
+          <div style={{ padding: breakpoint === "mobile" ? "0 20px 32px" : "0 32px 32px" }}>
+            <CtaButton href="/portfolio-management" onClick={handleNavigateToProcess}>
+              Mehr zum Anlageprozess
+            </CtaButton>
+          </div>
+        </ScrollFade>
 
         <AnlagestrategienMobileOverlay
           isOpen={isDetail}
@@ -1005,12 +1125,164 @@ function Section4Anlagestrategien({
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
     >
-      <Section4TopDownBottomUp scrollX={scrollX} isDetailMode={isDetail} homepage={homepage} />
+      {/* ── Right column: Methodik-Schaubild ──
+           Section4: 40/60 instead of 50/50 — deliberate, the diagram needs width.
+           Don't align this to the other sections' split. */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: "38vw",
+          right: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "visible",
+        }}
+      >
+        <figure
+          role="img"
+          aria-label="Flussdiagramm: Von Leitprinzipien und Investment-Philosophie über das Anlegerprofil des Kunden zu innovativem Portfolio-Management, strategischer und taktischer Allokation, individueller Portfolio-Konstruktion, Überwachung und Reporting."
+          style={{ maxWidth: 560, width: "100%", margin: 0, padding: 0 }}
+        >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {["Leitprinzipien", "Investment-Philosophie"].map((label) => (
+              <div
+                key={label}
+                style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 12, borderLeft: `1px dashed ${C.line}` }} />
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: 8,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: C.stone,
+                padding: "3px 10px",
+              }}
+            >
+              Anlegerprofil des Kunden
+            </span>
+            <div style={{ width: 0.5, height: 12, borderLeft: `1px dashed ${C.line}` }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            {[
+              "Innovatives Portfolio-Management",
+              "Zugang zu einzigartigen Investmentmöglichkeiten",
+              "Inhouse-Expertise & internationales Netzwerk",
+            ].map((label) => (
+              <div
+                key={label}
+                style={{
+                  backgroundColor: C.purple,
+                  padding: "14px 12px",
+                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 16, borderLeft: `1px dashed ${C.line}` }} />
+            <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke={C.stone}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {["Strategische Allokation", "Taktische Allokation"].map((label) => (
+              <div
+                key={label}
+                style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 16, borderLeft: `1px dashed ${C.line}` }} />
+            <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke={C.stone}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div style={{ backgroundColor: C.purple, padding: "16px 20px", textAlign: "center" }}>
+            <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+              Individuelle Portfolio-Konstruktion
+            </span>
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 16, borderLeft: `1px dashed ${C.line}` }} />
+            <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke={C.stone}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {["Überwachung", "Reporting"].map((label) => (
+              <div
+                key={label}
+                style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </figure>
+      </div>
 
+      {/* ── Left column: text (38vw — narrower, 40/60 split for the diagram) ── */}
       <div
         className="relative z-10 flex h-full flex-col justify-center"
         style={{
           ...textColStyle,
+          width: "38vw",
           maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
           opacity: isDetail ? 0 : 1,
           transform: isDetail ? "translateX(-50px)" : "translateX(0)",
@@ -1028,7 +1300,7 @@ function Section4Anlagestrategien({
           }}
           className="uppercase"
         >
-          {eyebrowText}
+          Portfolio Management
         </span>
 
         <div
@@ -1050,9 +1322,9 @@ function Section4Anlagestrategien({
             marginTop: SPACING.accentToHeadline,
           }}
         >
-          {headingLine1}
+          Methode statt
           <br />
-          <em>{headingLine2}</em>
+          <em>Zufall.</em>
         </h2>
 
         <div
@@ -1081,8 +1353,8 @@ function Section4Anlagestrategien({
 
           {/* CTA — inline with body text, left-aligned */}
           <a
-            href="/anlagestrategien"
-            onClick={handleOpenDetail}
+            href="/portfolio-management"
+            onClick={handleNavigateToProcess}
             className="inline-flex items-center gap-3 uppercase"
             style={{
               marginTop: "56px",
@@ -1101,7 +1373,7 @@ function Section4Anlagestrategien({
               transition: "background-color 250ms ease-out",
             }}
           >
-            {ctaLabel}
+            <span>Mehr zum Anlageprozess</span>
             <span aria-hidden>→</span>
           </a>
         </div>
@@ -1158,7 +1430,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const heroBottomLabel = t(homepage?.startBottomLabel, "FINMA-LIZENZIERT · ZÜRICH");
   // Hero image: prefer uploaded asset, then external URL, then bundled fallback.
   const heroImageSrc: string =
-    homepage?.startImageAsset?.url || homepage?.startImageUrl || IMG.hero.src;
+    homepage?.startImageAsset?.url || homepage?.startImageUrl || heroDesktopImg.src;
 
   const { scrollX, scrollProgress, scrollDirection, containerRef, scrollTo } = useHorizontalScroll({
     disabled: isVertical || !introComplete,
@@ -1171,9 +1443,14 @@ export default function HomeClient({ homepage }: { homepage: any }) {
 
   const vvw = useSubpageMode("/vermoegensverwaltung");
   const ast = useSubpageMode("/anlagestrategien");
+  const pm = useSubpageMode("/portfolio-management");
   const legal = useLegalRoute();
 
-  const isDetailMode = vvw.mode === "detail" || ast.mode === "detail" || legal.activePath !== null;
+  const isDetailMode =
+    vvw.mode === "detail" ||
+    ast.mode === "detail" ||
+    pm.mode === "detail" ||
+    legal.activePath !== null;
 
   const [heroAnimate, setHeroAnimate] = useState(false);
   const heroArrowHidden = scrollX > 0.02;
@@ -1188,6 +1465,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const navigateToContact = useCallback(() => {
     vvw.closeDetail();
     ast.closeDetail();
+    pm.closeDetail();
     legal.close();
     if (isVertical) {
       const el = document.getElementById("section-kontakt");
@@ -1195,7 +1473,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
     } else {
       scrollTo(0.88);
     }
-  }, [vvw, ast, legal, isVertical, scrollTo]);
+  }, [vvw, ast, pm, legal, isVertical, scrollTo]);
 
   if (!introComplete) {
     return <PreloadScreen onComplete={() => setIntroComplete(true)} />;
@@ -1251,6 +1529,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
             onOpenDetail={ast.openDetail}
             onCloseDetail={ast.closeDetail}
             onContactClick={navigateToContact}
+            onNavigateToProcess={pm.openDetail}
             homepage={homepage}
           />
 
@@ -1272,6 +1551,22 @@ export default function HomeClient({ homepage }: { homepage: any }) {
         </main>
 
         <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+
+        {/* ═══ Portfolio Management Subpage (mobile) ═══ */}
+        <SubpageOverlay
+          isOpen={pm.isDetail}
+          onClose={() => pm.closeDetail()}
+          eyebrow="Portfolio Management"
+          headline={
+            <>
+              Wie wir Ihr Portfolio
+              <br />
+              <em style={{ fontStyle: "italic", fontWeight: 400 }}>führen.</em>
+            </>
+          }
+        >
+          <PortfolioManagementDetail isMobile={true} onContactClick={navigateToContact} />
+        </SubpageOverlay>
       </div>
     );
   }
@@ -1462,6 +1757,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           onOpenDetail={ast.openDetail}
           onCloseDetail={ast.closeDetail}
           onContactClick={navigateToContact}
+          onNavigateToProcess={pm.openDetail}
           homepage={homepage}
         />
 
@@ -1481,6 +1777,22 @@ export default function HomeClient({ homepage }: { homepage: any }) {
       </div>
 
       <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+
+      {/* ═══ Portfolio Management Subpage ═══ */}
+      <SubpageOverlay
+        isOpen={pm.isDetail}
+        onClose={() => pm.closeDetail()}
+        eyebrow="Portfolio Management"
+        headline={
+          <>
+            Wie wir Ihr Portfolio
+            <br />
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>führen.</em>
+          </>
+        }
+      >
+        <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} />
+      </SubpageOverlay>
     </div>
   );
 }

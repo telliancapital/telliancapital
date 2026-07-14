@@ -1,12 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-
-const sans = "'Inter', sans-serif";
-
-const C = {
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-  dark: "#1A1916",
-};
+import { C, sans } from "@/tokens";
 
 interface ExpandableBodyProps {
   /** All paragraphs to display. */

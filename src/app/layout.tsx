@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { draftMode } from "next/headers";
@@ -19,6 +20,14 @@ const inter = Inter({
   weight: ["300", "400", "500"],
   display: "swap",
   variable: "--font-inter",
+});
+
+// Brand Guidelines 2026 — display/title typeface, not distributed via Google Fonts.
+const lustria = localFont({
+  src: "../fonts/Lustria-Regular.ttf",
+  display: "swap",
+  variable: "--font-lustria",
+  declarations: [{ prop: "font-family", value: "'Lustria'" }],
 });
 
 const DEFAULT_TITLE = "Tellian Capital | Unabhängige Vermögensverwaltung Zürich";
@@ -82,7 +91,7 @@ export default async function RootLayout({
   const showVisualEditing = isEnabled || process.env.NODE_ENV === "development";
 
   return (
-    <html lang="de" className={`h-full ${cormorant.variable} ${inter.variable}`}>
+    <html lang="de" className={`h-full ${cormorant.variable} ${inter.variable} ${lustria.variable}`}>
       <body className="h-full">
         <LanguageProvider>{children}</LanguageProvider>
         {showVisualEditing && <VisualEditing />}

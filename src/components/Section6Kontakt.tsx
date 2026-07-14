@@ -537,6 +537,7 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
       <button
         type="submit"
         disabled={loading}
+        className="hover:bg-tellian-button-hover active:scale-[0.98]"
         style={{
           fontFamily: sans,
           fontSize: "11px",
