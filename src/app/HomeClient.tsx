@@ -81,7 +81,7 @@ function PreloadScreen({ onComplete }: { onComplete: () => void }) {
   return (
     <motion.div
       className="fixed inset-0 z-[200] flex items-center justify-center"
-      style={{ backgroundColor: "#3f212a" }}
+      style={{ backgroundColor: C.purple }}
       animate={{ y: sliding ? "-100%" : "0%" }}
       transition={sliding ? { duration: 0.8, ease: [0.76, 0, 0.24, 1] } : { duration: 0 }}
     >
@@ -1687,7 +1687,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
               bottom: "56px",
               right: "calc(10vw + 56px)",
               zIndex: 5,
-              color: "#3f212a",
+              color: C.purple,
               opacity: heroAnimate && !heroArrowHidden ? 1 : 0,
               transform: heroArrowHidden ? "translateX(16px) scale(0.6)" : "scale(1)",
               transition: heroArrowHidden

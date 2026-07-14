@@ -442,9 +442,9 @@ export function Section5UeberTellian({
 
   /* ═══ DESKTOP MODE ═══
      Single container: text column (absolute, 56vw) + filmstrip of all 8
-     portraits (flex row, 28vw each, 24px gaps). Text sits on top of the
+     portraits (flex row, 20vw each, 24px gaps). Text sits on top of the
      first ~56vw of the filmstrip via matching bg color.
-     Layout width: paddingLeft(60vw) + 8×28vw + 7×24px ≈ 284vw + 168px.
+     Layout width: paddingLeft(60vw) + 8×20vw + 7×24px ≈ 220vw + 168px.
   ══════════════════════════════════════════════════════════ */
   return (
     <div
@@ -559,7 +559,7 @@ export function Section5UeberTellian({
 
       {/* Filmstrip — all 8 portraits, equal spacing */}
       {TEAM.map((member) => (
-        <PortraitCard key={member.name} member={member} width="28vw" />
+        <PortraitCard key={member.name} member={member} width="20vw" />
       ))}
     </div>
   );

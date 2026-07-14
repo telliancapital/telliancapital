@@ -29,8 +29,8 @@ const VALUES = [
     en: "Integrity",
     readoutDe: "Wir benennen Chancen und Risiken so, wie sie sind.",
     readoutEn: "We name opportunities and risks as they are.",
-    inactiveSize: "32px",
-    mobileSize: "28px",
+    inactiveSize: "22px",
+    mobileSize: "22px",
     offset: "0%",
     mobileOffset: "0px",
   },
@@ -39,57 +39,57 @@ const VALUES = [
     en: "Discipline",
     readoutDe: "Wir halten uns an den Prozess, auch wenn es unbequem wird.",
     readoutEn: "We stick to the process, even when it gets uncomfortable.",
-    inactiveSize: "26px",
-    mobileSize: "24px",
-    offset: "8%",
-    mobileOffset: "12px",
+    inactiveSize: "19px",
+    mobileSize: "19px",
+    offset: "4%",
+    mobileOffset: "8px",
   },
   {
     de: "Respekt",
     en: "Respect",
     readoutDe: "Jedes Mandat zählt gleich viel, unabhängig von seiner Grösse.",
     readoutEn: "Every mandate counts the same, whatever its size.",
-    inactiveSize: "28px",
-    mobileSize: "26px",
-    offset: "18%",
-    mobileOffset: "24px",
+    inactiveSize: "20px",
+    mobileSize: "20px",
+    offset: "8%",
+    mobileOffset: "16px",
   },
   {
     de: "Leistungsbereitschaft",
     en: "Commitment",
     readoutDe: "Wir arbeiten am Portfolio weiter, nicht nur zum Quartalsende.",
     readoutEn: "We keep working on the portfolio, not just at quarter-end.",
-    inactiveSize: "24px",
-    mobileSize: "22px",
-    offset: "5%",
-    mobileOffset: "6px",
+    inactiveSize: "18px",
+    mobileSize: "18px",
+    offset: "2%",
+    mobileOffset: "4px",
   },
   {
     de: "Unabhängigkeit",
     en: "Independence",
     readoutDe: "Unsere Analyse ist unsere eigene, ohne fremde Interessen.",
     readoutEn: "Our analysis is our own, free of outside interests.",
-    inactiveSize: "30px",
-    mobileSize: "26px",
-    offset: "28%",
-    mobileOffset: "20px",
+    inactiveSize: "21px",
+    mobileSize: "20px",
+    offset: "12%",
+    mobileOffset: "12px",
   },
   {
     de: "Entschlossenheit",
     en: "Resolve",
     readoutDe: "Tragen die Daten eine Position, dann halten wir sie.",
     readoutEn: "When the data backs a position, we hold it.",
-    inactiveSize: "26px",
-    mobileSize: "24px",
-    offset: "14%",
-    mobileOffset: "10px",
+    inactiveSize: "19px",
+    mobileSize: "19px",
+    offset: "6%",
+    mobileOffset: "6px",
   },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
    LEISTUNGSETHIK STAGE — Typographic composition
    ═══════════════════════════════════════════════════════════════ */
-const ROW_H = 48;
+const ROW_H = 40;
 
 interface StageProps {
   compact?: boolean;
@@ -169,7 +169,7 @@ function LeistungsethikStage({ compact = false }: StageProps) {
     ? "none"
     : `font-size ${DURATION.medium}ms ${EASE.standard}, color ${DURATION.medium}ms ${EASE.standard}`;
 
-  const activeSize = compact ? "clamp(32px, 8vw, 48px)" : "clamp(40px, 5vw, 72px)";
+  const activeSize = compact ? "clamp(26px, 6vw, 34px)" : "clamp(26px, 2.4vw, 36px)";
 
   return (
     <div ref={containerRef}>
@@ -196,7 +196,7 @@ function LeistungsethikStage({ compact = false }: StageProps) {
         tabIndex={0}
         onKeyDown={handleKeyDown}
         style={{
-          marginTop: compact ? "20px" : "28px",
+          marginTop: compact ? "20px" : "18px",
           outline: "none",
           display: "flex",
           flexDirection: "column",
@@ -217,7 +217,7 @@ function LeistungsethikStage({ compact = false }: StageProps) {
               onFocus={() => handleInteract(i)}
               onClick={() => handleInteract(i)}
               style={{
-                height: `${ROW_H}px`,
+                minHeight: `${ROW_H}px`,
                 paddingLeft: compact ? v.mobileOffset : v.offset,
                 display: "flex",
                 alignItems: "center",
@@ -253,8 +253,8 @@ function LeistungsethikStage({ compact = false }: StageProps) {
       <div
         aria-live="polite"
         style={{
-          minHeight: compact ? "48px" : "40px",
-          marginTop: compact ? "16px" : "14px",
+          minHeight: compact ? "48px" : "30px",
+          marginTop: compact ? "16px" : "10px",
         }}
       >
         <p
@@ -407,31 +407,34 @@ export function Section2Anlagephilosophie({
       className="relative h-screen flex-shrink-0"
       style={{ width: "110vw", backgroundColor: C.bg }}
     >
-      {/* Image — right, clean (no overlay, no quote) */}
-      <div className="absolute z-0" style={{ top: 0, bottom: 0, left: LAYOUT.imageLeft, right: 0 }}>
+      {/* Image — right, narrowed to give the text column more room */}
+      <div className="absolute z-0" style={{ top: 0, bottom: 0, left: "54vw", right: 0 }}>
         <HeroExpandingImage src={imageSrc} scrollX={scrollX} className="h-full w-full" />
       </div>
 
-      {/* Left column — eyebrow + headline + body + Leistungsethik, vertically centered */}
+      {/* Left column — eyebrow + headline + body + Leistungsethik, vertically centered.
+          width (52vw) is deliberately narrower than the image's left offset (54vw) so the
+          column never overlaps the image at tablet-landscape widths (~1024–1350px); at
+          1440px+ maxWidth remains the governing constraint, so this is visually unchanged there. */}
       <div
         className="relative z-10 flex h-full flex-col justify-center"
         style={{
-          width: LAYOUT.columnWidth,
+          width: "52vw",
           paddingLeft: "clamp(36px, 8vw, 120px)",
           paddingRight: "clamp(36px, 5vw, 80px)",
-          maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
+          maxWidth: "calc(600px + clamp(36px, 5vw, 120px) + 4vw)",
         }}
       >
         {/* Eyebrow */}
         <span
           style={{
             fontFamily: sans,
-            fontSize: "14px",
-            letterSpacing: "0.15em",
+            fontSize: "10px",
+            letterSpacing: "0.22em",
             color: C.stone,
             display: "block",
-            textTransform: "uppercase",
           }}
+          className="uppercase"
         >
           {eyebrow}
         </span>
@@ -442,7 +445,7 @@ export function Section2Anlagephilosophie({
             width: "28px",
             height: "1.5px",
             backgroundColor: C.dark,
-            marginTop: "16px",
+            marginTop: SPACING.eyebrowToAccent,
           }}
         />
 
@@ -454,22 +457,21 @@ export function Section2Anlagephilosophie({
             lineHeight: 0.94,
             color: C.dark,
             letterSpacing: "-0.03em",
-            marginTop: "32px",
+            marginTop: SPACING.accentToHeadline,
           }}
         >
           {headingLine1}
-          <br />
-          <em>{headingLine2}</em>
+       
         </h2>
 
         {/* Body */}
         <div
           style={{
-            marginTop: "32px",
-            maxWidth: "480px",
+            marginTop: SPACING.headlineToBody,
+            maxWidth: "560px",
             display: "flex",
             flexDirection: "column",
-            gap: "16px",
+            gap: SPACING.bodyParagraphGap,
           }}
         >
           {BODY_PARAGRAPHS.map((text, i) => (
@@ -477,7 +479,7 @@ export function Section2Anlagephilosophie({
               key={i}
               style={{
                 fontFamily: sans,
-                fontSize: "clamp(10.5px, 1.3vh, 12px)",
+                fontSize: "clamp(10.5px, 1.3vh, 12.5px)",
                 color: C.charcoal,
                 lineHeight: 1.75,
                 margin: 0,
@@ -489,7 +491,7 @@ export function Section2Anlagephilosophie({
         </div>
 
         {/* Leistungsethik Stage */}
-        <div style={{ marginTop: "40px" }}>
+        <div style={{ marginTop: SPACING.bodyToCta }}>
           <LeistungsethikStage />
         </div>
       </div>
