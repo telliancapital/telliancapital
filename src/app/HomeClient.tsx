@@ -473,7 +473,7 @@ function Section3Vermoegensverwaltung({
             padding: breakpoint === "mobile" ? "32px 20px" : "40px 32px",
           }}
         >
-          <ParteiDreieck compact onNavigate={() => onOpenDetail?.()} />
+          <ParteiDreieck compact onNavigate={() => onOpenDetail?.()} homepage={homepage} />
         </div>
 
         {/* CTA — AFTER the visual element on mobile */}
@@ -506,7 +506,7 @@ function Section3Vermoegensverwaltung({
     >
       {/* Content wrapper — no sticky/scroll-lock, standard flow */}
       <div style={{ position: "relative", width: layout.sectionWidth, height: "100%" }}>
-        <ParteiDreieck onNavigate={() => onOpenDetail?.()} />
+        <ParteiDreieck onNavigate={() => onOpenDetail?.()} homepage={homepage} />
 
         <div
           className="relative z-10 flex h-full flex-col justify-center"
@@ -893,12 +893,57 @@ function Section4Anlagestrategien({
   };
 
   /* Overview copy — reframed around Portfolio Management (see the new
-     /portfolio-management subpage). Not CMS-driven: this replaces the
-     previous Anlagestrategien overview copy/visual per the redesign. */
-  const bodyParagraphs = [
+     /portfolio-management subpage). CMS-driven via the strategy* fields,
+     which were freed up by this redesign for exactly this content. */
+  const overviewEyebrow = t(homepage?.strategyEyebrow, "Portfolio Management");
+  const overviewHeadingLine1 = t(homepage?.strategyHeadingLine1, "Methode statt");
+  const overviewHeadingLine2 = t(homepage?.strategyHeadingLine2, "Zufall.");
+
+  const fallbackBodyParagraphs = [
     "Jede Anlageentscheidung bei Tellian Capital folgt einem klaren, nachvollziehbaren Prozess. Von den Leitprinzipien über Ihr persönliches Anlegerprofil bis zur strategischen und taktischen Allokation — nichts entsteht aus Marktstimmung, alles aus Methode.",
     "Das Ergebnis ist eine individuelle Portfolio-Konstruktion, die laufend überwacht und transparent berichtet wird. So bleibt Ihr Portfolio jederzeit auf Ihre Ziele ausgerichtet.",
   ];
+  const cmsBodyParagraphs: string[] = (homepage?.strategyParagraphs ?? [])
+    .map((p: LocaleValue) => t(p, ""))
+    .filter((p: string) => p.length > 0);
+  const bodyParagraphs = cmsBodyParagraphs.length > 0 ? cmsBodyParagraphs : fallbackBodyParagraphs;
+
+  const overviewCtaLabel = t(homepage?.strategyCtaLabel, "Mehr zum Anlageprozess");
+
+  /* Flowchart — fixed-size tiers merged with CMS overrides; falls back
+     to the original hardcoded labels whenever a CMS array is empty. */
+  const fallbackFlowchartTier1 = ["Leitprinzipien", "Investment-Philosophie"];
+  const fallbackFlowchartTier2 = [
+    "Innovatives Portfolio-Management",
+    "Zugang zu einzigartigen Investmentmöglichkeiten",
+    "Inhouse-Expertise & internationales Netzwerk",
+  ];
+  const fallbackFlowchartTier3 = ["Strategische Allokation", "Taktische Allokation"];
+  const fallbackFlowchartTier5 = ["Überwachung", "Reporting"];
+
+  const cmsFlowchartTier1: string[] = (homepage?.strategyFlowchartTier1 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier1 = cmsFlowchartTier1.length > 0 ? cmsFlowchartTier1 : fallbackFlowchartTier1;
+
+  const flowchartConnectorLabel = t(homepage?.strategyFlowchartConnectorLabel, "Anlegerprofil des Kunden");
+
+  const cmsFlowchartTier2: string[] = (homepage?.strategyFlowchartTier2 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier2 = cmsFlowchartTier2.length > 0 ? cmsFlowchartTier2 : fallbackFlowchartTier2;
+
+  const cmsFlowchartTier3: string[] = (homepage?.strategyFlowchartTier3 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier3 = cmsFlowchartTier3.length > 0 ? cmsFlowchartTier3 : fallbackFlowchartTier3;
+
+  const flowchartTier4 = t(homepage?.strategyFlowchartTier4, "Individuelle Portfolio-Konstruktion");
+
+  const cmsFlowchartTier5: string[] = (homepage?.strategyFlowchartTier5 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier5 = cmsFlowchartTier5.length > 0 ? cmsFlowchartTier5 : fallbackFlowchartTier5;
 
   const detailEyebrow = t(homepage?.strategyDetailEyebrow, "Anlagestrategien");
   const detailHeadingLine1 = t(homepage?.strategyDetailHeadingLine1, "Zwei Perspektiven,");
@@ -919,7 +964,7 @@ function Section4Anlagestrategien({
               }}
               className="uppercase"
             >
-              Portfolio Management
+              {overviewEyebrow}
             </span>
 
             <div
@@ -944,9 +989,9 @@ function Section4Anlagestrategien({
                 marginTop: SPACING.accentToHeadline,
               }}
             >
-              Methode statt
+              {overviewHeadingLine1}
               <br />
-              <em>Zufall.</em>
+              <em>{overviewHeadingLine2}</em>
             </h2>
           </ScrollFade>
 
@@ -972,7 +1017,7 @@ function Section4Anlagestrategien({
             style={{ maxWidth: 480, margin: "0 auto", padding: 0 }}
           >
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {["Leitprinzipien", "Investment-Philosophie"].map((label) => (
+              {flowchartTier1.map((label) => (
                 <div
                   key={label}
                   style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
@@ -998,16 +1043,12 @@ function Section4Anlagestrategien({
                   padding: "2px 8px",
                 }}
               >
-                Anlegerprofil des Kunden
+                {flowchartConnectorLabel}
               </span>
               <div style={{ width: 0.5, height: 10, borderLeft: `1px dashed ${C.line}` }} />
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
-              {[
-                "Innovatives Portfolio-Management",
-                "Zugang zu einzigartigen Investmentmöglichkeiten",
-                "Inhouse-Expertise & internationales Netzwerk",
-              ].map((label) => (
+              {flowchartTier2.map((label) => (
                 <div
                   key={label}
                   style={{ backgroundColor: C.purple, padding: "12px 14px", textAlign: "center" }}
@@ -1034,7 +1075,7 @@ function Section4Anlagestrategien({
               </svg>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {["Strategische Allokation", "Taktische Allokation"].map((label) => (
+              {flowchartTier3.map((label) => (
                 <div
                   key={label}
                   style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
@@ -1062,7 +1103,7 @@ function Section4Anlagestrategien({
             </div>
             <div style={{ backgroundColor: C.purple, padding: "14px 18px", textAlign: "center" }}>
               <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
-                Individuelle Portfolio-Konstruktion
+                {flowchartTier4}
               </span>
             </div>
             <div
@@ -1081,7 +1122,7 @@ function Section4Anlagestrategien({
               </svg>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {["Überwachung", "Reporting"].map((label) => (
+              {flowchartTier5.map((label) => (
                 <div
                   key={label}
                   style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
@@ -1099,7 +1140,7 @@ function Section4Anlagestrategien({
         <ScrollFade scrollX={0} isVertical yOffset={16}>
           <div style={{ padding: breakpoint === "mobile" ? "0 20px 32px" : "0 32px 32px" }}>
             <CtaButton href="/portfolio-management" onClick={handleNavigateToProcess}>
-              Mehr zum Anlageprozess
+              {overviewCtaLabel}
             </CtaButton>
           </div>
         </ScrollFade>
@@ -1147,7 +1188,7 @@ function Section4Anlagestrategien({
           style={{ maxWidth: 560, width: "100%", margin: 0, padding: 0 }}
         >
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {["Leitprinzipien", "Investment-Philosophie"].map((label) => (
+            {flowchartTier1.map((label) => (
               <div
                 key={label}
                 style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
@@ -1173,16 +1214,12 @@ function Section4Anlagestrategien({
                 padding: "3px 10px",
               }}
             >
-              Anlegerprofil des Kunden
+              {flowchartConnectorLabel}
             </span>
             <div style={{ width: 0.5, height: 12, borderLeft: `1px dashed ${C.line}` }} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-            {[
-              "Innovatives Portfolio-Management",
-              "Zugang zu einzigartigen Investmentmöglichkeiten",
-              "Inhouse-Expertise & internationales Netzwerk",
-            ].map((label) => (
+            {flowchartTier2.map((label) => (
               <div
                 key={label}
                 style={{
@@ -1216,7 +1253,7 @@ function Section4Anlagestrategien({
             </svg>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {["Strategische Allokation", "Taktische Allokation"].map((label) => (
+            {flowchartTier3.map((label) => (
               <div
                 key={label}
                 style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
@@ -1244,7 +1281,7 @@ function Section4Anlagestrategien({
           </div>
           <div style={{ backgroundColor: C.purple, padding: "16px 20px", textAlign: "center" }}>
             <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
-              Individuelle Portfolio-Konstruktion
+              {flowchartTier4}
             </span>
           </div>
           <div
@@ -1263,7 +1300,7 @@ function Section4Anlagestrategien({
             </svg>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            {["Überwachung", "Reporting"].map((label) => (
+            {flowchartTier5.map((label) => (
               <div
                 key={label}
                 style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
@@ -1300,7 +1337,7 @@ function Section4Anlagestrategien({
           }}
           className="uppercase"
         >
-          Portfolio Management
+          {overviewEyebrow}
         </span>
 
         <div
@@ -1322,9 +1359,9 @@ function Section4Anlagestrategien({
             marginTop: SPACING.accentToHeadline,
           }}
         >
-          Methode statt
+          {overviewHeadingLine1}
           <br />
-          <em>Zufall.</em>
+          <em>{overviewHeadingLine2}</em>
         </h2>
 
         <div
@@ -1373,7 +1410,7 @@ function Section4Anlagestrategien({
               transition: "background-color 250ms ease-out",
             }}
           >
-            <span>Mehr zum Anlageprozess</span>
+            <span>{overviewCtaLabel}</span>
             <span aria-hidden>→</span>
           </a>
         </div>
@@ -1431,6 +1468,11 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   // Hero image: prefer uploaded asset, then external URL, then bundled fallback.
   const heroImageSrc: string =
     homepage?.startImageAsset?.url || homepage?.startImageUrl || heroDesktopImg.src;
+
+  // Portfolio Management subpage overlay header (localized, with fallback to the original German copy)
+  const pmDetailEyebrow = t(homepage?.pmDetailEyebrow, "Portfolio Management");
+  const pmDetailHeadingLine1 = t(homepage?.pmDetailHeadingLine1, "Wie wir Ihr Portfolio");
+  const pmDetailHeadingLine2 = t(homepage?.pmDetailHeadingLine2, "führen.");
 
   const { scrollX, scrollProgress, scrollDirection, containerRef, scrollTo } = useHorizontalScroll({
     disabled: isVertical || !introComplete,
@@ -1556,16 +1598,16 @@ export default function HomeClient({ homepage }: { homepage: any }) {
         <SubpageOverlay
           isOpen={pm.isDetail}
           onClose={() => pm.closeDetail()}
-          eyebrow="Portfolio Management"
+          eyebrow={pmDetailEyebrow}
           headline={
             <>
-              Wie wir Ihr Portfolio
+              {pmDetailHeadingLine1}
               <br />
-              <em style={{ fontStyle: "italic", fontWeight: 400 }}>führen.</em>
+              <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
             </>
           }
         >
-          <PortfolioManagementDetail isMobile={true} onContactClick={navigateToContact} />
+          <PortfolioManagementDetail isMobile={true} onContactClick={navigateToContact} homepage={homepage} />
         </SubpageOverlay>
       </div>
     );
@@ -1782,16 +1824,16 @@ export default function HomeClient({ homepage }: { homepage: any }) {
       <SubpageOverlay
         isOpen={pm.isDetail}
         onClose={() => pm.closeDetail()}
-        eyebrow="Portfolio Management"
+        eyebrow={pmDetailEyebrow}
         headline={
           <>
-            Wie wir Ihr Portfolio
+            {pmDetailHeadingLine1}
             <br />
-            <em style={{ fontStyle: "italic", fontWeight: 400 }}>führen.</em>
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
           </>
         }
       >
-        <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} />
+        <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} homepage={homepage} />
       </SubpageOverlay>
     </div>
   );

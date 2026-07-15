@@ -15,8 +15,17 @@ import type { LocaleValue } from "@/i18n/types";
 import { C, serif, sans } from "@/tokens";
 import { EASE } from "@/styles/motion";
 
+/* Temporarily disabled — the footer link is hidden (see Section6Kontakt.tsx)
+   and direct URL access is blocked here too. The /impressum route, its CMS
+   fields, and this overlay's rendering logic are all kept intact; remove
+   "/impressum" from this list to re-enable it. */
+const TEMP_DISABLED_LEGAL_PATHS: readonly LegalPath[] = ["/impressum"];
+
 function isLegalPath(p: string): p is LegalPath {
-  return (LEGAL_PATHS as readonly string[]).includes(p);
+  return (
+    (LEGAL_PATHS as readonly string[]).includes(p) &&
+    !TEMP_DISABLED_LEGAL_PATHS.includes(p as LegalPath)
+  );
 }
 
 /**

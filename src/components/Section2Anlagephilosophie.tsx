@@ -93,9 +93,13 @@ const ROW_H = 40;
 
 interface StageProps {
   compact?: boolean;
+  /** CMS-resolved label + per-value overrides (falls back to the bundled German copy when absent) */
+  label?: string;
+  overrides?: { label: string; readout: string }[];
+  lang?: "de" | "en";
 }
 
-function LeistungsethikStage({ compact = false }: StageProps) {
+function LeistungsethikStage({ compact = false, label, overrides, lang = "de" }: StageProps) {
   const [active, setActive] = useState(0);
   const reducedMotion = usePrefersReducedMotion();
   const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -186,7 +190,7 @@ function LeistungsethikStage({ compact = false }: StageProps) {
           marginTop: "16px",
         }}
       >
-        Unsere Leistungsethik
+        {label || "Unsere Leistungsethik"}
       </span>
 
       {/* Values composition */}
@@ -240,9 +244,9 @@ function LeistungsethikStage({ compact = false }: StageProps) {
                   wordBreak: compact ? "normal" : undefined,
                   hyphens: compact ? "auto" : undefined,
                 }}
-                lang="de"
+                lang={lang}
               >
-                {v.de}
+                {overrides?.[i]?.label ?? v.de}
               </span>
             </div>
           );
@@ -269,7 +273,7 @@ function LeistungsethikStage({ compact = false }: StageProps) {
             animation: reducedMotion ? "none" : `stageReadoutFade ${DURATION.normal}ms ${EASE.standard}`,
           }}
         >
-          {VALUES[active].readoutDe}
+          {overrides?.[active]?.readout ?? VALUES[active].readoutDe}
         </p>
       </div>
 
@@ -294,7 +298,7 @@ export function Section2Anlagephilosophie({
 }: Props) {
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const eyebrow = t(homepage?.philosophyEyebrow, "Anlagephilosophie");
   const headingLine1 = t(homepage?.philosophyHeadingLine1, "Analyse entscheidet.");
@@ -311,6 +315,19 @@ export function Section2Anlagephilosophie({
     homepage?.philosophyImageAlt,
     "Tektonikarena Sardona — UNESCO-Welterbe im Kanton Glarus.",
   );
+
+  /* ── Leistungsethik values: CMS text merged with the bundled fallback,
+        sizing/offset stay index-driven (not editor-controlled). ── */
+  const valuesLabel = t(homepage?.philosophyValuesLabel, "Unsere Leistungsethik");
+  type CmsValue = { name?: LocaleValue; readout?: LocaleValue };
+  const cmsValues: CmsValue[] = homepage?.philosophyValues ?? [];
+  const valueOverrides = VALUES.map((fb, i) => {
+    const cms = cmsValues[i];
+    return {
+      label: t(cms?.name, fb.de),
+      readout: t(cms?.readout, fb.readoutDe),
+    };
+  });
 
   /* ── VERTICAL (Tablet / Mobile) ── */
   if (isVertical) {
@@ -376,7 +393,7 @@ export function Section2Anlagephilosophie({
           {/* Leistungsethik Stage */}
           <ScrollFade scrollX={0} isVertical yOffset={16}>
             <div style={{ marginTop: "36px", paddingBottom: "24px" }}>
-              <LeistungsethikStage compact />
+              <LeistungsethikStage compact label={valuesLabel} overrides={valueOverrides} lang={lang} />
             </div>
           </ScrollFade>
         </div>
@@ -492,7 +509,7 @@ export function Section2Anlagephilosophie({
 
         {/* Leistungsethik Stage */}
         <div style={{ marginTop: SPACING.bodyToCta }}>
-          <LeistungsethikStage />
+          <LeistungsethikStage label={valuesLabel} overrides={valueOverrides} lang={lang} />
         </div>
       </div>
     </div>

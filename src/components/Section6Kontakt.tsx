@@ -627,7 +627,9 @@ function LegalLinksRow({
         rowGap: "6px",
       }}
     >
-      {LEGAL_PATHS.map((path, i) => (
+      {/* "/impressum" temporarily hidden from the footer — see LegalPage.tsx
+         (TEMP_DISABLED_LEGAL_PATHS) for the matching direct-URL block. */}
+      {LEGAL_PATHS.filter((path) => path !== "/impressum").map((path, i) => (
         <span key={path} style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
           {i > 0 && (
             <span
@@ -788,7 +790,9 @@ function LegalLinksStackedMobile({
         flexDirection: "column",
       }}
     >
-      {LEGAL_PATHS.map((path) => (
+      {/* "/impressum" temporarily hidden from the footer — see LegalPage.tsx
+         (TEMP_DISABLED_LEGAL_PATHS) for the matching direct-URL block. */}
+      {LEGAL_PATHS.filter((path) => path !== "/impressum").map((path) => (
         <LegalLinkMobileRow
           key={path}
           path={path}

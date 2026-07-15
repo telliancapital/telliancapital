@@ -1,5 +1,7 @@
 import { CtaButton } from "./CtaButton";
 import { C, serif, sans } from "@/tokens";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 import {
   PM_HERO,
   PM_PROCESS_STAGES,
@@ -11,21 +13,109 @@ import {
 /* ═══════════════════════════════════════════════════════════
    PORTFOLIO MANAGEMENT — Subpage detail body.
    4 Sektionen: Prozess → Komitee → Strategien → Universum.
-   Keine Verwahrung (MANDAT deckt das ab). Kein FAQ (pending).
-   EN: pending — Übersetzung folgt.
+   Keine Verwahrung (MANDAT deckt das ab).
+   Alle Texte CMS-gestützt (homepage.pm*), Fallback = Bundled German.
    ═══════════════════════════════════════════════════════════ */
 
 interface Props {
   isMobile: boolean;
   onContactClick: () => void;
+  homepage?: any;
 }
 
-export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
+export function PortfolioManagementDetail({ isMobile, onContactClick, homepage }: Props) {
+  const { t } = useLanguage();
   const sectionPad = {
     paddingTop: isMobile ? "48px" : "72px",
     paddingBottom: isMobile ? "48px" : "72px",
   };
   const hSize = isMobile ? "clamp(28px, 7vw, 36px)" : "32px";
+
+  /* ── Intro paragraphs ── */
+  const cmsIntroParagraphs: string[] = (homepage?.pmIntroParagraphs ?? [])
+    .map((p: LocaleValue) => t(p, ""))
+    .filter((p: string) => p.length > 0);
+  const introParagraphs = cmsIntroParagraphs.length > 0 ? cmsIntroParagraphs : [...PM_HERO.intro];
+
+  /* ── Section 1 — Anlageprozess ── */
+  const processEyebrow = t(homepage?.pmProcessEyebrow, "Anlageprozess");
+  const processHeadingLine1 = t(homepage?.pmProcessHeadingLine1, "Der Weg zum");
+  const processHeadingLine2 = t(homepage?.pmProcessHeadingLine2, "Portfolio.");
+  const processClosing = t(homepage?.pmProcessClosing, PM_PROCESS_BODY);
+
+  type CmsStage = { name?: LocaleValue; bullets?: LocaleValue[] };
+  const cmsStages: CmsStage[] = homepage?.pmProcessStages ?? [];
+  const processStages = PM_PROCESS_STAGES.map((fb, i) => {
+    const cms = cmsStages[i];
+    const cmsBullets = (cms?.bullets ?? []).map((b) => t(b, "")).filter((b) => b.length > 0);
+    return {
+      name: t(cms?.name, fb.name),
+      bullets: cmsBullets.length > 0 ? cmsBullets : fb.bullets,
+    };
+  });
+
+  /* ── Section 2 — Anlagekomitee ── */
+  const committeeEyebrow = t(homepage?.pmCommitteeEyebrow, PM_TEXT_SECTIONS[0].eyebrow);
+  const committeeHeadingLine1 = t(homepage?.pmCommitteeHeadingLine1, PM_TEXT_SECTIONS[0].headlineBefore);
+  const committeeHeadingLine2 = t(homepage?.pmCommitteeHeadingLine2, PM_TEXT_SECTIONS[0].headlineItalic);
+  const cmsCommitteeParagraphs: string[] = (homepage?.pmCommitteeParagraphs ?? [])
+    .map((p: LocaleValue) => t(p, ""))
+    .filter((p: string) => p.length > 0);
+  const committeeParagraphs =
+    cmsCommitteeParagraphs.length > 0 ? cmsCommitteeParagraphs : PM_TEXT_SECTIONS[0].paragraphs;
+
+  /* ── Section 3 — Anlagestrategien ── */
+  const strategiesEyebrow = t(homepage?.pmStrategiesEyebrow, "Anlagestrategien");
+  const strategiesHeadingLine1 = t(homepage?.pmStrategiesHeadingLine1, "Sieben Strategien,");
+  const strategiesHeadingLine2 = t(homepage?.pmStrategiesHeadingLine2, "frei kombinierbar.");
+  const strategiesSubline = t(
+    homepage?.pmStrategiesSubline,
+    "Sie legen eine oder mehrere Strategien für Ihr Portfolio fest und bestimmen die Gewichtung selbst. Die angegebene Zielallokation ist eine Richtgrösse; im Rahmen der vertraglich vereinbarten Bandbreiten darf davon abgewichen werden.",
+  );
+
+  type CmsStrategy = {
+    name?: LocaleValue;
+    tag?: LocaleValue;
+    goal?: LocaleValue;
+    volatility?: LocaleValue;
+    allocation?: LocaleValue;
+    allocationLegend?: LocaleValue;
+    focus?: LocaleValue;
+  };
+  const cmsStrategies: CmsStrategy[] = homepage?.pmStrategies ?? [];
+  const strategies = PM_STRATEGIES.map((fb, i) => {
+    const cms = cmsStrategies[i];
+    return {
+      name: t(cms?.name, fb.name),
+      tag: t(cms?.tag, fb.tag),
+      goal: t(cms?.goal, fb.goal),
+      volatility: t(cms?.volatility, fb.volatility),
+      allocation: t(cms?.allocation, fb.allocation),
+      allocationLegend: t(cms?.allocationLegend, fb.allocationLegend ?? ""),
+      focus: t(cms?.focus, fb.focus ?? ""),
+    };
+  });
+
+  /* ── Section 4 — Anlageuniversum ── */
+  const universeEyebrow = t(homepage?.pmUniverseEyebrow, PM_TEXT_SECTIONS[1].eyebrow);
+  const universeHeadingLine1 = t(homepage?.pmUniverseHeadingLine1, PM_TEXT_SECTIONS[1].headlineBefore);
+  const universeHeadingLine2 = t(homepage?.pmUniverseHeadingLine2, PM_TEXT_SECTIONS[1].headlineItalic);
+  const cmsUniverseParagraphs: string[] = (homepage?.pmUniverseParagraphs ?? [])
+    .map((p: LocaleValue) => t(p, ""))
+    .filter((p: string) => p.length > 0);
+  const universeParagraphs =
+    cmsUniverseParagraphs.length > 0 ? cmsUniverseParagraphs : PM_TEXT_SECTIONS[1].paragraphs;
+
+  /* ── Final CTA + footer ── */
+  const ctaEyebrow = t(homepage?.pmCtaEyebrow, "Nächster Schritt");
+  const ctaHeadingLine1 = t(homepage?.pmCtaHeadingLine1, "Ein Gespräch ist");
+  const ctaHeadingLine2 = t(homepage?.pmCtaHeadingLine2, "der Anfang.");
+  const ctaDescription = t(
+    homepage?.pmCtaDescription,
+    "Wenn Sie unseren Prozess bis hierher verfolgt haben — sprechen wir über Ihren. Ein erstes Gespräch ist unverbindlich, persönlich und vertraulich.",
+  );
+  const ctaButtonLabel = t(homepage?.pmCtaButtonLabel, "Gespräch vereinbaren");
+  const footerTagline = t(homepage?.pmFooterTagline, "Tellian Capital AG — Est. 1996 — Zürich");
 
   return (
     <div
@@ -40,7 +130,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
       {/* ═══ Intro (below SubpageOverlay hero) ═══ */}
       <section style={{ paddingBottom: isMobile ? "48px" : "72px" }}>
         <div style={{ maxWidth: "600px", display: "flex", flexDirection: "column", gap: "16px" }}>
-          {PM_HERO.intro.map((text, i) => (
+          {introParagraphs.map((text, i) => (
             <p
               key={i}
               style={{ fontFamily: sans, fontSize: "14px", color: C.charcoal, lineHeight: 1.7, margin: 0 }}
@@ -64,7 +154,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               display: "block",
             }}
           >
-            Anlageprozess
+            {processEyebrow}
           </span>
           <h2
             style={{
@@ -77,12 +167,13 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               margin: "16px 0 0 0",
             }}
           >
-            Der Weg zum <em style={{ fontStyle: "italic", fontWeight: 400 }}>Portfolio.</em>
+            {processHeadingLine1}{" "}
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{processHeadingLine2}</em>
           </h2>
 
           {/* 8 process stages */}
           <div style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: 0 }}>
-            {PM_PROCESS_STAGES.map((stage, si) => (
+            {processStages.map((stage, si) => (
               <div
                 key={si}
                 style={{
@@ -142,7 +233,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               fontStyle: "italic",
             }}
           >
-            {PM_PROCESS_BODY}
+            {processClosing}
           </p>
         </div>
       </section>
@@ -160,7 +251,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               display: "block",
             }}
           >
-            {PM_TEXT_SECTIONS[0].eyebrow}
+            {committeeEyebrow}
           </span>
           <h2
             style={{
@@ -173,11 +264,11 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               margin: "16px 0 0 0",
             }}
           >
-            {PM_TEXT_SECTIONS[0].headlineBefore}{" "}
-            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{PM_TEXT_SECTIONS[0].headlineItalic}</em>
+            {committeeHeadingLine1}{" "}
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{committeeHeadingLine2}</em>
           </h2>
           <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "20px" }}>
-            {PM_TEXT_SECTIONS[0].paragraphs.map((text, i) => (
+            {committeeParagraphs.map((text, i) => (
               <p
                 key={i}
                 style={{ fontFamily: sans, fontSize: "14px", color: C.charcoal, lineHeight: 1.7, margin: 0 }}
@@ -202,7 +293,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               display: "block",
             }}
           >
-            Anlagestrategien
+            {strategiesEyebrow}
           </span>
           <h2
             style={{
@@ -215,7 +306,8 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               margin: "16px 0 0 0",
             }}
           >
-            Sieben Strategien, <em style={{ fontStyle: "italic", fontWeight: 400 }}>frei kombinierbar.</em>
+            {strategiesHeadingLine1}{" "}
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{strategiesHeadingLine2}</em>
           </h2>
           <p
             style={{
@@ -226,14 +318,11 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               margin: "8px 0 32px 0",
             }}
           >
-            Sie legen eine oder mehrere Strategien für Ihr Portfolio fest und bestimmen die Gewichtung
-            selbst. Die angegebene Zielallokation ist eine Richtgrösse; im Rahmen der vertraglich
-            vereinbarten Bandbreiten darf davon abgewichen werden.
+            {strategiesSubline}
           </p>
 
-          {/* PENDING VERIFICATION — Allokationsprozente */}
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {PM_STRATEGIES.map((s, si) => (
+            {strategies.map((s, si) => (
               <div
                 key={si}
                 style={{
@@ -297,7 +386,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               display: "block",
             }}
           >
-            {PM_TEXT_SECTIONS[1].eyebrow}
+            {universeEyebrow}
           </span>
           <h2
             style={{
@@ -310,11 +399,11 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
               margin: "16px 0 0 0",
             }}
           >
-            {PM_TEXT_SECTIONS[1].headlineBefore}{" "}
-            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{PM_TEXT_SECTIONS[1].headlineItalic}</em>
+            {universeHeadingLine1}{" "}
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{universeHeadingLine2}</em>
           </h2>
           <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "20px" }}>
-            {PM_TEXT_SECTIONS[1].paragraphs.map((text, i) => (
+            {universeParagraphs.map((text, i) => (
               <p
                 key={i}
                 style={{ fontFamily: sans, fontSize: "14px", color: C.charcoal, lineHeight: 1.7, margin: 0 }}
@@ -348,7 +437,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
             color: C.stone,
           }}
         >
-          Nächster Schritt
+          {ctaEyebrow}
         </span>
         <h3
           style={{
@@ -361,7 +450,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
             color: C.dark,
           }}
         >
-          Ein Gespräch ist <em style={{ fontStyle: "italic", fontWeight: 400 }}>der Anfang.</em>
+          {ctaHeadingLine1} <em style={{ fontStyle: "italic", fontWeight: 400 }}>{ctaHeadingLine2}</em>
         </h3>
         <p
           style={{
@@ -373,8 +462,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
             margin: 0,
           }}
         >
-          Wenn Sie unseren Prozess bis hierher verfolgt haben — sprechen wir über Ihren. Ein erstes
-          Gespräch ist unverbindlich, persönlich und vertraulich.
+          {ctaDescription}
         </p>
         <CtaButton
           href="/#contact"
@@ -383,7 +471,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
             onContactClick();
           }}
         >
-          Gespräch vereinbaren
+          {ctaButtonLabel}
         </CtaButton>
       </div>
 
@@ -411,7 +499,7 @@ export function PortfolioManagementDetail({ isMobile, onContactClick }: Props) {
             textAlign: "center",
           }}
         >
-          Tellian Capital AG &mdash; Est. 1996 &mdash; Zürich
+          {footerTagline}
         </span>
       </div>
     </div>

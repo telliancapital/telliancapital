@@ -26,6 +26,8 @@ interface TeamMember {
   role: string;
   bio: string;
   img: string;
+  /** Optional CMS override for the mailto: address; falls back to teamEmail(name) when absent. */
+  email?: string;
 }
 
 const FALLBACK_TEAM: TeamMember[] = [
@@ -212,7 +214,7 @@ function PortraitCard({
 
         {/* Action link */}
         <div style={{ marginTop: "18px" }}>
-          <SendMessageLink email={teamEmail(member.name)} />
+          <SendMessageLink email={member.email || teamEmail(member.name)} />
         </div>
       </div>
     </div>
@@ -316,6 +318,7 @@ export function Section5UeberTellian({
   type CmsTeamMember = {
     name?: string;
     role?: LocaleValue;
+    email?: string;
     bio?: LocaleValue;
     imageAsset?: { url?: string };
     imageUrl?: string;
@@ -329,6 +332,7 @@ export function Section5UeberTellian({
         role: t(m.role, ""),
         bio: t(m.bio, ""),
         img: m.imageAsset?.url || m.imageUrl || "",
+        email: m.email?.trim() || undefined,
       };
     })
     .filter((m: TeamMember | null): m is TeamMember => m !== null);

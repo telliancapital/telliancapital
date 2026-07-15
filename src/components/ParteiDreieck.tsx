@@ -4,6 +4,8 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { C, sans, serif } from "@/tokens";
 import { EASE } from "@/styles/motion";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ═══════════════════════════════════════════════════════════════
    PARTEI-DREIECK — Dark-panel relationship graph
@@ -148,11 +150,13 @@ function TellianLogo({ w, h, color }: { w: number; h: number; color: string }) {
 interface Props {
   compact?: boolean;
   onNavigate?: () => void;
+  homepage?: any;
 }
 
-export function ParteiDreieck({ compact = false, onNavigate }: Props) {
+export function ParteiDreieck({ compact = false, onNavigate, homepage }: Props) {
   const [hovered, setHovered] = useState<number | null>(null);
   const rm = usePrefersReducedMotion();
+  const { t, lang } = useLanguage();
 
   const onKey = useCallback(
     (e: React.KeyboardEvent, i: number) => {
@@ -165,10 +169,25 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
     [onNavigate],
   );
 
-  const sr =
-    "Sie: Persönlicher Ansprechpartner, vollständige Transparenz, laufende Überwachung. " +
-    "Tellian Capital: Unsere Leistungen für Sie. " +
-    "Banken: Ausgewählte Kooperationsbanken in der Schweiz und Liechtenstein, beste Konditionen.";
+  /* ── CMS text merged with the bundled fallback; geometry/color/isCta stay index-driven ── */
+  const caption = t(homepage?.methodPartiesCaption, "Die Struktur bewährter Geschäftsbeziehungen");
+  const cmsParties: { label?: LocaleValue; prosa?: LocaleValue }[] = [
+    { label: homepage?.methodPartyKundeLabel, prosa: homepage?.methodPartyKundeProsa },
+    { label: homepage?.methodPartyTellianLabel, prosa: homepage?.methodPartyTellianProsa },
+    { label: homepage?.methodPartyBankenLabel, prosa: homepage?.methodPartyBankenProsa },
+  ];
+  const parties = PARTIES.map((p, i) => ({
+    ...p,
+    labelText: t(cmsParties[i]?.label, p.label.de),
+    prosaText: t(cmsParties[i]?.prosa, p.prosa.de),
+  }));
+  const edgeLabels = [
+    t(homepage?.methodEdgeLabelAuftrag, EDGE_LABELS[0].de),
+    t(homepage?.methodEdgeLabelDepot, EDGE_LABELS[1].de),
+    t(homepage?.methodEdgeLabelVollmacht, EDGE_LABELS[2].de),
+  ];
+
+  const sr = parties.map((p) => `${p.labelText}: ${p.prosaText}`).join(" ");
 
   /* ════════════════ MOBILE — visual diagram (compact) ════════════════ */
   if (compact) {
@@ -240,7 +259,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
             marginBottom: 16,
           }}
         >
-          Die Struktur bewährter Geschäftsbeziehungen
+          {caption}
         </span>
 
         {/* Diagram container */}
@@ -285,7 +304,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
           </svg>
 
           {/* Three circles */}
-          {PARTIES.map((party, i) => {
+          {parties.map((party, i) => {
             const v = mVenn[i];
             const act = hovered === i;
             const anyH = hovered !== null;
@@ -299,7 +318,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                 <div
                   role={isCta ? "link" : "button"}
                   tabIndex={0}
-                  aria-label={isCta ? "Unsere Leistungen für Sie" : `${party.label.de} — Details`}
+                  aria-label={isCta ? "Unsere Leistungen für Sie" : `${party.labelText} — Details`}
                   onClick={() => {
                     if (isCta && onNavigate) onNavigate();
                     else setHovered(hovered === i ? null : i);
@@ -355,7 +374,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                     transition: rm ? "none" : `all 260ms ${EASE.standard}`,
                   }}
                 >
-                  {party.label.de}
+                  {party.labelText}
                 </span>
               </div>
             );
@@ -374,7 +393,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
             transition: rm ? "none" : `opacity 300ms ${EASE.standard}`,
           }}
         >
-          {EDGE_LABELS.map((label, i) => (
+          {edgeLabels.map((label, i) => (
             <span
               key={i}
               style={{
@@ -386,7 +405,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                 whiteSpace: "nowrap",
               }}
             >
-              {label.de}
+              {label}
             </span>
           ))}
         </div>
@@ -394,7 +413,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
         {/* Reading zone — tap-activated text */}
         {hovered !== null &&
           (() => {
-            const party = PARTIES[hovered];
+            const party = parties[hovered];
             const isCta = hovered === 1;
             return (
               <div style={{ textAlign: "center", marginTop: 20, padding: "0 8px" }}>
@@ -425,7 +444,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                       color: mW75,
                     }}
                   >
-                    {party.label.de}
+                    {party.labelText}
                   </span>
                 </div>
                 {isCta ? (
@@ -445,7 +464,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                       cursor: "pointer",
                     }}
                   >
-                    {party.prosa.de}
+                    {party.prosaText}
                   </a>
                 ) : (
                   <p
@@ -456,9 +475,9 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                       lineHeight: 1.5,
                       margin: 0,
                     }}
-                    lang="de"
+                    lang={lang}
                   >
-                    {party.prosa.de}
+                    {party.prosaText}
                   </p>
                 )}
               </div>
@@ -468,7 +487,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
         {/* reduced-motion: all texts visible */}
         {rm && hovered === null && (
           <div style={{ marginTop: 20, padding: "0 8px" }}>
-            {PARTIES.map((party, pi) => (
+            {parties.map((party, pi) => (
               <div key={`rm-${party.id}`} style={{ marginTop: pi === 0 ? 0 : 14, textAlign: "center" }}>
                 <span
                   style={{
@@ -482,7 +501,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                     marginBottom: 4,
                   }}
                 >
-                  {party.label.de}
+                  {party.labelText}
                 </span>
                 <p
                   style={{
@@ -492,9 +511,9 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                     lineHeight: 1.5,
                     margin: 0,
                   }}
-                  lang="de"
+                  lang={lang}
                 >
-                  {party.prosa.de}
+                  {party.prosaText}
                 </p>
               </div>
             ))}
@@ -607,7 +626,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
           transition: rm ? "none" : `opacity 300ms ${EASE.standard}`,
         }}
       >
-        Die Struktur bewährter Geschäftsbeziehungen
+        {caption}
       </span>
 
       <div
@@ -680,12 +699,12 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
               transition: rm ? "none" : `opacity 300ms ${EASE.standard}`,
             }}
           >
-            {EDGE_LABELS[i].de}
+            {edgeLabels[i]}
           </span>
         ))}
 
         {/* ── Three circles + icons + labels ── */}
-        {PARTIES.map((party, i) => {
+        {parties.map((party, i) => {
           const v = VENN[i];
           const isz = ICON_SIZES[i];
           const act = hovered === i;
@@ -702,7 +721,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                 aria-label={
                   isCta
                     ? "Unsere Leistungen für Sie — mehr zur Vermögensverwaltung"
-                    : `${party.label.de} — Details anzeigen`
+                    : `${party.labelText} — Details anzeigen`
                 }
                 onClick={() => {
                   if (isCta && onNavigate) onNavigate();
@@ -765,7 +784,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                   transition: entered ? trans : rm ? "none" : `opacity 500ms ${EASE.standard} ${delay}ms`,
                 }}
               >
-                {party.label.de}
+                {party.labelText}
               </span>
             </div>
           );
@@ -774,7 +793,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
         {/* ── Fixed reading zone — ONE position for all hover texts ── */}
         {hovered !== null &&
           (() => {
-            const party = PARTIES[hovered];
+            const party = parties[hovered];
             const isCta = hovered === 1;
             return (
               <div
@@ -817,7 +836,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                       color: W75,
                     }}
                   >
-                    {party.label.de}
+                    {party.labelText}
                   </span>
                 </div>
                 {/* Prosa text or CTA */}
@@ -839,7 +858,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                       animation: rm ? "none" : `vennFade 240ms ${EASE.standard} both`,
                     }}
                   >
-                    {party.prosa.de}
+                    {party.prosaText}
                   </a>
                 ) : (
                   <p
@@ -851,9 +870,9 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                       margin: 0,
                       animation: rm ? "none" : `vennFade 280ms ${EASE.standard} both`,
                     }}
-                    lang="de"
+                    lang={lang}
                   >
-                    {party.prosa.de}
+                    {party.prosaText}
                   </p>
                 )}
               </div>
@@ -873,7 +892,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
             textAlign: "center",
           }}
         >
-          {PARTIES.map((party, pi) => (
+          {parties.map((party, pi) => (
             <div key={`rm-${party.id}`} style={{ marginTop: pi === 0 ? 0 : 18 }}>
               <span
                 style={{
@@ -887,7 +906,7 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                   marginBottom: 4,
                 }}
               >
-                {party.label.de}
+                {party.labelText}
               </span>
               <p
                 style={{
@@ -897,9 +916,9 @@ export function ParteiDreieck({ compact = false, onNavigate }: Props) {
                   lineHeight: 1.5,
                   margin: 0,
                 }}
-                lang="de"
+                lang={lang}
               >
-                {party.prosa.de}
+                {party.prosaText}
               </p>
             </div>
           ))}

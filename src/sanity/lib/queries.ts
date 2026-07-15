@@ -28,6 +28,8 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   philosophyImageAlt,
   philosophyQuote,
   philosophyParagraphs,
+  philosophyValuesLabel,
+  philosophyValues[]{ name, readout },
 
   // 03 — Method
   methodEyebrow,
@@ -42,6 +44,16 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   methodTimelineSteps[]{ title, description },
   methodTimelineDividerLabel,
   methodTimelineFooterLabel,
+  methodPartiesCaption,
+  methodPartyKundeLabel,
+  methodPartyKundeProsa,
+  methodPartyTellianLabel,
+  methodPartyTellianProsa,
+  methodPartyBankenLabel,
+  methodPartyBankenProsa,
+  methodEdgeLabelAuftrag,
+  methodEdgeLabelDepot,
+  methodEdgeLabelVollmacht,
   methodDetailSteps[]{
     shortLabel,
     eyebrow,
@@ -65,6 +77,12 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   strategyHeadingLine2,
   strategyParagraphs,
   strategyCtaLabel,
+  strategyFlowchartTier1,
+  strategyFlowchartConnectorLabel,
+  strategyFlowchartTier2,
+  strategyFlowchartTier3,
+  strategyFlowchartTier4,
+  strategyFlowchartTier5,
   strategyDetailEyebrow,
   strategyDetailHeadingLine1,
   strategyDetailHeadingLine2,
@@ -104,6 +122,7 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   teamMembers[]{
     name,
     role,
+    email,
     bio,
     "imageAsset": image.asset->{ url },
     imageUrl
@@ -155,7 +174,37 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   navItems[]{ label, sub },
   navLoginButtonLabel,
   navKundenportalLabel,
-  navKundenportalCaption
+  navKundenportalCaption,
+
+  // 10 — Portfolio Management
+  pmDetailEyebrow,
+  pmDetailHeadingLine1,
+  pmDetailHeadingLine2,
+  pmIntroParagraphs,
+  pmProcessEyebrow,
+  pmProcessHeadingLine1,
+  pmProcessHeadingLine2,
+  pmProcessClosing,
+  pmProcessStages[]{ name, bullets },
+  pmCommitteeEyebrow,
+  pmCommitteeHeadingLine1,
+  pmCommitteeHeadingLine2,
+  pmCommitteeParagraphs,
+  pmStrategiesEyebrow,
+  pmStrategiesHeadingLine1,
+  pmStrategiesHeadingLine2,
+  pmStrategiesSubline,
+  pmStrategies[]{ name, tag, goal, volatility, allocation, allocationLegend, focus },
+  pmUniverseEyebrow,
+  pmUniverseHeadingLine1,
+  pmUniverseHeadingLine2,
+  pmUniverseParagraphs,
+  pmCtaEyebrow,
+  pmCtaHeadingLine1,
+  pmCtaHeadingLine2,
+  pmCtaDescription,
+  pmCtaButtonLabel,
+  pmFooterTagline
 }`);
 
 /**
