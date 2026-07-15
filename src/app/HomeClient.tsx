@@ -574,7 +574,7 @@ function Section3Vermoegensverwaltung({
               key={i}
               style={{
                 fontFamily: sans,
-                fontSize: "clamp(10.5px, 1.3vh, 12.5px)",
+                fontSize: "clamp(11px, 1.6vh, 16px)",
                 color: C.charcoal,
                 lineHeight: 1.75,
                 margin: 0,
@@ -1378,7 +1378,7 @@ function Section4Anlagestrategien({
               key={i}
               style={{
                 fontFamily: sans,
-                fontSize: "clamp(10.5px, 1.3vh, 12.5px)",
+                fontSize: "clamp(11px, 1.6vh, 16px)",
                 color: C.charcoal,
                 lineHeight: 1.75,
                 margin: 0,

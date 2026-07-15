@@ -1461,6 +1461,13 @@ export const homepageType = defineType({
               type: "string",
             },
             {
+              name: "linkedin",
+              title: "LinkedIn profile URL",
+              description:
+                "Optional. When filled in, a LinkedIn icon appears next to the name, opening this URL in a new tab.",
+              type: "url",
+            },
+            {
               name: "bio",
               title: "Short bio",
               description:

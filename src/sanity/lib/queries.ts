@@ -123,6 +123,7 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
     name,
     role,
     email,
+    linkedin,
     bio,
     "imageAsset": image.asset->{ url },
     imageUrl

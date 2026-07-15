@@ -28,6 +28,8 @@ interface TeamMember {
   img: string;
   /** Optional CMS override for the mailto: address; falls back to teamEmail(name) when absent. */
   email?: string;
+  /** Optional LinkedIn profile URL; the icon only renders when present. */
+  linkedin?: string;
 }
 
 const FALLBACK_TEAM: TeamMember[] = [
@@ -126,6 +128,23 @@ function SendMessageLink({ email }: { email: string }) {
         cursor: "pointer",
       }}
     >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden
+        style={{ flexShrink: 0, color, transition: "color 200ms ease" }}
+      >
+        <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M2 7l10 7 10-7"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
       <span
         style={{
           fontFamily: sans,
@@ -137,16 +156,6 @@ function SendMessageLink({ email }: { email: string }) {
         }}
       >
         {label}
-      </span>
-      <span
-        aria-hidden
-        style={{
-          color,
-          fontSize: "13px",
-          transition: "color 200ms ease",
-        }}
-      >
-        →
       </span>
     </a>
   );
@@ -179,25 +188,53 @@ function PortraitCard({
           style={{
             backgroundImage: `url(${member.img})`,
             backgroundPosition: "center top",
-            filter: "saturate(0.2) contrast(1.06) brightness(1.02)",
           }}
         />
       </div>
 
       {/* Caption */}
       <div style={{ marginTop: "24px" }}>
-        <span
-          style={{
-            fontFamily: sans,
-            fontSize: nameSize,
-            fontWeight: nameWeight,
-            color: C.dark,
-            display: "block",
-            lineHeight: 1.2,
-          }}
-        >
-          {member.name}
-        </span>
+        {/* Name row + LinkedIn icon aligned to the right edge of the photo */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span
+            style={{
+              fontFamily: sans,
+              fontSize: nameSize,
+              fontWeight: nameWeight,
+              color: C.dark,
+              lineHeight: 1.2,
+            }}
+          >
+            {member.name}
+          </span>
+          {member.linkedin && (
+            <a
+              href={member.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${member.name} LinkedIn`}
+              style={{ lineHeight: 0, flexShrink: 0, transition: "opacity 200ms ease" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = "0.6";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = "1";
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7H10v-7a6 6 0 0 1 6-6z"
+                  stroke={C.stone}
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <rect x="2" y="9" width="4" height="12" stroke={C.stone} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="4" cy="4" r="2" stroke={C.stone} strokeWidth="1.5" />
+              </svg>
+            </a>
+          )}
+        </div>
         <span
           style={{
             fontFamily: sans,
@@ -319,6 +356,7 @@ export function Section5UeberTellian({
     name?: string;
     role?: LocaleValue;
     email?: string;
+    linkedin?: string;
     bio?: LocaleValue;
     imageAsset?: { url?: string };
     imageUrl?: string;
@@ -333,6 +371,7 @@ export function Section5UeberTellian({
         bio: t(m.bio, ""),
         img: m.imageAsset?.url || m.imageUrl || "",
         email: m.email?.trim() || undefined,
+        linkedin: m.linkedin?.trim() || undefined,
       };
     })
     .filter((m: TeamMember | null): m is TeamMember => m !== null);
@@ -445,10 +484,10 @@ export function Section5UeberTellian({
   }
 
   /* ═══ DESKTOP MODE ═══
-     Single container: text column (absolute, 56vw) + filmstrip of all 8
-     portraits (flex row, 20vw each, 24px gaps). Text sits on top of the
+     Single container: text column (absolute, 56vw) + filmstrip of all
+     portraits (flex row, 21vw each, 24px gaps). Text sits on top of the
      first ~56vw of the filmstrip via matching bg color.
-     Layout width: paddingLeft(60vw) + 8×20vw + 7×24px ≈ 220vw + 168px.
+     Layout width: paddingLeft(60vw) + N×21vw + (N-1)×24px.
   ══════════════════════════════════════════════════════════ */
   return (
     <div
@@ -520,7 +559,7 @@ export function Section5UeberTellian({
               key={i}
               style={{
                 fontFamily: sans,
-                fontSize: "clamp(10.5px, 1.3vh, 12px)",
+                fontSize: "clamp(11px, 1.6vh, 16px)",
                 color: C.charcoal,
                 lineHeight: 1.75,
                 margin: 0,
@@ -563,7 +602,7 @@ export function Section5UeberTellian({
 
       {/* Filmstrip — all 8 portraits, equal spacing */}
       {TEAM.map((member) => (
-        <PortraitCard key={member.name} member={member} width="20vw" />
+        <PortraitCard key={member.name} member={member} width="21vw" />
       ))}
     </div>
   );
