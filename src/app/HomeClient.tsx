@@ -1,7 +1,5 @@
 "use client";
 
-import { Section4CoreSatellite } from "@/components/Section4CoreSatellite";
-import { Section4TopDownBottomUp } from "@/components/Section4TopDownBottomUp";
 import { useEffect, useState, useCallback, useRef, FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
@@ -9,6 +7,7 @@ import { useSubpageMode } from "@/components/useSubpageMode";
 import { SubpageOverlay } from "@/components/SubpageOverlay";
 import { AnlageprozessDetail } from "@/components/AnlageprozessDetail";
 import { AnlagestrategienDetail } from "@/components/AnlagestrategienDetail";
+import { PortfolioManagementDetail } from "@/components/PortfolioManagementDetail";
 import { ANLAGEPROZESS_STEPS } from "@/data/anlageprozessSteps";
 import { AnlageprozessStepOrdinal, ORDINAL_FONT_SIZE } from "@/components/AnlageprozessStepOrdinal";
 import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
@@ -29,33 +28,20 @@ import { Section6Kontakt } from "@/components/Section6Kontakt";
 import { HeroVertical } from "@/components/HeroVertical";
 import { ExpandableBody } from "@/components/ExpandableBody";
 import { Section2Anlagephilosophie } from "@/components/Section2Anlagephilosophie";
-import { Section3Timeline } from "@/components/Section3Timeline";
+import { ParteiDreieck } from "@/components/ParteiDreieck";
 import { LAYOUT, TEXT_COLUMN_STYLE, getLayout, getTextColumnStyle, SPACING } from "@/layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
-import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.png";
-import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.png";
-import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.png";
-import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.png";
-import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.png";
+import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.webp";
+import heroDesktopImg from "@/assets/zh-3.jpg";
+import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.webp";
+import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.webp";
+import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.webp";
+import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.webp";
 import { useRouter } from "next/navigation";
-
-/* ═════════════════════════════════════════════════════════
-   LIGHT MODE — SWISS LUXURY PALETTE
-   ════════════════════════════════════════════════════════ */
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-  muted: "#B0ACA5",
-  line: "#D8D5CF",
-  accent: "#6B665E",
-  subtle: "#E8E6E1",
-};
-
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
+import preloadLogo from "@/assets/logo/Tellian__archive white logo horizontal.svg";
+import { C, serif, sans } from "../tokens";
+import { EASE } from "../styles/motion";
 
 /* ═══════════════════════════════════════════════════════════
    SWISS IMAGERY
@@ -76,7 +62,7 @@ const IMG = {
     "https://images.unsplash.com/photo-1716124095942-c6ff3ad0541c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBTd2lzcyUyMGFyY2hpdGVjdHVyZSUyMHN0b25lJTIwZ2xhc3MlMjBtaW5pbWFsJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzczNzMzODU5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   notebook: notebookImg,
 };
-const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+// const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 /* ═════════════════════════════════════════════════════════
    PRELOAD SCREEN
@@ -95,40 +81,22 @@ function PreloadScreen({ onComplete }: { onComplete: () => void }) {
   return (
     <motion.div
       className="fixed inset-0 z-[200] flex items-center justify-center"
-      style={{ backgroundColor: "#989071" }}
+      style={{ backgroundColor: C.purple }}
       animate={{ y: sliding ? "-100%" : "0%" }}
       transition={sliding ? { duration: 0.8, ease: [0.76, 0, 0.24, 1] } : { duration: 0 }}
     >
-      <svg
-        viewBox="0 0 461.35 275.61"
-        xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        aria-label="Tellian Capital"
-        fill="currentColor"
+      <img
+        src={preloadLogo.src}
+        alt="Tellian Capital"
         style={{
-          width: "clamp(440px, 64vw, 720px)",
+          width: "clamp(560px, 80vw, 920px)",
           height: "auto",
-          color: "#FFFFFF",
           opacity: textVisible ? 1 : 0,
           transition: textVisible ? "opacity 0.6s ease-out" : "none",
           userSelect: "none",
+          pointerEvents: "none",
         }}
-      >
-        <path d="M144.22,126.17c0,6.59.99,8.74,4.24,9.16v1.26c-2.3-.21-4.97-.31-7.38-.31s-4.97.1-7.32.31v-1.26c3.24-.42,4.19-2.56,4.19-9.16v-22.34c-5.86,0-8.89,1.1-10.25,6.49h-1.78c.47-2.56.79-6.07.89-9.1,2.56.21,6.12.31,10.04.31h8.47c3.82,0,7.43-.1,9.99-.31.11,3.03.52,6.28.94,9.1h-1.78c-1.26-5.28-3.92-6.49-10.25-6.49v22.34Z" />
-        <path d="M169.33,116.49h2.98c3.45,0,6.17-.26,7.17-3.92h1.67c-.32,1.83-.47,3.66-.47,5.39,0,1.94.21,3.71.47,5.28h-1.73c-1.26-3.56-3.14-3.92-7.01-3.92h-3.09v6.59c0,3.71.26,5.81,1.05,6.96.52.94,1.57,1.36,3.45,1.36,6.17,0,9.63-3.09,11.88-8.06l1.73.94c-1.73,3.87-2.67,6.64-3.45,9.78-2.93-.31-7.11-.47-10.93-.47h-6.54c-2.35,0-5.44.05-7.59.16v-1.26c3.24-.42,4.19-2.62,4.19-9.16v-14.33c0-6.59-.94-8.74-4.19-9.21v-1.26c1.83.11,4.13.16,6.96.16h6.96c4.19,0,7.06-.05,10.2-.31.05,2.98.47,6.02,1.15,8.89l-1.62.52c-1.78-5.13-4.13-6.7-11.35-6.7h-1.88v12.56Z" />
-        <path d="M197.95,101.69c2.67,0,4.45-.05,7.48-.32v1.26c-3.09.47-4.03,2.62-4.03,9.21v14.6c0,3.09.37,5.34.99,6.33.52.99,1.57,1.47,3.5,1.47,5.75,0,9-2.25,11.88-8.06l1.67.89c-1.62,3.92-2.56,6.7-3.4,9.84-3.03-.26-7.74-.47-11.88-.47h-6.85c-1.93,0-4.55.05-6.33.16v-1.26c3.24-.42,4.19-2.56,4.19-9.16v-14.33c0-6.59-.94-8.74-4.19-9.21v-1.26c2.62.26,4.24.32,6.96.32Z" />
-        <path d="M228.5,101.69c2.67,0,4.45-.05,7.48-.32v1.26c-3.09.47-4.03,2.62-4.03,9.21v14.6c0,3.09.37,5.34.99,6.33.52.99,1.57,1.47,3.5,1.47,5.75,0,9-2.25,11.88-8.06l1.67.89c-1.62,3.92-2.56,6.7-3.4,9.84-3.03-.26-7.74-.47-11.88-.47h-6.85c-1.94,0-4.55.05-6.33.16v-1.26c3.24-.42,4.18-2.56,4.18-9.16v-14.33c0-6.59-.94-8.74-4.18-9.21v-1.26c2.62.26,4.24.32,6.96.32Z" />
-        <path d="M266.69,136.58c-3.14-.26-4.39-.31-7.06-.31s-4.71.1-7.53.31v-1.26c3.24-.42,4.18-2.56,4.18-9.16v-14.33c0-6.59-.94-8.74-4.18-9.21v-1.26c3.14.26,4.6.32,7.17.32s4.71-.11,7.43-.32v1.26c-3.24.47-4.18,2.62-4.18,9.21v14.33c0,6.59.94,8.74,4.18,9.16v1.26Z" />
-        <path d="M278.41,124.81l-1.2,3.3c-.52,1.57-.84,2.83-.84,3.77,0,2.15,1.1,3.19,3.5,3.45v1.26c-2.04-.26-3.56-.31-5.75-.31s-3.56.05-5.86.31v-1.05c2.67-.47,4.5-4.19,6.54-9.37l6.17-16.01c1.26-3.24,1.36-3.82,1.36-4.81,0-1.62-1.1-2.36-3.56-2.46v-1.31c.99.05,1.83.11,3.09.11,2.25,0,4.4-.16,6.91-.58.58,2.09,1.52,5.13,2.41,7.43l7.12,18.41c1.78,4.66,3.56,7.69,5.65,8.58v1.05c-2.51-.26-4.34-.31-7.06-.31s-4.34.05-6.91.31v-1.26c2.09-.16,3.45-.84,3.45-2.98,0-1.1-.47-2.77-1.1-4.45l-1.15-3.09h-12.76ZM284.79,108.28l-5.28,13.76h10.62l-5.34-13.76Z" />
-        <path d="M335.33,111.83c0-5.6-.63-8.79-4.13-9.21v-1.26c2.09.21,3.92.32,5.7.32s3.77-.11,5.7-.32v1.26c-3.45.42-4.19,3.35-4.19,9.21v11.41c0,4.45.11,9.52.31,13.34h-4.92l-20.46-28.62v18.21c0,5.7.68,8.74,4.13,9.16v1.26c-1.73-.21-3.71-.31-5.65-.31s-3.77.1-5.7.31v-1.26c3.4-.42,4.13-3.19,4.13-9.16v-14.33c0-5.55-.52-8.74-4.13-9.21v-1.26c1.83.16,3.71.32,5.55.32s3.71-.11,5.39-.32c1.31,2.67,2.93,5.23,4.66,7.69l13.6,19.25v-16.48Z" />
-        <path d="M158.72,157.98c-1.46-5.86-4.45-8.74-9.21-8.74-6.85,0-10.88,5.6-10.88,15.48,0,8.42,3.03,15.75,10.62,15.75,5.39,0,9.52-3.03,12.55-9.21l1.83.84c-1.26,3.19-1.94,5.49-2.51,8.79-3.35,1.2-7.95,1.94-12.35,1.94-11.61,0-17.21-5.6-17.21-17.32,0-12.29,6.33-18.62,18.73-18.62,3.56,0,6.8.42,10.31,1.36-.21,1.93-.26,2.93-.26,4.6s.05,2.93.26,5.13h-1.88Z" />
-        <path d="M174.52,170.7l-1.2,3.3c-.52,1.57-.84,2.83-.84,3.77,0,2.15,1.1,3.19,3.5,3.45v1.26c-2.04-.26-3.56-.31-5.75-.31s-3.56.05-5.86.31v-1.05c2.67-.47,4.5-4.19,6.54-9.37l6.17-16.01c1.26-3.24,1.36-3.82,1.36-4.81,0-1.62-1.1-2.36-3.56-2.46v-1.31c.99.05,1.83.11,3.09.11,2.25,0,4.4-.16,6.91-.58.58,2.09,1.52,5.13,2.41,7.43l7.12,18.41c1.78,4.66,3.56,7.69,5.65,8.58v1.05c-2.51-.26-4.34-.31-7.06-.31s-4.34.05-6.91.31v-1.26c2.09-.16,3.45-.84,3.45-2.98,0-1.1-.47-2.77-1.1-4.45l-1.15-3.09h-12.76ZM180.91,154.16l-5.28,13.76h10.62l-5.34-13.76Z" />
-        <path d="M212.92,172.06c0,6.49.63,8.95,5.18,9.16v1.26c-2.3-.21-5.02-.31-8.11-.31-2.67,0-5.34.1-7.43.31v-1.26c3.24-.42,4.18-2.56,4.18-9.16v-14.33c0-6.59-.94-8.74-4.18-9.21v-1.26c2.14.21,4.5.32,7.27.32s5.81-.32,9.68-.32c6.22,0,10.36,2.09,10.36,8.27,0,6.75-5.13,10.99-13.29,10.99-1.94,0-2.98-.16-3.66-.32v5.86ZM215.54,164.05c4.92,0,7.74-2.77,7.74-7.43s-2.62-7.12-7.12-7.12c-1.73,0-2.62.31-3.24.63v13.65c.84.21,1.41.26,2.62.26Z" />
-        <path d="M248.08,182.47c-3.14-.26-4.39-.31-7.06-.31s-4.71.1-7.53.31v-1.26c3.24-.42,4.18-2.56,4.18-9.16v-14.33c0-6.59-.94-8.74-4.18-9.21v-1.26c3.14.26,4.6.32,7.17.32s4.71-.11,7.43-.32v1.26c-3.24.47-4.18,2.62-4.18,9.21v14.33c0,6.59.94,8.74,4.18,9.16v1.26Z" />
-        <path d="M268.96,172.06c0,6.59.99,8.74,4.24,9.16v1.26c-2.3-.21-4.97-.31-7.38-.31s-4.97.1-7.32.31v-1.26c3.24-.42,4.18-2.56,4.18-9.16v-22.34c-5.86,0-8.89,1.1-10.25,6.49h-1.78c.47-2.56.79-6.07.89-9.1,2.56.21,6.12.31,10.04.31h8.48c3.82,0,7.43-.1,9.99-.31.1,3.03.52,6.28.94,9.1h-1.78c-1.26-5.28-3.92-6.49-10.25-6.49v22.34Z" />
-        <path d="M289.73,170.7l-1.2,3.3c-.52,1.57-.84,2.83-.84,3.77,0,2.15,1.1,3.19,3.5,3.45v1.26c-2.04-.26-3.56-.31-5.75-.31s-3.56.05-5.86.31v-1.05c2.67-.47,4.5-4.19,6.54-9.37l6.17-16.01c1.26-3.24,1.36-3.82,1.36-4.81,0-1.62-1.1-2.36-3.56-2.46v-1.31c.99.05,1.83.11,3.09.11,2.25,0,4.4-.16,6.91-.58.58,2.09,1.52,5.13,2.41,7.43l7.12,18.41c1.78,4.66,3.56,7.69,5.65,8.58v1.05c-2.51-.26-4.34-.31-7.06-.31s-4.34.05-6.91.31v-1.26c2.09-.16,3.45-.84,3.45-2.98,0-1.1-.47-2.77-1.1-4.45l-1.15-3.09h-12.76ZM296.11,154.16l-5.28,13.76h10.62l-5.34-13.76Z" />
-        <path d="M324.73,147.57c2.67,0,4.45-.05,7.48-.32v1.26c-3.09.47-4.03,2.62-4.03,9.21v14.6c0,3.09.37,5.34.99,6.33.52.99,1.57,1.47,3.5,1.47,5.75,0,9-2.25,11.88-8.06l1.67.89c-1.62,3.92-2.56,6.7-3.4,9.84-3.03-.26-7.74-.47-11.88-.47h-6.85c-1.94,0-4.55.05-6.33.16v-1.26c3.24-.42,4.18-2.56,4.18-9.16v-14.33c0-6.59-.94-8.74-4.18-9.21v-1.26c2.62.26,4.24.32,6.96.32Z" />
-      </svg>
+      />
     </motion.div>
   );
 }
@@ -496,27 +464,26 @@ function Section3Vermoegensverwaltung({
               />
             </div>
           </ScrollFade>
-
-          <ScrollFade scrollX={0} isVertical yOffset={16}>
-            <div style={{ marginTop: SPACING.bodyToCta, paddingBottom: "32px" }}>
-              <CtaButton href="/vermoegensverwaltung" onClick={handleAnlageprozess}>
-                {ctaLabel}
-              </CtaButton>
-            </div>
-          </ScrollFade>
         </div>
 
-        {/* Timeline visual — comes AFTER text on mobile/tablet */}
+        {/* Partei-Dreieck — comes AFTER text on mobile/tablet */}
         <div
           style={{
             width: "100%",
-            height: breakpoint === "mobile" ? "auto" : "60vh",
-            padding: breakpoint === "mobile" ? "32px 16px" : undefined,
-            position: "relative",
+            padding: breakpoint === "mobile" ? "32px 20px" : "40px 32px",
           }}
         >
-          <Section3Timeline scrollX={0} isVertical homepage={homepage} />
+          <ParteiDreieck compact onNavigate={() => onOpenDetail?.()} homepage={homepage} />
         </div>
+
+        {/* CTA — AFTER the visual element on mobile */}
+        <ScrollFade scrollX={0} isVertical yOffset={16}>
+          <div style={{ padding: breakpoint === "mobile" ? "0 20px 32px" : "0 32px 32px" }}>
+            <CtaButton href="/vermoegensverwaltung" onClick={handleAnlageprozess}>
+              {ctaLabel}
+            </CtaButton>
+          </div>
+        </ScrollFade>
         {/* Detail overlay for mobile/tablet — plain fade (no FLIP) */}
         <VermoegensverwaltungMobileOverlay
           isOpen={isDetail}
@@ -537,30 +504,35 @@ function Section3Vermoegensverwaltung({
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
     >
-      <Section3Timeline scrollX={scrollX} isDetailMode={isDetail} homepage={homepage} />
+      {/* Content wrapper — no sticky/scroll-lock, standard flow */}
+      <div style={{ position: "relative", width: layout.sectionWidth, height: "100%" }}>
+        <ParteiDreieck onNavigate={() => onOpenDetail?.()} homepage={homepage} />
 
-      <div
-        className="relative z-10 flex h-full flex-col"
-        style={{
-          ...textColStyle,
-          opacity: isDetail ? 0 : 1,
-          transform: isDetail ? "translateX(-50px)" : "translateX(0)",
-          transition: `opacity 500ms ${EASE}, transform 500ms ${EASE}`,
-          pointerEvents: isDetail ? "none" : "auto",
-        }}
-      >
-        <span
+        <div
+          className="relative z-10 flex h-full flex-col justify-center"
           style={{
-            fontFamily: sans,
-            fontSize: "10px",
-            letterSpacing: "0.22em",
-            color: C.stone,
-            display: "block",
+            ...textColStyle,
+            width: "44vw" /* Narrowed from 56vw — aligns with dark panel edge at 44vw */,
+            backgroundColor: C.bg /* Opaque — prevents dark panel bleeding through */,
+            maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
+            opacity: isDetail ? 0 : 1,
+            transform: isDetail ? "translateX(-50px)" : "translateX(0)",
+            transition: `opacity 500ms ${EASE.standard}, transform 500ms ${EASE.standard}`,
+            pointerEvents: isDetail ? "none" : "auto",
           }}
-          className="uppercase"
         >
-          {eyebrowText}
-        </span>
+          <span
+            style={{
+              fontFamily: sans,
+              fontSize: "10px",
+              letterSpacing: "0.22em",
+              color: C.stone,
+              display: "block",
+            }}
+            className="uppercase"
+          >
+            {eyebrowText}
+          </span>
 
         <div
           style={{
@@ -574,7 +546,7 @@ function Section3Vermoegensverwaltung({
         <h2
           style={{
             fontFamily: serif,
-            fontSize: "clamp(40px, 5.5vh, 64px)",
+            fontSize: "clamp(48px, 7vh, 80px)",
             lineHeight: 0.94,
             color: C.dark,
             letterSpacing: "-0.03em",
@@ -595,8 +567,6 @@ function Section3Vermoegensverwaltung({
             display: "flex",
             flexDirection: "column",
             gap: SPACING.bodyParagraphGap,
-            flex: 1,
-            minHeight: 0,
           }}
         >
           {bodyParagraphs.map((text, i) => (
@@ -604,7 +574,7 @@ function Section3Vermoegensverwaltung({
               key={i}
               style={{
                 fontFamily: sans,
-                fontSize: "clamp(10.5px, 1.3vh, 12.5px)",
+                fontSize: "clamp(11px, 1.6vh, 16px)",
                 color: C.charcoal,
                 lineHeight: 1.75,
                 margin: 0,
@@ -613,20 +583,41 @@ function Section3Vermoegensverwaltung({
               {text}
             </p>
           ))}
-        </div>
 
-        <div style={{ marginTop: SPACING.bodyToCta, flexShrink: 0 }}>
-          <CtaButton href="/vermoegensverwaltung" onClick={handleAnlageprozess}>
+          {/* CTA — inline with body text, left-aligned */}
+          <a
+            href="/vermoegensverwaltung"
+            onClick={handleAnlageprozess}
+            className="inline-flex items-center gap-3 uppercase"
+            style={{
+              marginTop: "56px",
+              padding: "16px 24px",
+              border: `1px solid ${C.button}`,
+              borderRadius: 0,
+              backgroundColor: C.button,
+              fontFamily: sans,
+              fontSize: "11px",
+              fontWeight: 500,
+              letterSpacing: "0.18em",
+              color: C.dark,
+              textDecoration: "none",
+              lineHeight: 1,
+              alignSelf: "flex-start",
+              transition: "background-color 250ms ease-out",
+            }}
+          >
             {ctaLabel}
-          </CtaButton>
+            <span aria-hidden>→</span>
+          </a>
         </div>
+      </div>
       </div>
     </div>
   );
 
   /* ── DETAIL overlay (rendered via Portal to body) ── */
   const detailOverlay =
-    mounted &&
+    typeof document !== "undefined" &&
     createPortal(
       <div
         style={{
@@ -671,7 +662,7 @@ function Section3Vermoegensverwaltung({
               textTransform: "uppercase",
             }}
           >
-            Tellian<span style={{ fontWeight: 400 }}> Capital</span>
+            Tellian
           </span>
           <button
             onClick={handleBackClick}
@@ -706,7 +697,7 @@ function Section3Vermoegensverwaltung({
             padding: "80px 48px 40px",
             opacity: isDetail ? 1 : 0,
             transform: isDetail ? "translateY(0)" : "translateY(-12px)",
-            transition: `opacity 600ms ease-out ${isDetail ? "500ms" : "0ms"}, transform 600ms ${EASE} ${isDetail ? "500ms" : "0ms"}`,
+            transition: `opacity 600ms ease-out ${isDetail ? "500ms" : "0ms"}, transform 600ms ${EASE.standard} ${isDetail ? "500ms" : "0ms"}`,
           }}
         >
           <span
@@ -738,6 +729,9 @@ function Section3Vermoegensverwaltung({
           </h1>
         </div>
 
+        {/* ═══ Horizontal Stepper ═══ Container is always opaque — only labels
+             and connector lines fade in. Step ordinals are FLIP targets and
+             need stable parent opacity for Framer Motion's layoutId to work. */}
         <div
           style={{
             padding: "40px 48px 56px",
@@ -779,6 +773,9 @@ function Section3Vermoegensverwaltung({
                     minWidth: "80px",
                   }}
                 >
+                  {/* Step ordinal — kept as a FLIP target (shared layoutId) for when
+                    another overview element renders it; currently fades in on its own
+                    since the Partei-Dreieck visual has no matching ordinal. */}
                   {isDetail && (
                     <AnlageprozessStepOrdinal
                       num={step.num}
@@ -798,13 +795,16 @@ function Section3Vermoegensverwaltung({
                       whiteSpace: "nowrap",
                       opacity: isDetail ? 1 : 0,
                       transform: isDetail ? "translateY(0)" : "translateY(6px)",
-                      transition: `opacity 400ms ease-out ${isDetail ? `${500 + i * 80}ms` : "0ms"}, transform 400ms ${EASE} ${isDetail ? `${500 + i * 80}ms` : "0ms"}`,
+                      transition: `opacity 400ms ease-out ${isDetail ? `${500 + i * 80}ms` : "0ms"}, transform 400ms ${EASE.standard} ${isDetail ? `${500 + i * 80}ms` : "0ms"}`,
                     }}
                   >
                     {step.shortLabel}
                   </span>
                 </div>
 
+                {/* Connector line — grows AFTER the FLIP completes.
+                  Last FLIP ends at ~1.1s (4 steps × 80ms delay + 800ms duration).
+                  Lines start at 1100ms with 80ms stagger. */}
                 {i < stepperItems.length - 1 && (
                   <div
                     aria-hidden
@@ -816,7 +816,7 @@ function Section3Vermoegensverwaltung({
                       flexShrink: 0,
                       transformOrigin: "left center",
                       transform: isDetail ? "scaleX(1)" : "scaleX(0)",
-                      transition: `transform 450ms ${EASE} ${isDetail ? `${1100 + i * 80}ms` : "0ms"}`,
+                      transition: `transform 450ms ${EASE.standard} ${isDetail ? `${1100 + i * 80}ms` : "0ms"}`,
                     }}
                   />
                 )}
@@ -825,11 +825,12 @@ function Section3Vermoegensverwaltung({
           </div>
         </div>
 
+        {/* ═══ Detail body ═══ */}
         <div
           style={{
             opacity: isDetail ? 1 : 0,
             transform: isDetail ? "translateY(0)" : "translateY(16px)",
-            transition: `opacity 500ms ease-out ${isDetail ? "900ms" : "0ms"}, transform 500ms ${EASE} ${isDetail ? "900ms" : "0ms"}`,
+            transition: `opacity 500ms ease-out ${isDetail ? "900ms" : "0ms"}, transform 500ms ${EASE.standard} ${isDetail ? "900ms" : "0ms"}`,
           }}
         >
           <AnlageprozessDetail
@@ -842,6 +843,9 @@ function Section3Vermoegensverwaltung({
       document.body,
     );
 
+  /* LayoutGroup enables Framer Motion's layoutId matching across React portals,
+     so any overview element sharing a layoutId with the Portal overlay's ordinals
+     can be recognized as the same element for a FLIP transition. */
   return (
     <LayoutGroup>
       {overviewMarkup}
@@ -861,6 +865,8 @@ interface Section4Props {
   onOpenDetail?: () => void;
   onCloseDetail?: () => void;
   onContactClick?: () => void;
+  /** Opens the Portfolio Management detail subpage (CTA "Mehr zum Anlageprozess") */
+  onNavigateToProcess?: () => void;
   homepage?: any;
 }
 
@@ -869,44 +875,76 @@ function Section4Anlagestrategien({
   isVertical = false,
   breakpoint = "desktop" as const,
   viewMode = "overview",
-  onOpenDetail,
   onCloseDetail,
   onContactClick,
+  onNavigateToProcess,
   homepage,
 }: Section4Props) {
+  void scrollX;
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
   const { t } = useLanguage();
   const isDetail = viewMode === "detail";
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const reducedMotion = usePrefersReducedMotion();
 
-  const handleOpenDetail = (e: React.MouseEvent) => {
+  const handleNavigateToProcess = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    onOpenDetail?.();
+    onNavigateToProcess?.();
   };
 
-  const handleBackClick = () => {
-    onCloseDetail?.();
-  };
+  /* Overview copy — reframed around Portfolio Management (see the new
+     /portfolio-management subpage). CMS-driven via the strategy* fields,
+     which were freed up by this redesign for exactly this content. */
+  const overviewEyebrow = t(homepage?.strategyEyebrow, "Portfolio Management");
+  const overviewHeadingLine1 = t(homepage?.strategyHeadingLine1, "Methode statt");
+  const overviewHeadingLine2 = t(homepage?.strategyHeadingLine2, "Zufall.");
 
-  const fallbackParagraphs = [
-    "Die Anlagestrategien von Tellian Capital vereinen zwei wesentliche Ansätze: Wir analysieren die globalen Märkte nach ökonomischen Rahmendaten (Top-Down) und bewerten gleichzeitig einzelne Unternehmen auf Basis ihrer fundamentalen Stärke (Bottom-Up).",
-    "Dieser duale Prozess ermöglicht es uns, strukturelle Trends frühzeitig zu erkennen und gezielt in Geschäftsmodelle zu investieren, die auch in einem volatilen Umfeld bestehen können.",
-    "Jede Strategie wird individuell auf das Kundenprofil zugeschnitten. Wir setzen dabei auf Transparenz, Liquidität und eine disziplinierte Umsetzung der Anlageentscheide.",
+  const fallbackBodyParagraphs = [
+    "Jede Anlageentscheidung bei Tellian Capital folgt einem klaren, nachvollziehbaren Prozess. Von den Leitprinzipien über Ihr persönliches Anlegerprofil bis zur strategischen und taktischen Allokation — nichts entsteht aus Marktstimmung, alles aus Methode.",
+    "Das Ergebnis ist eine individuelle Portfolio-Konstruktion, die laufend überwacht und transparent berichtet wird. So bleibt Ihr Portfolio jederzeit auf Ihre Ziele ausgerichtet.",
   ];
-
-  const cmsParagraphs: string[] = (homepage?.strategyParagraphs ?? [])
+  const cmsBodyParagraphs: string[] = (homepage?.strategyParagraphs ?? [])
     .map((p: LocaleValue) => t(p, ""))
     .filter((p: string) => p.length > 0);
-  const bodyParagraphs = cmsParagraphs.length > 0 ? cmsParagraphs : fallbackParagraphs;
+  const bodyParagraphs = cmsBodyParagraphs.length > 0 ? cmsBodyParagraphs : fallbackBodyParagraphs;
 
-  const eyebrowText = t(homepage?.strategyEyebrow, "Anlagestrategien");
-  const headingLine1 = t(homepage?.strategyHeadingLine1, "Zwei Perspektiven.");
-  const headingLine2 = t(homepage?.strategyHeadingLine2, "Ein Portfolio.");
-  const ctaLabel = t(homepage?.strategyCtaLabel, "Mehr zu den Strategien");
+  const overviewCtaLabel = t(homepage?.strategyCtaLabel, "Mehr zum Anlageprozess");
+
+  /* Flowchart — fixed-size tiers merged with CMS overrides; falls back
+     to the original hardcoded labels whenever a CMS array is empty. */
+  const fallbackFlowchartTier1 = ["Leitprinzipien", "Investment-Philosophie"];
+  const fallbackFlowchartTier2 = [
+    "Innovatives Portfolio-Management",
+    "Zugang zu einzigartigen Investmentmöglichkeiten",
+    "Inhouse-Expertise & internationales Netzwerk",
+  ];
+  const fallbackFlowchartTier3 = ["Strategische Allokation", "Taktische Allokation"];
+  const fallbackFlowchartTier5 = ["Überwachung", "Reporting"];
+
+  const cmsFlowchartTier1: string[] = (homepage?.strategyFlowchartTier1 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier1 = cmsFlowchartTier1.length > 0 ? cmsFlowchartTier1 : fallbackFlowchartTier1;
+
+  const flowchartConnectorLabel = t(homepage?.strategyFlowchartConnectorLabel, "Anlegerprofil des Kunden");
+
+  const cmsFlowchartTier2: string[] = (homepage?.strategyFlowchartTier2 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier2 = cmsFlowchartTier2.length > 0 ? cmsFlowchartTier2 : fallbackFlowchartTier2;
+
+  const cmsFlowchartTier3: string[] = (homepage?.strategyFlowchartTier3 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier3 = cmsFlowchartTier3.length > 0 ? cmsFlowchartTier3 : fallbackFlowchartTier3;
+
+  const flowchartTier4 = t(homepage?.strategyFlowchartTier4, "Individuelle Portfolio-Konstruktion");
+
+  const cmsFlowchartTier5: string[] = (homepage?.strategyFlowchartTier5 ?? [])
+    .map((v: LocaleValue) => t(v, ""))
+    .filter((v: string) => v.length > 0);
+  const flowchartTier5 = cmsFlowchartTier5.length > 0 ? cmsFlowchartTier5 : fallbackFlowchartTier5;
+
   const detailEyebrow = t(homepage?.strategyDetailEyebrow, "Anlagestrategien");
   const detailHeadingLine1 = t(homepage?.strategyDetailHeadingLine1, "Zwei Perspektiven,");
   const detailHeadingLine2 = t(homepage?.strategyDetailHeadingLine2, "ein Portfolio.");
@@ -926,7 +964,7 @@ function Section4Anlagestrategien({
               }}
               className="uppercase"
             >
-              {eyebrowText}
+              {overviewEyebrow}
             </span>
 
             <div
@@ -951,9 +989,9 @@ function Section4Anlagestrategien({
                 marginTop: SPACING.accentToHeadline,
               }}
             >
-              {headingLine1}
+              {overviewHeadingLine1}
               <br />
-              <em>{headingLine2}</em>
+              <em>{overviewHeadingLine2}</em>
             </h2>
           </ScrollFade>
 
@@ -969,19 +1007,143 @@ function Section4Anlagestrategien({
               />
             </div>
           </ScrollFade>
+        </div>
 
-          <ScrollFade scrollX={0} isVertical yOffset={16}>
-            <div style={{ marginTop: SPACING.bodyToCta, paddingBottom: "32px" }}>
-              <CtaButton href="/anlagestrategien" onClick={handleOpenDetail}>
-                {ctaLabel}
-              </CtaButton>
+        {/* Methodik-Schaubild — comes AFTER text on mobile/tablet */}
+        <div style={{ width: "100%", padding: "32px 16px" }}>
+          <figure
+            role="img"
+            aria-label="Flussdiagramm: Anlageprozess von Leitprinzipien bis Reporting."
+            style={{ maxWidth: 480, margin: "0 auto", padding: 0 }}
+          >
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {flowchartTier1.map((label) => (
+                <div
+                  key={label}
+                  style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
             </div>
-          </ScrollFade>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 10, borderLeft: `1px dashed ${C.line}` }} />
+              <span
+                style={{
+                  fontFamily: sans,
+                  fontSize: 7,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: C.stone,
+                  padding: "2px 8px",
+                }}
+              >
+                {flowchartConnectorLabel}
+              </span>
+              <div style={{ width: 0.5, height: 10, borderLeft: `1px dashed ${C.line}` }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
+              {flowchartTier2.map((label) => (
+                <div
+                  key={label}
+                  style={{ backgroundColor: C.purple, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 14, borderLeft: `1px dashed ${C.line}` }} />
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke={C.stone}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {flowchartTier3.map((label) => (
+                <div
+                  key={label}
+                  style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 14, borderLeft: `1px dashed ${C.line}` }} />
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke={C.stone}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={{ backgroundColor: C.purple, padding: "14px 18px", textAlign: "center" }}>
+              <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+                {flowchartTier4}
+              </span>
+            </div>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+              aria-hidden
+            >
+              <div style={{ width: 0.5, height: 14, borderLeft: `1px dashed ${C.line}` }} />
+              <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke={C.stone}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {flowchartTier5.map((label) => (
+                <div
+                  key={label}
+                  style={{ border: `1px solid ${C.line}`, padding: "12px 14px", textAlign: "center" }}
+                >
+                  <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </figure>
         </div>
 
-        <div style={{ width: "100%", padding: "0 16px 64px" }}>
-          <Section4TopDownBottomUp scrollX={0} isVertical homepage={homepage} />
-        </div>
+        {/* CTA — AFTER the visual element on mobile */}
+        <ScrollFade scrollX={0} isVertical yOffset={16}>
+          <div style={{ padding: breakpoint === "mobile" ? "0 20px 32px" : "0 32px 32px" }}>
+            <CtaButton href="/portfolio-management" onClick={handleNavigateToProcess}>
+              {overviewCtaLabel}
+            </CtaButton>
+          </div>
+        </ScrollFade>
 
         <AnlagestrategienMobileOverlay
           isOpen={isDetail}
@@ -996,20 +1158,172 @@ function Section4Anlagestrategien({
     );
   }
 
+  /* Desktop */
+
+  /* ─── Overview markup — normal section inside horizontal scroll strip ─── */
   const overviewMarkup = (
     <div
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
     >
-      <Section4TopDownBottomUp scrollX={scrollX} isDetailMode={isDetail} homepage={homepage} />
-
+      {/* ── Right column: Methodik-Schaubild ──
+           Section4: 40/60 instead of 50/50 — deliberate, the diagram needs width.
+           Don't align this to the other sections' split. */}
       <div
-        className="relative z-10 flex h-full flex-col"
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: "38vw",
+          right: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "visible",
+        }}
+      >
+        <figure
+          role="img"
+          aria-label="Flussdiagramm: Von Leitprinzipien und Investment-Philosophie über das Anlegerprofil des Kunden zu innovativem Portfolio-Management, strategischer und taktischer Allokation, individueller Portfolio-Konstruktion, Überwachung und Reporting."
+          style={{ maxWidth: 560, width: "100%", margin: 0, padding: 0 }}
+        >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {flowchartTier1.map((label) => (
+              <div
+                key={label}
+                style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 12, borderLeft: `1px dashed ${C.line}` }} />
+            <span
+              style={{
+                fontFamily: sans,
+                fontSize: 8,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: C.stone,
+                padding: "3px 10px",
+              }}
+            >
+              {flowchartConnectorLabel}
+            </span>
+            <div style={{ width: 0.5, height: 12, borderLeft: `1px dashed ${C.line}` }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+            {flowchartTier2.map((label) => (
+              <div
+                key={label}
+                style={{
+                  backgroundColor: C.purple,
+                  padding: "14px 12px",
+                  textAlign: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 16, borderLeft: `1px dashed ${C.line}` }} />
+            <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke={C.stone}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {flowchartTier3.map((label) => (
+              <div
+                key={label}
+                style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 16, borderLeft: `1px dashed ${C.line}` }} />
+            <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke={C.stone}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div style={{ backgroundColor: C.purple, padding: "16px 20px", textAlign: "center" }}>
+            <span style={{ fontFamily: serif, fontSize: 13, color: C.bg, lineHeight: 1.4 }}>
+              {flowchartTier4}
+            </span>
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "4px 0" }}
+            aria-hidden
+          >
+            <div style={{ width: 0.5, height: 16, borderLeft: `1px dashed ${C.line}` }} />
+            <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke={C.stone}
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {flowchartTier5.map((label) => (
+              <div
+                key={label}
+                style={{ border: `1px solid ${C.line}`, padding: "14px 16px", textAlign: "center" }}
+              >
+                <span style={{ fontFamily: serif, fontSize: 13, color: C.dark, lineHeight: 1.4 }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </figure>
+      </div>
+
+      {/* ── Left column: text (38vw — narrower, 40/60 split for the diagram) ── */}
+      <div
+        className="relative z-10 flex h-full flex-col justify-center"
         style={{
           ...textColStyle,
+          width: "38vw",
+          maxWidth: "calc(460px + clamp(36px, 5vw, 120px) + 4vw)",
           opacity: isDetail ? 0 : 1,
           transform: isDetail ? "translateX(-50px)" : "translateX(0)",
-          transition: `opacity 500ms ${EASE}, transform 500ms ${EASE}`,
+          transition: `opacity 500ms ${EASE.in}, transform 500ms ${EASE.in}`,
           pointerEvents: isDetail ? "none" : "auto",
         }}
       >
@@ -1023,7 +1337,7 @@ function Section4Anlagestrategien({
           }}
           className="uppercase"
         >
-          {eyebrowText}
+          {overviewEyebrow}
         </span>
 
         <div
@@ -1038,16 +1352,16 @@ function Section4Anlagestrategien({
         <h2
           style={{
             fontFamily: serif,
-            fontSize: "clamp(40px, 5.5vh, 64px)",
+            fontSize: "clamp(48px, 7vh, 80px)",
             lineHeight: 0.94,
             color: C.dark,
             letterSpacing: "-0.03em",
             marginTop: SPACING.accentToHeadline,
           }}
         >
-          {headingLine1}
+          {overviewHeadingLine1}
           <br />
-          <em>{headingLine2}</em>
+          <em>{overviewHeadingLine2}</em>
         </h2>
 
         <div
@@ -1057,8 +1371,6 @@ function Section4Anlagestrategien({
             display: "flex",
             flexDirection: "column",
             gap: SPACING.bodyParagraphGap,
-            flex: 1,
-            minHeight: 0,
           }}
         >
           {bodyParagraphs.map((text, i) => (
@@ -1066,7 +1378,7 @@ function Section4Anlagestrategien({
               key={i}
               style={{
                 fontFamily: sans,
-                fontSize: "clamp(10.5px, 1.3vh, 12.5px)",
+                fontSize: "clamp(11px, 1.6vh, 16px)",
                 color: C.charcoal,
                 lineHeight: 1.75,
                 margin: 0,
@@ -1075,99 +1387,61 @@ function Section4Anlagestrategien({
               {text}
             </p>
           ))}
-        </div>
 
-        <div style={{ marginTop: SPACING.bodyToCta, flexShrink: 0 }}>
-          <CtaButton href="/anlagestrategien" onClick={handleOpenDetail}>
-            {ctaLabel}
-          </CtaButton>
+          {/* CTA — inline with body text, left-aligned */}
+          <a
+            href="/portfolio-management"
+            onClick={handleNavigateToProcess}
+            className="inline-flex items-center gap-3 uppercase"
+            style={{
+              marginTop: "56px",
+              padding: "16px 24px",
+              border: `1px solid ${C.button}`,
+              borderRadius: 0,
+              backgroundColor: C.button,
+              fontFamily: sans,
+              fontSize: "11px",
+              fontWeight: 500,
+              letterSpacing: "0.18em",
+              color: C.dark,
+              textDecoration: "none",
+              lineHeight: 1,
+              alignSelf: "flex-start",
+              transition: "background-color 250ms ease-out",
+            }}
+          >
+            <span>{overviewCtaLabel}</span>
+            <span aria-hidden>→</span>
+          </a>
         </div>
       </div>
     </div>
   );
 
-  const detailOverlay =
-    mounted &&
-    createPortal(
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 90,
-          backgroundColor: C.bg,
-          overflowY: "auto",
-          opacity: isDetail ? 1 : 0,
-          pointerEvents: isDetail ? "auto" : "none",
-          visibility: isDetail ? "visible" : "hidden",
-          transition: `opacity 400ms ease-out, visibility 0s linear ${isDetail ? "0s" : "800ms"}`,
-        }}
-      >
-        <div
-          style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 10,
-            backgroundColor: "rgba(249, 249, 247, 0.92)",
-            backdropFilter: "blur(12px)",
-            borderBottom: `1px solid ${C.line}`,
-            height: 56,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 32px",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: sans,
-              fontSize: "13px",
-              fontWeight: 700,
-              letterSpacing: "2.5px",
-              color: C.dark,
-              textTransform: "uppercase",
-            }}
-          >
-            Tellian<span style={{ fontWeight: 400 }}> Capital</span>
-          </span>
-          <button
-            onClick={handleBackClick}
-            style={{
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              padding: "10px 4px",
-              minHeight: "44px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              fontFamily: sans,
-              fontSize: "11px",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: C.stone,
-            }}
-          >
-            <span>Zurück</span>
-          </button>
-        </div>
-
-        <div style={{ padding: "80px 48px" }}>
-          <AnlagestrategienDetail
-            isMobile={false}
-            isDetail={isDetail}
-            reducedMotion={false}
-            onContactClick={onContactClick || (() => {})}
-            homepage={homepage}
-          />
-        </div>
-      </div>,
-      document.body,
-    );
-
+  /* ─── Wrap overview + overlay in a shared LayoutGroup so Framer Motion
+         can match headline layoutIds across the React Portal. ─── */
   return (
     <LayoutGroup>
       {overviewMarkup}
-      {detailOverlay}
+      <SubpageOverlay
+        isOpen={isDetail}
+        onClose={() => onCloseDetail?.()}
+        eyebrow={detailEyebrow}
+        headline={
+          <>
+            {detailHeadingLine1}
+            <br />
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{detailHeadingLine2}</em>
+          </>
+        }
+      >
+        <AnlagestrategienDetail
+          isMobile={isVertical}
+          isDetail={isDetail}
+          reducedMotion={reducedMotion}
+          onContactClick={() => onContactClick?.()}
+        />
+      </SubpageOverlay>
     </LayoutGroup>
   );
 }
@@ -1193,7 +1467,12 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const heroBottomLabel = t(homepage?.startBottomLabel, "FINMA-LIZENZIERT · ZÜRICH");
   // Hero image: prefer uploaded asset, then external URL, then bundled fallback.
   const heroImageSrc: string =
-    homepage?.startImageAsset?.url || homepage?.startImageUrl || IMG.hero.src;
+    homepage?.startImageAsset?.url || homepage?.startImageUrl || heroDesktopImg.src;
+
+  // Portfolio Management subpage overlay header (localized, with fallback to the original German copy)
+  const pmDetailEyebrow = t(homepage?.pmDetailEyebrow, "Portfolio Management");
+  const pmDetailHeadingLine1 = t(homepage?.pmDetailHeadingLine1, "Wie wir Ihr Portfolio");
+  const pmDetailHeadingLine2 = t(homepage?.pmDetailHeadingLine2, "führen.");
 
   const { scrollX, scrollProgress, scrollDirection, containerRef, scrollTo } = useHorizontalScroll({
     disabled: isVertical || !introComplete,
@@ -1206,9 +1485,14 @@ export default function HomeClient({ homepage }: { homepage: any }) {
 
   const vvw = useSubpageMode("/vermoegensverwaltung");
   const ast = useSubpageMode("/anlagestrategien");
+  const pm = useSubpageMode("/portfolio-management");
   const legal = useLegalRoute();
 
-  const isDetailMode = vvw.mode === "detail" || ast.mode === "detail" || legal.activePath !== null;
+  const isDetailMode =
+    vvw.mode === "detail" ||
+    ast.mode === "detail" ||
+    pm.mode === "detail" ||
+    legal.activePath !== null;
 
   const [heroAnimate, setHeroAnimate] = useState(false);
   const heroArrowHidden = scrollX > 0.02;
@@ -1223,6 +1507,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const navigateToContact = useCallback(() => {
     vvw.closeDetail();
     ast.closeDetail();
+    pm.closeDetail();
     legal.close();
     if (isVertical) {
       const el = document.getElementById("section-kontakt");
@@ -1230,7 +1515,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
     } else {
       scrollTo(0.88);
     }
-  }, [vvw, ast, legal, isVertical, scrollTo]);
+  }, [vvw, ast, pm, legal, isVertical, scrollTo]);
 
   if (!introComplete) {
     return <PreloadScreen onComplete={() => setIntroComplete(true)} />;
@@ -1286,17 +1571,44 @@ export default function HomeClient({ homepage }: { homepage: any }) {
             onOpenDetail={ast.openDetail}
             onCloseDetail={ast.closeDetail}
             onContactClick={navigateToContact}
+            onNavigateToProcess={pm.openDetail}
             homepage={homepage}
           />
 
-          <Section5UeberTellian isVertical={true} homepage={homepage} />
+          <Section5UeberTellian
+            isVertical={true}
+            breakpoint={breakpoint}
+            homepage={homepage}
+            onContactClick={navigateToContact}
+          />
 
           <div id="section-kontakt">
-            <Section6Kontakt initialData={homepage} isVertical={true} onOpenLegal={legal.open} />
+            <Section6Kontakt
+              initialData={homepage}
+              isVertical={true}
+              breakpoint={breakpoint}
+              onOpenLegal={legal.open}
+            />
           </div>
         </main>
 
         <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+
+        {/* ═══ Portfolio Management Subpage (mobile) ═══ */}
+        <SubpageOverlay
+          isOpen={pm.isDetail}
+          onClose={() => pm.closeDetail()}
+          eyebrow={pmDetailEyebrow}
+          headline={
+            <>
+              {pmDetailHeadingLine1}
+              <br />
+              <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
+            </>
+          }
+        >
+          <PortfolioManagementDetail isMobile={true} onContactClick={navigateToContact} homepage={homepage} />
+        </SubpageOverlay>
       </div>
     );
   }
@@ -1338,49 +1650,28 @@ export default function HomeClient({ homepage }: { homepage: any }) {
             <HeroExpandingImage src={heroImageSrc} scrollX={scrollX} className="h-full w-full" />
           </div>
 
+          {/* Text column — eyebrow + headline + CTA, vertically centered */}
           <div
-            style={{
-              position: "absolute",
-              top: "40px",
-              left: "68px",
-              zIndex: 5,
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              opacity: heroAnimate ? 1 : 0,
-              transform: heroAnimate ? "translateX(0)" : "translateX(-8px)",
-              transition:
-                "opacity 600ms ease-out 500ms, transform 600ms cubic-bezier(0.16,1,0.3,1) 500ms",
-            }}
+            className="relative z-10 flex h-full flex-col justify-center"
+            style={{ ...textColStyle }}
           >
-            <span
-              aria-hidden
-              style={{
-                display: "inline-block",
-                width: "16px",
-                height: "1px",
-                backgroundColor: C.muted,
-                flexShrink: 0,
-              }}
-            />
+            {/* Eyebrow — above headline */}
             <span
               style={{
                 fontFamily: sans,
-                fontSize: "10px",
-                letterSpacing: "0.16em",
-                color: C.stone,
+                fontSize: "11px",
+                fontWeight: 400,
+                letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                whiteSpace: "nowrap",
+                color: C.stone,
+                opacity: heroAnimate ? 1 : 0,
+                transition: "opacity 600ms ease-out 200ms",
               }}
             >
               {heroEyebrow}
             </span>
-          </div>
 
-          <div
-            className="relative z-10 flex h-full flex-col justify-end"
-            style={{ ...textColStyle, paddingBottom: "80px" }}
-          >
+            {/* Headline */}
             <h1
               style={{
                 fontFamily: serif,
@@ -1391,10 +1682,11 @@ export default function HomeClient({ homepage }: { homepage: any }) {
                 maxWidth: "520px",
                 fontWeight: 400,
                 margin: 0,
+                marginTop: "28px",
                 opacity: heroAnimate ? 1 : 0,
                 transform: heroAnimate ? "translateY(0)" : "translateY(24px)",
                 transition:
-                  "opacity 800ms ease-out 200ms, transform 800ms cubic-bezier(0.16,1,0.3,1) 200ms",
+                  "opacity 800ms ease-out 400ms, transform 800ms cubic-bezier(0.16,1,0.3,1) 400ms",
               }}
             >
               {heroLine1}
@@ -1402,10 +1694,10 @@ export default function HomeClient({ homepage }: { homepage: any }) {
               <em style={{ fontStyle: "italic", fontWeight: 400 }}>{heroLine2}</em>
             </h1>
 
-            <div style={{ height: "clamp(48px, 6vh, 80px)" }} />
-
+            {/* CTA — ghost button */}
             <div
               style={{
+                marginTop: "64px",
                 opacity: heroAnimate ? 1 : 0,
                 transform: heroAnimate ? "translateX(0)" : "translateX(-16px)",
                 transition:
@@ -1414,38 +1706,19 @@ export default function HomeClient({ homepage }: { homepage: any }) {
             >
               <CtaButton
                 href="#contact"
-                variant="solid"
+                variant="ghost"
                 fullWidth={false}
-                style={{ padding: "14px 32px" }}
+                style={{
+                  backgroundColor: C.button,
+                  color: C.dark,
+                }}
                 onClick={(e) => {
                   e.preventDefault();
-                  scrollTo(0.88);
+                  navigateToContact();
                 }}
               >
                 {heroCta}
               </CtaButton>
-            </div>
-
-            <div
-              className="flex items-center gap-3"
-              style={{
-                marginTop: "14px",
-                opacity: heroAnimate ? 1 : 0,
-                transition: "opacity 400ms ease-out 1200ms",
-              }}
-            >
-              <div style={{ width: "16px", height: "1px", backgroundColor: C.muted }} />
-              <span
-                style={{
-                  fontFamily: sans,
-                  fontSize: "10px",
-                  letterSpacing: "0.16em",
-                  color: C.stone,
-                }}
-                className="uppercase"
-              >
-                {heroBottomLabel}
-              </span>
             </div>
           </div>
 
@@ -1456,7 +1729,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
               bottom: "56px",
               right: "calc(10vw + 56px)",
               zIndex: 5,
-              color: C.charcoal,
+              color: C.purple,
               opacity: heroAnimate && !heroArrowHidden ? 1 : 0,
               transform: heroArrowHidden ? "translateX(16px) scale(0.6)" : "scale(1)",
               transition: heroArrowHidden
@@ -1474,18 +1747,13 @@ export default function HomeClient({ homepage }: { homepage: any }) {
               }}
             >
               <svg
-                width="140"
-                height="75"
-                viewBox="0 0 195 105"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeMiterlimit="10"
+                width="96"
+                height="24"
+                viewBox="0 0 32 8"
+                fill="currentColor"
                 style={{ display: "block" }}
               >
-                <path d="M0 52.6367L190.169 52.6367" />
-                <path d="M195.001 52.4033C166.054 52.4033 142.561 28.9266 142.561 0" />
-                <path d="M195.001 52.3516C166.054 52.3516 142.561 75.8282 142.561 104.755" />
+                <polygon points="2 2 28 2 30 4 28 6 2 6" />
               </svg>
             </div>
           </div>
@@ -1531,6 +1799,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           onOpenDetail={ast.openDetail}
           onCloseDetail={ast.closeDetail}
           onContactClick={navigateToContact}
+          onNavigateToProcess={pm.openDetail}
           homepage={homepage}
         />
 
@@ -1539,7 +1808,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           style={{ width: layout.breathingSpace, backgroundColor: C.bg }}
         />
 
-        <Section5UeberTellian homepage={homepage} />
+        <Section5UeberTellian homepage={homepage} onContactClick={navigateToContact} />
 
         <div
           className="h-screen flex-shrink-0"
@@ -1550,6 +1819,22 @@ export default function HomeClient({ homepage }: { homepage: any }) {
       </div>
 
       <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+
+      {/* ═══ Portfolio Management Subpage ═══ */}
+      <SubpageOverlay
+        isOpen={pm.isDetail}
+        onClose={() => pm.closeDetail()}
+        eyebrow={pmDetailEyebrow}
+        headline={
+          <>
+            {pmDetailHeadingLine1}
+            <br />
+            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
+          </>
+        }
+      >
+        <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} homepage={homepage} />
+      </SubpageOverlay>
     </div>
   );
 }

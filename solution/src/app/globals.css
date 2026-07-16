@@ -1,0 +1,30 @@
+@import "../styles/fonts.css";
+@import "tailwindcss" source(none);
+@source "../**/*.{js,ts,jsx,tsx}";
+@import "../styles/theme.css";
+
+/* ── Global scrollbar hide ── */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(26, 25, 22, 0.08);
+  color: #191718;
+}
+
+body {
+  margin: 0;
+  background-color: #f4f4f0;
+}

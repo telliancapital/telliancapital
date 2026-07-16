@@ -25,6 +25,8 @@ export const homepageType = defineType({
     { name: "contact", title: "6. Kontakt" },
     { name: "legal", title: "7. Rechtliches" },
     { name: "navigation", title: "8. Sidebar  ·  Navigation" },
+    { name: "seo", title: "9. SEO  ·  Meta tags" },
+    { name: "portfolioManagement", title: "10. Portfolio Management  ·  /portfolio-management" },
   ],
 
   /* Collapsible groupings within each tab.
@@ -78,6 +80,11 @@ export const homepageType = defineType({
       title: "Body Paragraphs",
       options: { collapsible: true, collapsed: false },
     },
+    {
+      name: "philosophyValuesSet",
+      title: "Leistungsethik values (auto-cycling list)",
+      options: { collapsible: true, collapsed: false },
+    },
 
     /* Method */
     {
@@ -103,6 +110,11 @@ export const homepageType = defineType({
     {
       name: "methodTimelineSet",
       title: "Right-side timeline (5 numbered steps)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "methodPartiesSet",
+      title: "Right-side relationship diagram (Sie · Tellian Capital · Banken)",
       options: { collapsible: true, collapsed: false },
     },
     {
@@ -140,6 +152,11 @@ export const homepageType = defineType({
     {
       name: "strategyCtaSet",
       title: "Call-to-Action Button",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "strategyFlowchartSet",
+      title: "Portfolio Management Flowchart (Overview diagram)",
       options: { collapsible: true, collapsed: false },
     },
     {
@@ -263,6 +280,95 @@ export const homepageType = defineType({
     {
       name: "navPortalSet",
       title: "Login / Kundenportal",
+      options: { collapsible: true, collapsed: false },
+    },
+
+    /* SEO — per-page meta tags */
+    {
+      name: "seoHomeSet",
+      title: "Homepage — Meta tags",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "seoVermoegensverwaltungSet",
+      title: "Vermögensverwaltung — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoAnlagestrategienSet",
+      title: "Anlagestrategien — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoImpressumSet",
+      title: "Impressum — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoDatenschutzSet",
+      title: "Datenschutz — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoKundeninformationSet",
+      title: "Kundeninformation — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "seoFaqSet",
+      title: "FAQ — Meta tags",
+      options: { collapsible: true, collapsed: true },
+    },
+
+    /* Portfolio Management */
+    {
+      name: "pmDetailHeaderSet",
+      title: "Overlay Header (Eyebrow + Headline)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmIntroSet",
+      title: "Intro paragraphs (below header)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmProcessSet",
+      title: "Section 1 — Anlageprozess (header + closing sentence)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmProcessStagesSet",
+      title: "Section 1 — Process stages (01 – 08)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmCommitteeSet",
+      title: "Section 2 — Anlagekomitee",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmStrategiesSet",
+      title: "Section 3 — Anlagestrategien (header + subline)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmStrategiesListSet",
+      title: "Section 3 — Strategy list (up to 7)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmUniverseSet",
+      title: "Section 4 — Anlageuniversum",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmCtaSet",
+      title: "Final CTA",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "pmFooterSet",
+      title: "Footer",
       options: { collapsible: true, collapsed: false },
     },
   ],
@@ -430,6 +536,57 @@ export const homepageType = defineType({
       fieldset: "philosophyBodySet",
     }),
 
+    /* ─── Auto-cycling "Leistungsethik" values list ─── */
+    defineField({
+      name: "philosophyValuesLabel",
+      title: "Values micro-label",
+      description: 'Small uppercase label above the values list. Example: "Unsere Leistungsethik".',
+      type: "localeString",
+      group: "philosophy",
+      fieldset: "philosophyValuesSet",
+    }),
+    defineField({
+      name: "philosophyValues",
+      title: "Values (up to 6)",
+      description:
+        "The auto-cycling list of guiding values shown under the body text. Add up to 6 entries — only the first 6 are used, in this order. Sizing/spacing of each row is fixed by position, not editable here.",
+      type: "array",
+      validation: (Rule) => Rule.max(6),
+      of: [
+        {
+          type: "object",
+          name: "philosophyValue",
+          title: "Value",
+          fields: [
+            {
+              name: "name",
+              title: "Value word",
+              description: 'Example: "Ehrlichkeit".',
+              type: "localeString",
+            },
+            {
+              name: "readout",
+              title: "Companion sentence",
+              description:
+                'Shown when this value is active. Example: "Wir benennen Chancen und Risiken so, wie sie sind."',
+              type: "localeString",
+            },
+          ],
+          preview: {
+            select: { title: "name.de", subtitle: "readout.de" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Value (untitled)",
+                subtitle: subtitle || "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "philosophy",
+      fieldset: "philosophyValuesSet",
+    }),
+
     /* ──────────────────────────────────────────────────────────
        03 — METHODE · VERMÖGENSVERWALTUNG
        Section + a separate detail overlay (“Anlageprozess”).
@@ -568,6 +725,89 @@ export const homepageType = defineType({
       type: "localeString",
       group: "method",
       fieldset: "methodTimelineSet",
+    }),
+
+    /* ─── Right-side relationship diagram (Sie · Tellian Capital · Banken) ─── */
+    defineField({
+      name: "methodPartiesCaption",
+      title: "Diagram caption",
+      description: 'Small uppercase label above the diagram. Example: "Die Struktur bewährter Geschäftsbeziehungen".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodPartyKundeLabel",
+      title: '"Sie" — label',
+      description: 'Top circle. Example: "Sie".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodPartyKundeProsa",
+      title: '"Sie" — description text',
+      description: "Shown when this circle is active/tapped.",
+      type: "localeText",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodPartyTellianLabel",
+      title: '"Tellian Capital" — label',
+      description: "Bottom-left circle (also the call-to-action circle).",
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodPartyTellianProsa",
+      title: '"Tellian Capital" — CTA text',
+      description:
+        'Shown when this circle is active/tapped — acts as a link into the Vermögensverwaltung detail. Example: "Unsere Leistungen für Sie →".',
+      type: "localeText",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodPartyBankenLabel",
+      title: '"Banken" — label',
+      description: 'Bottom-right circle. Example: "Banken".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodPartyBankenProsa",
+      title: '"Banken" — description text',
+      description: "Shown when this circle is active/tapped.",
+      type: "localeText",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodEdgeLabelAuftrag",
+      title: "Edge label — Sie ↔ Tellian Capital",
+      description: 'Example: "Vermögensverwaltungsauftrag".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodEdgeLabelDepot",
+      title: "Edge label — Sie ↔ Banken",
+      description: 'Example: "Depot-/Kontobeziehung".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
+    }),
+    defineField({
+      name: "methodEdgeLabelVollmacht",
+      title: "Edge label — Tellian Capital ↔ Banken",
+      description: 'Example: "Vermögensverwaltungsvollmacht".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPartiesSet",
     }),
 
     /* ─── Detail page — Step sections (the 5 detailed sections that appear
@@ -752,7 +992,7 @@ export const homepageType = defineType({
     defineField({
       name: "strategyEyebrow",
       title: "Eyebrow text",
-      description: 'Example: "Anlagestrategien".',
+      description: 'Overview section eyebrow, above the "Methode statt Zufall" headline. Example: "Portfolio Management".',
       type: "localeString",
       group: "strategy",
       fieldset: "strategyHeaderSet",
@@ -760,7 +1000,7 @@ export const homepageType = defineType({
     defineField({
       name: "strategyHeadingLine1",
       title: "Headline — Line 1",
-      description: 'Example: "Zwei Perspektiven."',
+      description: 'Example: "Methode statt".',
       type: "localeString",
       group: "strategy",
       fieldset: "strategyHeaderSet",
@@ -768,7 +1008,7 @@ export const homepageType = defineType({
     defineField({
       name: "strategyHeadingLine2",
       title: "Headline — Line 2 (italic)",
-      description: 'Example: "Ein Portfolio."',
+      description: 'Example: "Zufall.".',
       type: "localeString",
       group: "strategy",
       fieldset: "strategyHeaderSet",
@@ -785,10 +1025,68 @@ export const homepageType = defineType({
     defineField({
       name: "strategyCtaLabel",
       title: "Button label",
-      description: 'Example: "Mehr zu den Strategien".',
+      description: 'Example: "Mehr zum Anlageprozess".',
       type: "localeString",
       group: "strategy",
       fieldset: "strategyCtaSet",
+    }),
+    defineField({
+      name: "strategyFlowchartTier1",
+      title: "Flowchart — Tier 1 (outlined boxes, max 2)",
+      description:
+        'Top row of the Portfolio Management flowchart. Example: "Leitprinzipien", "Investment-Philosophie".',
+      type: "array",
+      of: [{ type: "localeString" }],
+      validation: (Rule) => Rule.max(2),
+      group: "strategy",
+      fieldset: "strategyFlowchartSet",
+    }),
+    defineField({
+      name: "strategyFlowchartConnectorLabel",
+      title: "Flowchart — Connector label",
+      description: 'Small label on the dashed connector below Tier 1. Example: "Anlegerprofil des Kunden".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyFlowchartSet",
+    }),
+    defineField({
+      name: "strategyFlowchartTier2",
+      title: "Flowchart — Tier 2 (filled boxes, max 3)",
+      description:
+        'Second row of the flowchart. Example: "Innovatives Portfolio-Management", "Zugang zu einzigartigen Investmentmöglichkeiten", "Inhouse-Expertise & internationales Netzwerk".',
+      type: "array",
+      of: [{ type: "localeString" }],
+      validation: (Rule) => Rule.max(3),
+      group: "strategy",
+      fieldset: "strategyFlowchartSet",
+    }),
+    defineField({
+      name: "strategyFlowchartTier3",
+      title: "Flowchart — Tier 3 (outlined boxes, max 2)",
+      description: 'Third row of the flowchart. Example: "Strategische Allokation", "Taktische Allokation".',
+      type: "array",
+      of: [{ type: "localeString" }],
+      validation: (Rule) => Rule.max(2),
+      group: "strategy",
+      fieldset: "strategyFlowchartSet",
+    }),
+    defineField({
+      name: "strategyFlowchartTier4",
+      title: "Flowchart — Tier 4 (single filled box)",
+      description: 'Fourth row of the flowchart. Example: "Individuelle Portfolio-Konstruktion".',
+      type: "localeString",
+      group: "strategy",
+      fieldset: "strategyFlowchartSet",
+    }),
+    defineField({
+      name: "strategyFlowchartTier5",
+      title: "Flowchart — Tier 5 (outlined boxes, max 2)",
+      description: 'Bottom row of the flowchart. Example: "Überwachung", "Reporting".',
+      type: "array",
+      of: [{ type: "localeString" }],
+      validation: (Rule) => Rule.max(2),
+      group: "strategy",
+      fieldset: "strategyFlowchartSet",
     }),
     defineField({
       name: "strategyDetailEyebrow",
@@ -1156,6 +1454,20 @@ export const homepageType = defineType({
               type: "localeString",
             },
             {
+              name: "email",
+              title: "Email (for the Send-Message link)",
+              description:
+                'Used as the mailto: address for the "Send message" link below the photo. Leave empty to auto-derive it from the name (firstname.lastname@telliancapital.ch).',
+              type: "string",
+            },
+            {
+              name: "linkedin",
+              title: "LinkedIn profile URL",
+              description:
+                "Optional. When filled in, a LinkedIn icon appears next to the name, opening this URL in a new tab.",
+              type: "url",
+            },
+            {
               name: "bio",
               title: "Short bio",
               description:
@@ -1292,6 +1604,31 @@ export const homepageType = defineType({
       fieldset: "contactFormSet",
     }),
     defineField({
+      name: "contactPrivacyPrefix",
+      title: "Privacy notice — prefix",
+      description:
+        'Text before the privacy link, shown under the form. Example: "Mit dem Absenden stimmen Sie unseren ".',
+      type: "localeString",
+      group: "contact",
+      fieldset: "contactFormSet",
+    }),
+    defineField({
+      name: "contactPrivacyLinkLabel",
+      title: "Privacy notice — link label",
+      description: 'The inline link that opens /datenschutz. Example: "Datenschutzbestimmungen".',
+      type: "localeString",
+      group: "contact",
+      fieldset: "contactFormSet",
+    }),
+    defineField({
+      name: "contactPrivacySuffix",
+      title: "Privacy notice — suffix",
+      description: 'Text after the privacy link. Example: " zu.".',
+      type: "localeString",
+      group: "contact",
+      fieldset: "contactFormSet",
+    }),
+    defineField({
       name: "contactCompanyName",
       title: "Company name",
       description: 'Top line in the address block. Example: "Tellian Capital".',
@@ -1320,6 +1657,15 @@ export const homepageType = defineType({
       title: "Phone",
       description: "Click-to-call number. Use international format.",
       type: "string",
+      group: "contact",
+      fieldset: "contactCompanySet",
+    }),
+    defineField({
+      name: "contactPhoneHours",
+      title: "Phone hours",
+      description:
+        'Small caption shown below the phone number. Example: "Montag bis Freitag, 8 bis 18 Uhr".',
+      type: "localeString",
       group: "contact",
       fieldset: "contactCompanySet",
     }),
@@ -1665,6 +2011,397 @@ export const homepageType = defineType({
       type: "localeString",
       group: "navigation",
       fieldset: "navPortalSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       09 — SEO · META TAGS
+       Per-page Open Graph + meta title/description/keywords + share image.
+       Title/description support DE/EN; keywords are a flat list of strings.
+       Falls back to the static defaults in src/lib/seo.ts when empty.
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "seoHome",
+      title: "Homepage  ·  /  ·  /de  ·  /en",
+      description:
+        "Meta tags for the main landing page. Used by Google, social shares (Open Graph / Twitter), and the browser tab.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoHomeSet",
+    }),
+    defineField({
+      name: "seoVermoegensverwaltung",
+      title: "Vermögensverwaltung  ·  /vermoegensverwaltung",
+      description: "Meta tags for the Vermögensverwaltung (Anlageprozess) deep-link page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoVermoegensverwaltungSet",
+    }),
+    defineField({
+      name: "seoAnlagestrategien",
+      title: "Anlagestrategien  ·  /anlagestrategien",
+      description: "Meta tags for the Anlagestrategien detail deep-link page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoAnlagestrategienSet",
+    }),
+    defineField({
+      name: "seoImpressum",
+      title: "Impressum  ·  /impressum",
+      description: "Meta tags for the Impressum legal page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoImpressumSet",
+    }),
+    defineField({
+      name: "seoDatenschutz",
+      title: "Datenschutz  ·  /datenschutz",
+      description: "Meta tags for the Datenschutz legal page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoDatenschutzSet",
+    }),
+    defineField({
+      name: "seoKundeninformation",
+      title: "Kundeninformation  ·  /kundeninformation",
+      description: "Meta tags for the Kundeninformation legal page.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoKundeninformationSet",
+    }),
+    defineField({
+      name: "seoFaq",
+      title: "FAQ  ·  /faq",
+      description: "Meta tags for the dedicated FAQ page that lists all published FAQ documents.",
+      type: "seoMeta",
+      group: "seo",
+      fieldset: "seoFaqSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       10 — PORTFOLIO MANAGEMENT · /portfolio-management
+       Detail overlay reached from the "Anlageprozess" CTA on the
+       Vermögensverwaltung section and from the Section 4 flowchart.
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "pmDetailEyebrow",
+      title: "Overlay eyebrow",
+      description: 'Example: "Portfolio Management".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmDetailHeaderSet",
+    }),
+    defineField({
+      name: "pmDetailHeadingLine1",
+      title: "Overlay headline — Line 1 (regular)",
+      description: 'Example: "Wie wir Ihr Portfolio".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmDetailHeaderSet",
+    }),
+    defineField({
+      name: "pmDetailHeadingLine2",
+      title: "Overlay headline — Line 2 (italic)",
+      description: 'Example: "führen."',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmDetailHeaderSet",
+    }),
+
+    defineField({
+      name: "pmIntroParagraphs",
+      title: "Intro paragraphs",
+      description: "Shown directly below the overlay header, before section 1.",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "portfolioManagement",
+      fieldset: "pmIntroSet",
+    }),
+
+    defineField({
+      name: "pmProcessEyebrow",
+      title: "Section 1 — Eyebrow",
+      description: 'Example: "Anlageprozess".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmProcessSet",
+    }),
+    defineField({
+      name: "pmProcessHeadingLine1",
+      title: "Section 1 — Headline Line 1 (regular)",
+      description: 'Example: "Der Weg zum".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmProcessSet",
+    }),
+    defineField({
+      name: "pmProcessHeadingLine2",
+      title: "Section 1 — Headline Line 2 (italic)",
+      description: 'Example: "Portfolio."',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmProcessSet",
+    }),
+    defineField({
+      name: "pmProcessClosing",
+      title: "Section 1 — Closing sentence (italic)",
+      description: "Shown under the process stages list.",
+      type: "localeText",
+      group: "portfolioManagement",
+      fieldset: "pmProcessSet",
+    }),
+    defineField({
+      name: "pmProcessStages",
+      title: "Process stages",
+      description:
+        "The stages listed under section 1, in order. Add up to 8 entries — only the first 8 are used. A stage with no bullets (e.g. a single-line milestone) is shown as a plain heading.",
+      type: "array",
+      validation: (Rule) => Rule.max(8),
+      of: [
+        {
+          type: "object",
+          name: "pmStage",
+          title: "Stage",
+          fields: [
+            {
+              name: "name",
+              title: "Stage name",
+              description: 'Example: "Leitprinzipien".',
+              type: "localeString",
+            },
+            {
+              name: "bullets",
+              title: "Bullets",
+              description: "Leave empty for a plain heading with no bullet list.",
+              type: "array",
+              of: [{ type: "localeString" }],
+            },
+          ],
+          preview: {
+            select: { title: "name.de" },
+            prepare({ title }) {
+              return { title: title || "Stage (untitled)" };
+            },
+          },
+        },
+      ],
+      group: "portfolioManagement",
+      fieldset: "pmProcessStagesSet",
+    }),
+
+    defineField({
+      name: "pmCommitteeEyebrow",
+      title: "Section 2 — Eyebrow",
+      description: 'Example: "Anlagekomitee".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCommitteeSet",
+    }),
+    defineField({
+      name: "pmCommitteeHeadingLine1",
+      title: "Section 2 — Headline Line 1 (regular)",
+      description: 'Example: "Wer die Entscheide".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCommitteeSet",
+    }),
+    defineField({
+      name: "pmCommitteeHeadingLine2",
+      title: "Section 2 — Headline Line 2 (italic)",
+      description: 'Example: "trägt."',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCommitteeSet",
+    }),
+    defineField({
+      name: "pmCommitteeParagraphs",
+      title: "Section 2 — Body paragraphs",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "portfolioManagement",
+      fieldset: "pmCommitteeSet",
+    }),
+
+    defineField({
+      name: "pmStrategiesEyebrow",
+      title: "Section 3 — Eyebrow",
+      description: 'Example: "Anlagestrategien".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmStrategiesSet",
+    }),
+    defineField({
+      name: "pmStrategiesHeadingLine1",
+      title: "Section 3 — Headline Line 1 (regular)",
+      description: 'Example: "Sieben Strategien,".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmStrategiesSet",
+    }),
+    defineField({
+      name: "pmStrategiesHeadingLine2",
+      title: "Section 3 — Headline Line 2 (italic)",
+      description: 'Example: "frei kombinierbar."',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmStrategiesSet",
+    }),
+    defineField({
+      name: "pmStrategiesSubline",
+      title: "Section 3 — Subline",
+      description: "Explanatory sentence shown above the strategy list.",
+      type: "localeText",
+      group: "portfolioManagement",
+      fieldset: "pmStrategiesSet",
+    }),
+    defineField({
+      name: "pmStrategies",
+      title: "Strategies (up to 7)",
+      description:
+        "One entry per strategy, in the order they should appear. Volatility, allocation, allocation legend and focus are all optional — leave blank to hide that line.",
+      type: "array",
+      validation: (Rule) => Rule.max(7),
+      of: [
+        {
+          type: "object",
+          name: "pmStrategy",
+          title: "Strategy",
+          fields: [
+            {
+              name: "name",
+              title: "Name",
+              description: 'Example: "Einkommen".',
+              type: "localeString",
+            },
+            {
+              name: "tag",
+              title: "Tag (in parentheses)",
+              description: 'Example: "konservativ".',
+              type: "localeString",
+            },
+            {
+              name: "goal",
+              title: "Goal",
+              type: "localeText",
+            },
+            {
+              name: "volatility",
+              title: "Volatility line (optional)",
+              description: 'Example: "Kleine Kursschwankungen."',
+              type: "localeString",
+            },
+            {
+              name: "allocation",
+              title: "Allocation line (optional)",
+              description: 'Example: "12 / 18 / 70".',
+              type: "localeString",
+            },
+            {
+              name: "allocationLegend",
+              title: "Allocation legend (optional)",
+              description: 'Shown in parentheses after the allocation line. Example: "Aktien / Alternativ / Obligationen".',
+              type: "localeString",
+            },
+            {
+              name: "focus",
+              title: "Focus paragraph (optional, italic)",
+              type: "localeText",
+            },
+          ],
+          preview: {
+            select: { title: "name.de", subtitle: "tag.de" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Strategy (untitled)",
+                subtitle: subtitle || "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "portfolioManagement",
+      fieldset: "pmStrategiesListSet",
+    }),
+
+    defineField({
+      name: "pmUniverseEyebrow",
+      title: "Section 4 — Eyebrow",
+      description: 'Example: "Anlageuniversum".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmUniverseSet",
+    }),
+    defineField({
+      name: "pmUniverseHeadingLine1",
+      title: "Section 4 — Headline Line 1 (regular)",
+      description: 'Example: "Über alle".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmUniverseSet",
+    }),
+    defineField({
+      name: "pmUniverseHeadingLine2",
+      title: "Section 4 — Headline Line 2 (italic)",
+      description: 'Example: "Anlageklassen."',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmUniverseSet",
+    }),
+    defineField({
+      name: "pmUniverseParagraphs",
+      title: "Section 4 — Body paragraphs",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "portfolioManagement",
+      fieldset: "pmUniverseSet",
+    }),
+
+    defineField({
+      name: "pmCtaEyebrow",
+      title: "Final CTA — Eyebrow",
+      description: 'Example: "Nächster Schritt".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCtaSet",
+    }),
+    defineField({
+      name: "pmCtaHeadingLine1",
+      title: "Final CTA — Headline Line 1 (regular)",
+      description: 'Example: "Ein Gespräch ist".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCtaSet",
+    }),
+    defineField({
+      name: "pmCtaHeadingLine2",
+      title: "Final CTA — Headline Line 2 (italic)",
+      description: 'Example: "der Anfang."',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCtaSet",
+    }),
+    defineField({
+      name: "pmCtaDescription",
+      title: "Final CTA — Description",
+      type: "localeText",
+      group: "portfolioManagement",
+      fieldset: "pmCtaSet",
+    }),
+    defineField({
+      name: "pmCtaButtonLabel",
+      title: "Final CTA — Button label",
+      description: 'Example: "Gespräch vereinbaren".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmCtaSet",
+    }),
+
+    defineField({
+      name: "pmFooterTagline",
+      title: "Footer tagline",
+      description: 'Example: "Tellian Capital AG — Est. 1996 — Zürich".',
+      type: "localeString",
+      group: "portfolioManagement",
+      fieldset: "pmFooterSet",
     }),
   ],
 

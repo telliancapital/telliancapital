@@ -1,54 +1,15 @@
+import { useState, useEffect, useRef, useCallback } from "react";
 import { HeroExpandingImage, ScrollFade } from "./ScrollAnimations";
 import { ExpandableBody } from "./ExpandableBody";
-import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.png";
+import sardonaImg from "@/assets/sardona-1.jpg";
 import { LAYOUT, getLayout, getTextColumnStyle, SPACING } from "../layout";
 import type { Breakpoint } from "./useBreakpoint";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
+import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 
-/* ─── Design tokens ─── */
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-};
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
-
-/* ─── Section geometry ────────────────────────────────────────
-   Layout order: Hero(110) + Breathing(8)
-   → Philosophie starts at scrollX = 118vw.
-   Section width = 110vw.
-   progress = (scrollX - 118vw) / 110vw   clamped [0, 1]
-   ──────────────────────────────────────────────────────────── */
-const SECTION_START_VW = 118;
-const SECTION_WIDTH_VW = 110;
-
-/* ─── Animation mapping (all linear, GPU-friendly) ───────────
-   progress 0.0  →  scale 1.00 (32px), quoteOpacity 0.40, overlay 0.00
-   progress 0.5  →  scale 1.50 (48px), quoteOpacity 0.70, overlay 0.15
-   progress 1.0  →  scale 2.00 (64px), quoteOpacity 1.00, overlay 0.35
-   ───────────────────────────────────────────────────────────── */
-function getAnimValues(scrollX: number) {
-  const vw = typeof window !== "undefined" && window.innerWidth > 0 ? window.innerWidth : 1440;
-  const start = (SECTION_START_VW * vw) / 100;
-  const width = (SECTION_WIDTH_VW * vw) / 100;
-
-  if (width === 0) return { scale: 1.0, quoteOpacity: 0.7, overlayAlpha: 0.5 };
-
-  const p = Math.max(0, Math.min(1, (scrollX - start) / width));
-  const safe = (n: number) => (isFinite(n) ? n : 0);
-
-  // Ease-out curve: fast ramp to ~90% at p=0.35, then slow crawl to 100%
-  const eased = 1 - Math.pow(1 - p, 2.5);
-
-  return {
-    scale: safe(1.0 + eased * 0.5), // 1.00 → 1.50  (48px → 72px)
-    quoteOpacity: safe(0.7 + eased * 0.3), // 0.70 → 1.00
-    overlayAlpha: safe(0.1 + eased * 0.3), // 0.10 → 0.40
-  };
-}
+import { C, serif, sans, cormorant } from "@/tokens";
+import { EASE, DURATION } from "@/styles/motion";
 
 interface Props {
   scrollX: number;
@@ -58,12 +19,277 @@ interface Props {
 }
 
 const FALLBACK_BODY = [
-  "Tellian Capital verwaltet Vermögen nach einem quantitativen Prozess. Anlageentscheide entstehen aus Daten, Modellen und systematischer Marktanalyse — nicht aus Prognosen einzelner Personen und nicht aus der Nachrichtenlage einer Woche.",
-  "Wir nehmen Positionen ein, wenn unsere Analyse sie stützt. Und wir halten sie, solange die Grundlage trägt. Das erfordert Disziplin — besonders dann, wenn die Märkte nervös werden und der Impuls zum Handeln am grössten ist.",
-  "Diese Arbeitsweise ist kein Zufall. Tellian Capital wurde 1996 als eine der ersten Schweizer Vermögensverwaltungen mit quantitativem Ansatz gegründet. Seither haben wir den Prozess verfeinert, aber das Prinzip nicht verändert: Methodik vor Meinung.",
-  "Wir sind unabhängig von Banken, Produktanbietern und Vertriebsinteressen. Das bedeutet: Jede Anlageentscheidung dient einem Interesse — dem des Kunden.",
+  "Tellian Capital verwaltet Vermögen nach einem quantitativen Prozess. Was wir kaufen oder verkaufen, ergibt sich aus Daten und Modellen, die wir laufend prüfen. Die Stimmung an den Märkten oder die Schlagzeile der Woche ändert daran nichts.",
 ];
 
+/* ─── Leistungsethik values (not CMS-driven — new to this design) ─── */
+const VALUES = [
+  {
+    de: "Ehrlichkeit",
+    en: "Integrity",
+    readoutDe: "Wir benennen Chancen und Risiken so, wie sie sind.",
+    readoutEn: "We name opportunities and risks as they are.",
+    inactiveSize: "22px",
+    mobileSize: "22px",
+    offset: "0%",
+    mobileOffset: "0px",
+  },
+  {
+    de: "Disziplin",
+    en: "Discipline",
+    readoutDe: "Wir halten uns an den Prozess, auch wenn es unbequem wird.",
+    readoutEn: "We stick to the process, even when it gets uncomfortable.",
+    inactiveSize: "19px",
+    mobileSize: "19px",
+    offset: "4%",
+    mobileOffset: "8px",
+  },
+  {
+    de: "Respekt",
+    en: "Respect",
+    readoutDe: "Jedes Mandat zählt gleich viel, unabhängig von seiner Grösse.",
+    readoutEn: "Every mandate counts the same, whatever its size.",
+    inactiveSize: "20px",
+    mobileSize: "20px",
+    offset: "8%",
+    mobileOffset: "16px",
+  },
+  {
+    de: "Leistungsbereitschaft",
+    en: "Commitment",
+    readoutDe: "Wir arbeiten am Portfolio weiter, nicht nur zum Quartalsende.",
+    readoutEn: "We keep working on the portfolio, not just at quarter-end.",
+    inactiveSize: "18px",
+    mobileSize: "18px",
+    offset: "2%",
+    mobileOffset: "4px",
+  },
+  {
+    de: "Unabhängigkeit",
+    en: "Independence",
+    readoutDe: "Unsere Analyse ist unsere eigene, ohne fremde Interessen.",
+    readoutEn: "Our analysis is our own, free of outside interests.",
+    inactiveSize: "21px",
+    mobileSize: "20px",
+    offset: "12%",
+    mobileOffset: "12px",
+  },
+  {
+    de: "Entschlossenheit",
+    en: "Resolve",
+    readoutDe: "Tragen die Daten eine Position, dann halten wir sie.",
+    readoutEn: "When the data backs a position, we hold it.",
+    inactiveSize: "19px",
+    mobileSize: "19px",
+    offset: "6%",
+    mobileOffset: "6px",
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   LEISTUNGSETHIK STAGE — Typographic composition
+   ═══════════════════════════════════════════════════════════════ */
+const ROW_H = 40;
+
+interface StageProps {
+  compact?: boolean;
+  /** CMS-resolved label + per-value overrides (falls back to the bundled German copy when absent) */
+  label?: string;
+  overrides?: { label: string; readout: string }[];
+  lang?: "de" | "en";
+}
+
+function LeistungsethikStage({ compact = false, label, overrides, lang = "de" }: StageProps) {
+  const [active, setActive] = useState(0);
+  const reducedMotion = usePrefersReducedMotion();
+  const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cycleTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useRef(true);
+
+  /* ── Viewport observer — pause cycle off-screen ── */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        isInView.current = entry.isIntersecting;
+      },
+      { threshold: 0.15 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  /* ── Auto-cycle ── */
+  const startCycle = useCallback(() => {
+    if (reducedMotion) return;
+    if (cycleTimer.current) clearInterval(cycleTimer.current);
+    cycleTimer.current = setInterval(() => {
+      if (!isInView.current) return;
+      setActive((p) => (p + 1) % VALUES.length);
+    }, DURATION.valueCycle);
+  }, [reducedMotion]);
+
+  const stopCycle = useCallback(() => {
+    if (cycleTimer.current) {
+      clearInterval(cycleTimer.current);
+      cycleTimer.current = null;
+    }
+  }, []);
+
+  const handleInteract = useCallback(
+    (i: number) => {
+      setActive(i);
+      stopCycle();
+      if (pauseTimer.current) clearTimeout(pauseTimer.current);
+      pauseTimer.current = setTimeout(() => startCycle(), DURATION.valueCyclePause);
+    },
+    [stopCycle, startCycle],
+  );
+
+  useEffect(() => {
+    if (!reducedMotion) startCycle();
+    return () => {
+      stopCycle();
+      if (pauseTimer.current) clearTimeout(pauseTimer.current);
+    };
+  }, [reducedMotion, startCycle, stopCycle]);
+
+  /* ── Keyboard ── */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    let next = active;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      next = (active + 1) % VALUES.length;
+      e.preventDefault();
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      next = (active - 1 + VALUES.length) % VALUES.length;
+      e.preventDefault();
+    }
+    if (next !== active) handleInteract(next);
+  };
+
+  const transition = reducedMotion
+    ? "none"
+    : `font-size ${DURATION.medium}ms ${EASE.standard}, color ${DURATION.medium}ms ${EASE.standard}`;
+
+  const activeSize = compact ? "clamp(26px, 6vw, 34px)" : "clamp(26px, 2.4vw, 36px)";
+
+  return (
+    <div ref={containerRef}>
+      {/* Micro-label eyebrow */}
+      <div style={{ width: "28px", height: "1.5px", backgroundColor: C.dark }} />
+      <span
+        style={{
+          fontFamily: sans,
+          fontSize: compact ? "10px" : "11px",
+          letterSpacing: "0.2em",
+          color: C.stone,
+          textTransform: "uppercase",
+          display: "block",
+          marginTop: "16px",
+        }}
+      >
+        {label || "Unsere Leistungsethik"}
+      </span>
+
+      {/* Values composition */}
+      <div
+        role="listbox"
+        aria-label="Unsere Leistungsethik"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        style={{
+          marginTop: compact ? "20px" : "18px",
+          outline: "none",
+          display: "flex",
+          flexDirection: "column",
+          gap: compact ? "4px" : "2px",
+        }}
+      >
+        {VALUES.map((v, i) => {
+          const isAct = active === i;
+          return (
+            <div
+              key={i}
+              role="option"
+              aria-selected={isAct}
+              tabIndex={-1}
+              onMouseEnter={() => {
+                if (!compact) handleInteract(i);
+              }}
+              onFocus={() => handleInteract(i)}
+              onClick={() => handleInteract(i)}
+              style={{
+                minHeight: `${ROW_H}px`,
+                paddingLeft: compact ? v.mobileOffset : v.offset,
+                display: "flex",
+                alignItems: "center",
+                overflow: "visible",
+                position: "relative",
+                zIndex: isAct ? 1 : 0,
+                cursor: "pointer",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: cormorant,
+                  fontSize: isAct ? activeSize : compact ? v.mobileSize : v.inactiveSize,
+                  fontWeight: isAct ? 500 : 300,
+                  color: isAct ? C.ink : C.greigeSoft,
+                  lineHeight: 1.1,
+                  transition,
+                  userSelect: "none",
+                  whiteSpace: compact ? "normal" : "nowrap",
+                  wordBreak: compact ? "normal" : undefined,
+                  hyphens: compact ? "auto" : undefined,
+                }}
+                lang={lang}
+              >
+                {overrides?.[i]?.label ?? v.de}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Readout / companion line */}
+      <div
+        aria-live="polite"
+        style={{
+          minHeight: compact ? "48px" : "30px",
+          marginTop: compact ? "16px" : "10px",
+        }}
+      >
+        <p
+          key={active}
+          style={{
+            fontFamily: sans,
+            fontSize: compact ? "13px" : "12px",
+            fontStyle: "italic",
+            color: C.charcoal,
+            lineHeight: 1.5,
+            margin: 0,
+            animation: reducedMotion ? "none" : `stageReadoutFade ${DURATION.normal}ms ${EASE.standard}`,
+          }}
+        >
+          {overrides?.[active]?.readout ?? VALUES[active].readoutDe}
+        </p>
+      </div>
+
+      <style>{`
+        @keyframes stageReadoutFade {
+          from { opacity: 0; transform: translateY(4px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 2 — ANLAGEPHILOSOPHIE
+   ═══════════════════════════════════════════════════════════════ */
 export function Section2Anlagephilosophie({
   scrollX,
   isVertical = false,
@@ -72,15 +298,11 @@ export function Section2Anlagephilosophie({
 }: Props) {
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const eyebrow = t(homepage?.philosophyEyebrow, "Anlagephilosophie");
   const headingLine1 = t(homepage?.philosophyHeadingLine1, "Analyse entscheidet.");
   const headingLine2 = t(homepage?.philosophyHeadingLine2, "Nicht Stimmung.");
-  const quote = t(
-    homepage?.philosophyQuote,
-    "Ihr Vermögen verdient bessere Gründe als ein Bauchgefühl.",
-  );
   const cmsParagraphs: string[] = (homepage?.philosophyParagraphs ?? [])
     .map((p: LocaleValue) => t(p, ""))
     .filter((p: string) => p.length > 0);
@@ -88,10 +310,24 @@ export function Section2Anlagephilosophie({
 
   /* Background image: prefer uploaded asset, then external URL, then bundled fallback */
   const imageSrc: string =
-    homepage?.philosophyImageAsset?.url || homepage?.philosophyImageUrl || philosophyImg.src;
-  /* Alt text — kept for future a11y wiring; HeroExpandingImage doesn't currently
-     forward an `alt` prop, so unused for now. */
-  void t(homepage?.philosophyImageAlt, "");
+    homepage?.philosophyImageAsset?.url || homepage?.philosophyImageUrl || sardonaImg.src;
+  const imageAlt = t(
+    homepage?.philosophyImageAlt,
+    "Tektonikarena Sardona — UNESCO-Welterbe im Kanton Glarus.",
+  );
+
+  /* ── Leistungsethik values: CMS text merged with the bundled fallback,
+        sizing/offset stay index-driven (not editor-controlled). ── */
+  const valuesLabel = t(homepage?.philosophyValuesLabel, "Unsere Leistungsethik");
+  type CmsValue = { name?: LocaleValue; readout?: LocaleValue };
+  const cmsValues: CmsValue[] = homepage?.philosophyValues ?? [];
+  const valueOverrides = VALUES.map((fb, i) => {
+    const cms = cmsValues[i];
+    return {
+      label: t(cms?.name, fb.de),
+      readout: t(cms?.readout, fb.readoutDe),
+    };
+  });
 
   /* ── VERTICAL (Tablet / Mobile) ── */
   if (isVertical) {
@@ -142,7 +378,7 @@ export function Section2Anlagephilosophie({
           </ScrollFade>
 
           <ScrollFade scrollX={0} isVertical yOffset={20}>
-            <div style={{ marginTop: SPACING.headlineToBody, paddingBottom: "32px" }}>
+            <div style={{ marginTop: SPACING.headlineToBody }}>
               <ExpandableBody
                 paragraphs={BODY_PARAGRAPHS}
                 visibleCount={1}
@@ -153,186 +389,128 @@ export function Section2Anlagephilosophie({
               />
             </div>
           </ScrollFade>
+
+          {/* Leistungsethik Stage */}
+          <ScrollFade scrollX={0} isVertical yOffset={16}>
+            <div style={{ marginTop: "36px", paddingBottom: "24px" }}>
+              <LeistungsethikStage compact label={valuesLabel} overrides={valueOverrides} lang={lang} />
+            </div>
+          </ScrollFade>
         </div>
 
-        {/* Image with quote overlay — comes AFTER text on mobile/tablet */}
+        {/* Image — clean, no overlay */}
         <div
           style={{
             width: "100%",
-            height: breakpoint === "mobile" ? "50vh" : "55vh",
-            position: "relative",
+            height: breakpoint === "mobile" ? "60vh" : "55vh",
             overflow: "hidden",
           }}
         >
-          <HeroExpandingImage src={imageSrc} scrollX={0} className="h-full w-full" isVertical />
-          {/* Dark overlay */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.35)",
-              pointerEvents: "none",
-              zIndex: 2,
-            }}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className="h-full w-full"
+            style={{ objectFit: "cover", objectPosition: "center" }}
           />
-          {/* Quote */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              pointerEvents: "none",
-              zIndex: 3,
-              padding: breakpoint === "mobile" ? "0 24px" : "0 10%",
-            }}
-          >
-            <p
-              style={{
-                fontFamily: serif,
-                fontSize: breakpoint === "mobile" ? "28px" : "36px",
-                fontStyle: "italic",
-                color: "#ffffff",
-                lineHeight: 1.3,
-                maxWidth: breakpoint === "mobile" ? "90%" : "70%",
-                textAlign: "center",
-                margin: 0,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              «{quote}»
-            </p>
-          </div>
         </div>
       </section>
     );
   }
 
   /* ── DESKTOP (horizontal) ── */
-  const { scale, quoteOpacity, overlayAlpha } = getAnimValues(scrollX);
-
   return (
     <div
       className="relative h-screen flex-shrink-0"
       style={{ width: "110vw", backgroundColor: C.bg }}
     >
-      <div className="absolute z-0" style={{ top: 0, bottom: 0, left: LAYOUT.imageLeft, right: 0 }}>
+      {/* Image — right, narrowed to give the text column more room */}
+      <div className="absolute z-0" style={{ top: 0, bottom: 0, left: "54vw", right: 0 }}>
         <HeroExpandingImage src={imageSrc} scrollX={scrollX} className="h-full w-full" />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: `rgba(0,0,0,${overlayAlpha.toFixed(4)})`,
-            pointerEvents: "none",
-            zIndex: 2,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "none",
-            zIndex: 3,
-            padding: "0 10%",
-          }}
-        >
-          <p
-            style={{
-              fontFamily: serif,
-              fontSize: "48px",
-              fontStyle: "italic",
-              color: "#ffffff",
-              lineHeight: 1.3,
-              maxWidth: "45%",
-              textAlign: "center",
-              margin: 0,
-              letterSpacing: "-0.01em",
-              opacity: quoteOpacity,
-              transform: `scale(${scale.toFixed(4)})`,
-              transformOrigin: "center center",
-              willChange: "opacity, transform",
-            }}
-          >
-            «{quote}»
-          </p>
-        </div>
       </div>
 
+      {/* Left column — eyebrow + headline + body + Leistungsethik, vertically centered.
+          width (52vw) is deliberately narrower than the image's left offset (54vw) so the
+          column never overlaps the image at tablet-landscape widths (~1024–1350px); at
+          1440px+ maxWidth remains the governing constraint, so this is visually unchanged there. */}
       <div
-        className="relative z-10 flex h-full flex-col justify-end"
+        className="relative z-10 flex h-full flex-col justify-center"
         style={{
-          width: LAYOUT.columnWidth,
-          paddingLeft: LAYOUT.paddingLeft,
-          paddingRight: LAYOUT.paddingRight,
-          paddingBottom: "clamp(56px, 8vh, 96px)",
+          width: "52vw",
+          paddingLeft: "clamp(36px, 8vw, 120px)",
+          paddingRight: "clamp(36px, 5vw, 80px)",
+          maxWidth: "calc(600px + clamp(36px, 5vw, 120px) + 4vw)",
         }}
       >
-        <div style={{ marginBottom: "clamp(100px, 18vh, 240px)" }}>
-          <span
-            style={{
-              fontFamily: sans,
-              fontSize: "10px",
-              letterSpacing: "0.22em",
-              color: C.stone,
-              display: "block",
-              textTransform: "uppercase",
-            }}
-          >
-            {eyebrow}
-          </span>
+        {/* Eyebrow */}
+        <span
+          style={{
+            fontFamily: sans,
+            fontSize: "10px",
+            letterSpacing: "0.22em",
+            color: C.stone,
+            display: "block",
+          }}
+          className="uppercase"
+        >
+          {eyebrow}
+        </span>
 
-          <div
-            style={{
-              width: "28px",
-              height: "1.5px",
-              backgroundColor: C.dark,
-              marginTop: SPACING.eyebrowToAccent,
-            }}
-          />
+        {/* Eyebrow divider */}
+        <div
+          style={{
+            width: "28px",
+            height: "1.5px",
+            backgroundColor: C.dark,
+            marginTop: SPACING.eyebrowToAccent,
+          }}
+        />
 
-          <h2
-            style={{
-              fontFamily: serif,
-              fontSize: "clamp(48px, 7vh, 80px)",
-              lineHeight: 0.94,
-              color: C.dark,
-              letterSpacing: "-0.03em",
-              marginTop: SPACING.accentToHeadline,
-            }}
-          >
-            {headingLine1}
-            <br />
-            <em>{headingLine2}</em>
-          </h2>
+        {/* Headline */}
+        <h2
+          style={{
+            fontFamily: serif,
+            fontSize: "clamp(48px, 7vh, 80px)",
+            lineHeight: 0.94,
+            color: C.dark,
+            letterSpacing: "-0.03em",
+            marginTop: SPACING.accentToHeadline,
+          }}
+        >
+          {headingLine1}
+          <br />
+          <em>{headingLine2}</em>
+        </h2>
 
-          <div
-            style={{
-              marginTop: SPACING.headlineToBody,
-              maxWidth: LAYOUT.bodyMaxWidth,
-              display: "flex",
-              flexDirection: "column",
-              gap: SPACING.bodyParagraphGap,
-            }}
-          >
-            {BODY_PARAGRAPHS.map((text, i) => (
-              <p
-                key={i}
-                style={{
-                  fontFamily: sans,
-                  fontSize: "clamp(10.5px, 1.3vh, 12px)",
-                  color: C.charcoal,
-                  lineHeight: 1.75,
-                  margin: 0,
-                }}
-              >
-                {text}
-              </p>
-            ))}
-          </div>
+        {/* Body */}
+        <div
+          style={{
+            marginTop: SPACING.headlineToBody,
+            maxWidth: "560px",
+            display: "flex",
+            flexDirection: "column",
+            gap: SPACING.bodyParagraphGap,
+          }}
+        >
+          {BODY_PARAGRAPHS.map((text, i) => (
+            <p
+              key={i}
+              style={{
+                fontFamily: sans,
+                fontSize: "clamp(11px, 1.6vh, 16px)",
+                color: C.charcoal,
+                lineHeight: 1.75,
+                margin: 0,
+              }}
+            >
+              {text}
+            </p>
+          ))}
+        </div>
+
+        {/* Leistungsethik Stage */}
+        <div style={{ marginTop: SPACING.bodyToCta }}>
+          <LeistungsethikStage label={valuesLabel} overrides={valueOverrides} lang={lang} />
         </div>
       </div>
     </div>

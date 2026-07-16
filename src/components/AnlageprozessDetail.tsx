@@ -5,6 +5,7 @@ import { CtaButton } from "./CtaButton";
 import { FaqAccordion, type FaqItem } from "./FaqAccordion";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
+import { C, serif, sans } from "@/tokens";
 
 const FALLBACK_FAQ: readonly FaqItem[] = [
   {
@@ -15,7 +16,7 @@ const FALLBACK_FAQ: readonly FaqItem[] = [
   {
     question: "Wer entscheidet über Anlagen in meinem Portfolio?",
     answer:
-      "Die Entscheidungen trifft unser Anlagekomitee, das monatlich tagt und Geschäftsleitung, Chef Anlagestrategie, internationale Partner Asset Manager und Experten für alternative Anlageklassen vereint. Bei ausserordentlichen Marktentwicklungen tagt das Komitee kurzfristig.",
+      "Die Entscheidungen trifft unser Anlagekomitee. Es tagt monatlich und vereint Geschäftsleitung, Chef Anlagestrategie, internationale Partner Asset Manager und Experten für alternative Anlageklassen. Bei ausserordentlichen Marktentwicklungen tagt das Komitee kurzfristig.",
   },
   {
     question: "Wie oft erhalte ich ein Reporting?",
@@ -23,19 +24,6 @@ const FALLBACK_FAQ: readonly FaqItem[] = [
       "Vierteljährlich, automatisch und konsolidiert. Auf Wunsch mit kundenspezifischen Zusatzauswertungen. Zusätzlich haben Sie jederzeit Einblick in Ihr Kundenportal.",
   },
 ];
-
-/* ─── Design tokens ─── */
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-  muted: "#B0ACA5",
-  line: "#D8D5CF",
-};
-
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
 
 interface AnlageprozessDetailProps {
   isMobile: boolean;

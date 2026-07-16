@@ -1,14 +1,7 @@
 import type { CSSProperties } from "react";
 import { useBreakpoint } from "./useBreakpoint";
 
-const sans = "'Inter', sans-serif";
-
-const C = {
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  line: "#D8D5CF",
-  bg: "#F9F9F7",
-};
+import { C, sans } from "../tokens";
 
 interface CtaButtonProps {
   href: string;
@@ -61,11 +54,11 @@ export function CtaButton({
       <a
         href={href}
         onClick={handleClick}
-        className={`inline-flex items-center justify-center gap-3 rounded-none px-6 py-4 text-[11px] uppercase transition-colors duration-300 ease-out hover:bg-[#3A3835] active:scale-[0.98] ${widthFull ? "w-full" : ""} ${className} `}
+        className={`hover:bg-tellian-button-hover inline-flex items-center justify-center gap-3 rounded-none px-6 py-4 text-[11px] uppercase transition-colors duration-300 ease-out active:scale-[0.98] ${widthFull ? "w-full" : ""} ${className} `}
         style={{
           fontFamily: sans,
-          color: "#FFFFFF",
-          backgroundColor: C.dark,
+          color: C.dark,
+          backgroundColor: C.button,
           letterSpacing: "0.18em",
           lineHeight: 1,
           textAlign: "center",
@@ -82,25 +75,27 @@ export function CtaButton({
     );
   }
 
-  /* Ghost variant (default desktop) — subtle hover: border darkens,
-     bg gets a light tint, arrow nudges right. Text color is preserved. */
+  /* Ghost variant (default desktop) — always button color bg + dark text */
   return (
     <a
       href={href}
       onClick={handleClick}
-      className={`group inline-flex items-center gap-3 rounded-none border border-[#D8D5CF] px-6 py-3 text-[10px] tracking-[0.16em] uppercase transition-[background-color,border-color] duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[#1A1916] hover:bg-[#F2F1EC] active:scale-[0.98] md:px-8 md:py-4 md:text-[11px] ${widthFull ? "w-full justify-center" : ""} ${className} `}
+      className={`group hover:bg-tellian-button-hover inline-flex items-center gap-3 rounded-none px-6 py-3 text-[10px] tracking-[0.16em] uppercase active:scale-[0.98] md:px-8 md:py-4 md:text-[11px] ${widthFull ? "w-full justify-center" : ""} ${className} `}
       style={{
         fontFamily: sans,
         color: C.dark,
+        backgroundColor: C.button,
+        border: `1px solid ${C.button}`,
         letterSpacing: "0.16em",
         lineHeight: 1,
+        transition: "background-color 400ms cubic-bezier(0.16,1,0.3,1)",
         ...style,
       }}
     >
       <span>{children}</span>
       {arrow && (
         <span
-          className="inline-block transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1.5"
+          className="inline-block transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1.5"
           aria-hidden
         >
           →
