@@ -6,13 +6,9 @@ import React from "react";
 import type { Breakpoint } from "./useBreakpoint";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
-
-/* ─── Typography ─── */
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
-
-const EASE_ARR: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
-const EASE = "cubic-bezier(0.25, 0.1, 0.25, 1)";
+import { C, serif, sans } from "@/tokens";
+import { EASE } from "@/styles/motion";
+import logoHorizontal from "@/assets/logo/Tellian__Imperial purple logo.svg";
 
 const BAR_W = 48;
 const PANEL_W = 300;
@@ -20,10 +16,10 @@ const PANEL_W = 300;
 /* ─── Six sections — targets & thresholds match DotNavigation.tsx.
       Scrollable width = 764vw. targets = sectionStart / 764. ─── */
 const NAV_ITEMS = [
-  { num: "01", label: "Vermögen mit Methode", sub: "Einführung", progress: 0.0 },
-  { num: "02", label: "Haltung", sub: "Anlagephilosophie", progress: 0.154 },
+  { num: "01", label: "Start", sub: "Einführung", progress: 0.0 },
+  { num: "02", label: "Philosophie", sub: "Anlagephilosophie", progress: 0.154 },
   { num: "03", label: "Vermögensverwaltung", sub: "Mandat & Prozess", progress: 0.309 },
-  { num: "04", label: "Anlagestrategien", sub: "Wie wir investieren", progress: 0.463 },
+  { num: "04", label: "Portfolio Management", sub: "Wie wir investieren", progress: 0.463 },
   { num: "05", label: "Über uns", sub: "Team & Geschichte", progress: 0.618 },
   { num: "06", label: "Kontakt", sub: "Gespräch vereinbaren", progress: 1.0 },
 ];
@@ -51,7 +47,7 @@ function getActiveIndex(progress: number): number {
 
 function LockIcon({
   size = 18,
-  color = "#1a1a1a",
+  color = C.dark,
   strokeWidth = 1.5,
 }: {
   size?: number;
@@ -164,8 +160,6 @@ export function Navigation({
       sub: t(cms?.sub, fb.sub),
     };
   });
-  const brandPrimary = t(homepage?.navBrandPrimary, "TELLIAN");
-  const brandSecondary = t(homepage?.navBrandSecondary, "CAPITAL");
   const loginLabel = t(homepage?.navLoginButtonLabel, "Login");
   const kundenportalLabel = t(homepage?.navKundenportalLabel, "Kundenportal");
   const kundenportalCaption = t(homepage?.navKundenportalCaption, "Zugang für bestehende Kunden");
@@ -244,7 +238,7 @@ export function Navigation({
             borderBottom: "1px solid rgba(216,213,207,0.4)",
             opacity: introComplete ? 1 : 0,
             transform: visible ? "translateY(0)" : "translateY(-100%)",
-            transition: `transform 0.4s ${EASE}, opacity 0.4s ${EASE}`,
+            transition: `transform 0.4s ${EASE.nav}, opacity 0.4s ${EASE.nav}`,
           }}
         >
           {/* Logo */}
@@ -264,16 +258,16 @@ export function Navigation({
                 fontSize: "13px",
                 fontWeight: 700,
                 letterSpacing: "2.5px",
-                color: "#1a1a1a",
+                color: C.dark,
                 textTransform: "uppercase",
                 userSelect: "none",
               }}
             >
-              {brandPrimary}
-              <span style={{ fontWeight: 400 }}>
-                {"\u00A0"}
-                {brandSecondary}
-              </span>
+              <img
+                src={logoHorizontal.src}
+                alt="Tellian Capital"
+                style={{ width: "120px", height: "auto" }}
+              />
             </span>
           </button>
 
@@ -300,27 +294,27 @@ export function Navigation({
               style={{
                 width: 22,
                 height: 1.5,
-                backgroundColor: "#1a1a1a",
+                backgroundColor: C.dark,
                 transform: expanded ? "rotate(45deg) translate(2px, 2px)" : "none",
-                transition: `transform 0.3s ${EASE}`,
+                transition: `transform 0.3s ${EASE.nav}`,
               }}
             />
             <div
               style={{
                 width: 22,
                 height: 1.5,
-                backgroundColor: "#1a1a1a",
+                backgroundColor: C.dark,
                 opacity: expanded ? 0 : 1,
-                transition: `opacity 0.2s ${EASE}`,
+                transition: `opacity 0.2s ${EASE.nav}`,
               }}
             />
             <div
               style={{
                 width: 22,
                 height: 1.5,
-                backgroundColor: "#1a1a1a",
+                backgroundColor: C.dark,
                 transform: expanded ? "rotate(-45deg) translate(2px, -2px)" : "none",
-                transition: `transform 0.3s ${EASE}`,
+                transition: `transform 0.3s ${EASE.nav}`,
               }}
             />
           </button>
@@ -331,11 +325,11 @@ export function Navigation({
           {expanded && (
             <motion.div
               className="fixed inset-0 z-[60] flex flex-col"
-              style={{ backgroundColor: "#F2F1EC" }}
+              style={{ backgroundColor: C.bgSecondary }}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: EASE_ARR }}
+              transition={{ duration: 0.4, ease: EASE.navArr }}
             >
               {/* Header with close */}
               <div
@@ -355,16 +349,16 @@ export function Navigation({
                     fontSize: "13px",
                     fontWeight: 700,
                     letterSpacing: "2.5px",
-                    color: "#1a1a1a",
+                    color: C.dark,
                     textTransform: "uppercase",
                     userSelect: "none",
                   }}
                 >
-                  {brandPrimary}
-                  <span style={{ fontWeight: 400 }}>
-                    {"\u00A0"}
-                    {brandSecondary}
-                  </span>
+                  <img
+                    src={logoHorizontal.src}
+                    alt="Tellian Capital"
+                    style={{ width: "120px", height: "auto" }}
+                  />
                 </span>
                 <button
                   onClick={() => setExpanded(false)}
@@ -388,7 +382,7 @@ export function Navigation({
                       y1="1.5"
                       x2="14.5"
                       y2="14.5"
-                      stroke="#1a1a1a"
+                      stroke={C.dark}
                       strokeWidth="1.25"
                       strokeLinecap="round"
                     />
@@ -397,7 +391,7 @@ export function Navigation({
                       y1="1.5"
                       x2="1.5"
                       y2="14.5"
-                      stroke="#1a1a1a"
+                      stroke={C.dark}
                       strokeWidth="1.25"
                       strokeLinecap="round"
                     />
@@ -427,7 +421,7 @@ export function Navigation({
                         key={item.num}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35, delay: 0.05 + i * 0.04, ease: EASE_ARR }}
+                        transition={{ duration: 0.35, delay: 0.05 + i * 0.04, ease: EASE.navArr }}
                         onClick={() => handleNavigate(i)}
                         style={{
                           outline: "none",
@@ -448,7 +442,7 @@ export function Navigation({
                               transform: "translateY(-50%)",
                               width: 2,
                               height: 28,
-                              backgroundColor: "#989071",
+                              backgroundColor: C.button,
                             }}
                           />
                         )}
@@ -456,7 +450,7 @@ export function Navigation({
                           style={{
                             fontFamily: sans,
                             fontSize: "11px",
-                            color: isActive ? "#989071" : "#bbb",
+                            color: isActive ? C.purple : "#bbb",
                             display: "block",
                             marginBottom: 3,
                           }}
@@ -467,7 +461,7 @@ export function Navigation({
                           style={{
                             fontFamily: serif,
                             fontSize: breakpoint === "mobile" ? "18px" : "20px",
-                            color: "#1a1a1a",
+                            color: C.dark,
                             display: "block",
                             lineHeight: 1.2,
                           }}
@@ -491,74 +485,106 @@ export function Navigation({
                 </div>
               </nav>
 
-              {/* Bottom section */}
+              {/* Bottom section — Primary (Kundenportal) → Secondary (Solutions link) → Tertiary (Lang) */}
               <div
                 style={{
                   padding: breakpoint === "mobile" ? "20px" : "24px 32px",
                   borderTop: "1px solid #ddd",
                 }}
               >
-                <div
-                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                {/* PRIMÄR: Kundenportal */}
+                <button
+                  onClick={(e) => {
+                    (e.currentTarget as HTMLElement).focus();
+                    setExpanded(false);
+                    onLoginClick();
+                  }}
+                  aria-haspopup="dialog"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    backgroundColor: C.button,
+                    color: C.dark,
+                    fontFamily: sans,
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "1.5px",
+                    textTransform: "uppercase",
+                    padding: "10px 16px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                 >
-                  {/* Language */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    {(["DE", "EN"] as const).map((l, idx) => (
-                      <React.Fragment key={l}>
-                        {idx > 0 && (
-                          <span style={{ color: "#ddd", fontSize: "11px", fontFamily: sans }}>
-                            /
-                          </span>
-                        )}
-                        <button
-                          onClick={() => setLang(l)}
-                          style={{
-                            outline: "none",
-                            border: "none",
-                            background: "transparent",
-                            cursor: "pointer",
-                            fontFamily: sans,
-                            fontSize: "11px",
-                            fontWeight: 700,
-                            letterSpacing: "0.08em",
-                            textTransform: "uppercase",
-                            color: lang === l ? "#1a1a1a" : "#bbb",
-                            padding: 0,
-                          }}
-                        >
-                          {l}
-                        </button>
-                      </React.Fragment>
-                    ))}
-                  </div>
+                  <LockIcon size={14} color={C.bgSecondary} strokeWidth={1.5} />
+                  {kundenportalLabel}
+                </button>
+                <span
+                  style={{
+                    fontFamily: sans,
+                    fontSize: "10px",
+                    color: "#999",
+                    marginTop: "6px",
+                    display: "block",
+                    userSelect: "none",
+                  }}
+                >
+                  {kundenportalCaption}
+                </span>
 
-                  {/* Login */}
-                  <button
-                    onClick={(e) => {
-                      (e.currentTarget as HTMLElement).focus();
-                      setExpanded(false);
-                      onLoginClick();
-                    }}
-                    aria-haspopup="dialog"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      backgroundColor: "#1a1a1a",
-                      color: "#F2F1EC",
-                      fontFamily: sans,
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      letterSpacing: "1.5px",
-                      textTransform: "uppercase",
-                      padding: "10px 16px",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <LockIcon size={14} color="#F2F1EC" strokeWidth={1.5} />
-                    {loginLabel}
-                  </button>
+                {/* SEKUNDÄR: Solutions text link */}
+                <a
+                  href="https://solutions.telliancapital.ch"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    marginTop: 18,
+                    fontFamily: sans,
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    letterSpacing: "0.06em",
+                    color: C.stone,
+                    textDecoration: "none",
+                  }}
+                >
+                  <span>Tellian Capital Solutions</span>
+                  <span aria-hidden style={{ fontSize: "11px" }}>
+                    →
+                  </span>
+                </a>
+
+                {/* TERTIÄR: Language */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 18 }}>
+                  {(["DE", "EN"] as const).map((l, idx) => (
+                    <React.Fragment key={l}>
+                      {idx > 0 && (
+                        <span style={{ color: "#ddd", fontSize: "11px", fontFamily: sans }}>
+                          /
+                        </span>
+                      )}
+                      <button
+                        onClick={() => setLang(l)}
+                        style={{
+                          outline: "none",
+                          border: "none",
+                          background: "transparent",
+                          cursor: "pointer",
+                          fontFamily: sans,
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: lang === l ? C.dark : "#bbb",
+                          padding: 0,
+                        }}
+                      >
+                        {l}
+                      </button>
+                    </React.Fragment>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -583,11 +609,12 @@ export function Navigation({
           opacity: introComplete ? 1 : 0,
           transform: visible ? "translateX(0)" : "translateX(-16px)",
           filter: visible ? "opacity(1)" : "opacity(0)",
-          transition: `transform 0.9s ${EASE}, filter 0.7s ${EASE}, opacity 0.6s ${EASE}`,
+          transition: `transform 0.9s ${EASE.nav}, filter 0.7s ${EASE.nav}, opacity 0.6s ${EASE.nav}`,
           pointerEvents: visible ? "auto" : "none",
         }}
       >
-        {/* ── TOP: "TELLIAN" bottom → top ── */}
+        {/* ── TOP: Tellian wordmark, rotated -90deg ──
+             Inline SVG with cropped viewBox. Wrapper 48×140px. */}
         <button
           onClick={() => onNavigate(0)}
           style={{
@@ -596,25 +623,61 @@ export function Navigation({
             border: "none",
             background: "transparent",
             padding: 0,
+            position: "relative",
+            width: `${BAR_W}px`,
+            height: 140,
+            flexShrink: 0,
           }}
           aria-label="Zurück zum Anfang"
         >
-          <span
+          <div
             style={{
-              fontFamily: sans,
-              fontSize: "15px",
-              fontWeight: 700,
-              letterSpacing: "4px",
-              color: "#1a1a1a",
-              textTransform: "uppercase",
-              writingMode: "vertical-rl",
-              transform: "rotate(180deg)",
-              display: "block",
-              userSelect: "none",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%) rotate(-90deg)",
+              lineHeight: 0,
             }}
           >
-            {brandPrimary}
-          </span>
+            <svg
+              viewBox="96 126 370 78"
+              width={140}
+              height={32}
+              xmlns="http://www.w3.org/2000/svg"
+              role="img"
+              aria-label="Tellian"
+              style={{ display: "block" }}
+            >
+              <path
+                fill="#2a1f34"
+                d="M106.58,142.6h6.59c1.17,0,1.71.59,1.71,1.87v44.03c0,.87-.3,1.54-.92,2.04-.64.52-1.44.83-2.37.93l-2.89.16c-.77,0-1.2.45-1.2,1.27,0,.39.15.72.44.97.28.25.59.38.92.38h0l9.72-.31,8.88.31c.33,0,.63-.13.91-.38.29-.26.44-.59.44-.97,0-.82-.43-1.27-1.18-1.27h0l-2.27-.15c-.94-.1-1.74-.41-2.38-.93-.62-.5-.93-1.17-.93-2.04v-44.03c0-1.27.54-1.87,1.71-1.87h6.59c2.43,0,4.36.66,5.75,1.97,1.4,1.33,2.58,3.38,3.51,6.11.36.89.87,1.34,1.53,1.34.62,0,1.09-.16,1.4-.47.32-.32.45-.73.39-1.22l-.79-9.74c-.15-1.75-1.2-2.12-2.06-2.12h-43.49c-1.18,0-1.86.59-1.98,1.73l-.63,10.11c-.06.44.06.84.38,1.19.31.34.79.51,1.4.51.66,0,1.18-.45,1.54-1.36.82-2.67,1.96-4.71,3.39-6.05,1.41-1.33,3.39-2.01,5.87-2.01Z"
+              />
+              <path
+                fill="#2a1f34"
+                d="M189.31,193.93c1,0,1.87-.33,2.57-.97.7-.64,1.11-1.45,1.22-2.39l1.26-8.17c.06-.44-.05-.83-.33-1.18-.29-.35-.77-.53-1.45-.53-.72,0-1.24.48-1.54,1.44-.76,2.49-2.12,4.41-4.02,5.71-1.91,1.3-4.23,1.96-6.88,1.96h-12.95c-1.09,0-1.95-.3-2.61-.91-.66-.61-.98-1.41-.98-2.44v-18.21c0-.74.35-.84.69-.84h14.68c1.55,0,2.52,1.26,2.97,3.87l.23,1.41c.12.74.6,1.15,1.38,1.15h0c.81-.12,1.23-.62,1.23-1.44l-.31-6.33.31-6.69c0-1.18-.75-1.35-1.2-1.35-.75,0-1.24.39-1.42,1.12l-.31,1.02c-.26.82-.45,1.4-.58,1.71-.12.28-.37.59-.76.93-.37.33-.88.49-1.56.49h-14.6c-.54,0-.77-.23-.77-.77v-16.48c0-1.07.33-1.92.98-2.52.67-.61,1.52-.91,2.61-.91h12.32c2.71,0,4.85.52,6.37,1.53,1.51,1.01,2.67,2.76,3.43,5.2.29.94.96,1.44,1.93,1.44.49,0,.85-.14,1.09-.4.26-.29.36-.72.29-1.3l-1.1-7.21c-.11-.95-.51-1.75-1.18-2.39-.67-.64-1.55-.97-2.61-.97h-27.86l-8.88-.32c-.87,0-1.35.47-1.35,1.31,0,1.14.69,1.31,1.09,1.31h0l2.28.24c2.27.2,3.38,1.14,3.38,2.89v44.58c0,.87-.3,1.54-.93,2.04-.64.52-1.46.83-2.45.93l-2.26.16c-.42,0-1.12.17-1.12,1.31,0,.85.48,1.31,1.36,1.31l8.86-.31h29.44Z"
+              />
+              <path
+                fill="#2a1f34"
+                d="M246.01,192.96c.67-.64,1.06-1.45,1.17-2.38l1.26-8.17c.06-.57-.04-1.01-.3-1.3-.23-.26-.59-.39-1.06-.39-.94,0-1.59.5-1.89,1.44-.71,2.49-2.05,4.41-3.98,5.71-1.94,1.3-4.29,1.96-7,1.96h-11.38c-1.09,0-1.95-.3-2.62-.91-.66-.61-.98-1.41-.98-2.44v-42.54c0-1.6.96-2.55,2.93-2.89l1.31-.23c.81-.07,1.25-.57,1.25-1.43,0-.45-.19-1.2-1.44-1.2l-7.75.32-8.88-.32c-.87,0-1.35.48-1.35,1.35,0,.71.37,1.15,1.09,1.27l2.28.24c2.28.2,3.38,1.14,3.38,2.89v44.58c0,.87-.3,1.54-.93,2.04-.64.52-1.46.83-2.45.93l-2.26.16c-.42,0-1.12.17-1.12,1.31,0,.85.48,1.31,1.36,1.31l8.86-.31h27.87c1.06,0,1.93-.33,2.61-.97Z"
+              />
+              <path
+                fill="#2a1f34"
+                d="M301.36,182.4c.06-.57-.04-1.01-.3-1.3-.23-.26-.59-.39-1.06-.39-.94,0-1.59.5-1.89,1.44-.71,2.49-2.05,4.41-3.98,5.71-1.94,1.3-4.29,1.96-7,1.96h-11.38c-1.09,0-1.95-.3-2.61-.91-.66-.61-.98-1.41-.98-2.44v-42.54c0-1.6.96-2.55,2.93-2.89l1.31-.23c.81-.07,1.25-.57,1.25-1.43,0-.45-.19-1.2-1.44-1.2l-7.75.32-8.88-.32c-.87,0-1.35.48-1.35,1.35,0,.71.37,1.15,1.09,1.27l2.28.24c2.27.2,3.38,1.14,3.38,2.89v44.58c0,.87-.3,1.54-.93,2.04-.64.52-1.46.83-2.45.93l-2.26.16c-.42,0-1.12.17-1.12,1.31,0,.85.48,1.31,1.36,1.31l8.86-.31h27.87c1.06,0,1.93-.33,2.61-.97.67-.64,1.06-1.45,1.17-2.38l1.26-8.17Z"
+              />
+              <path
+                fill="#2a1f34"
+                d="M311.45,140.79l2.28.24c2.28.2,3.38,1.14,3.38,2.89v44.58c0,1.75-.98,2.72-3,2.97l-1.35.16c-.49.09-1.07.4-1.07,1.39,0,.8.48,1.23,1.35,1.23h0l7.75-.31,8.88.31c.33,0,.63-.13.91-.38.29-.26.44-.59.44-.98,0-.82-.42-1.27-1.18-1.27h0l-2.27-.15c-.94-.1-1.74-.41-2.38-.93-.62-.5-.93-1.17-.93-2.04v-44.58c0-1.6.96-2.55,2.93-2.89l1.31-.23c.81-.07,1.25-.57,1.25-1.43,0-.45-.19-1.2-1.44-1.2l-7.75.32-8.88-.32c-.87,0-1.35.48-1.35,1.35,0,.71.37,1.15,1.09,1.27Z"
+              />
+              <path
+                fill="#2a1f34"
+                d="M339.37,194.25h0l7.12-.31,6.84.31c.92,0,1.43-.48,1.43-1.35,0-.49-.22-1.11-1.25-1.27l-1.73-.16c-.67-.05-1.18-.29-1.55-.73-.38-.45-.57-.84-.57-1.17,0-.36.05-.69.14-.98l4.63-12c.17-.43.49-.62,1.02-.62h20.33c.75,0,.93.34,1.02.62l4.64,12.03c.14.28.21.61.21.99,0,.35-.2.74-.6,1.16-.4.42-.91.66-1.52.71l-1.81.16c-.76.07-1.18.57-1.18,1.43,0,.45.18,1.2,1.36,1.2l8.07-.31,9.03.31c.87,0,1.35-.51,1.35-1.43,0-.27-.1-.53-.29-.78-.26-.34-.55-.41-.72-.41h0l-1.65-.16c-2.22-.2-3.61-1.2-4.26-3.06l-20.1-49.69c-.3-.73-1.03-1.1-2.16-1.1s-1.84.38-2.08,1.1l-20.17,49.68c-.75,1.81-2.18,2.81-4.35,3.06l-1.46.15c-.42,0-1.12.17-1.12,1.31,0,.85.48,1.31,1.36,1.31ZM356.47,171.73c-.04-.06-.04-.19,0-.34l9.1-23.56,9.1,23.4c.08.24.09.43.03.51-.05.06-.17.1-.34.1h-17.51c-.2,0-.34-.04-.39-.1Z"
+              />
+              <path
+                fill="#2a1f34"
+                d="M419.05,192.97c0-.53-.21-1.19-1.23-1.35l-1.33-.24c-1.97-.34-2.93-1.29-2.93-2.89v-37.52c0-.41.07-.52.06-.53.13,0,.23.03.27.06l33.04,42.31c.99,1.32,2.19,1.98,3.58,1.98h1.02c.72,0,1.12-.43,1.12-1.2v-49.69c0-1.6.96-2.55,2.93-2.89l1.33-.24c1.02-.16,1.23-.82,1.23-1.35,0-.45-.19-1.19-1.44-1.19l-6.1.24-7.62-.24c-1.18,0-1.35.75-1.35,1.19,0,.76.37,1.23,1.09,1.35l2.27.24c2.22.25,3.31,1.19,3.31,2.89v38.07c0,.17-.04.21-.06.22-.14,0-.26-.05-.35-.14l-32.74-42c-.83-.99-2.05-1.53-3.64-1.58l-6.29-.24c-1.25,0-1.43.77-1.43,1.23,0,.78.4,1.26,1.17,1.39l1.41.16c1.96.24,2.92,1.19,2.92,2.89v44.58c0,1.69-1.11,2.64-3.39,2.89l-2.29.24c-.7.13-1.07.6-1.07,1.35,0,.45.18,1.19,1.36,1.19l7.6-.23,6.13.23c1.24,0,1.43-.75,1.43-1.19Z"
+              />
+            </svg>
+          </div>
         </button>
 
         {/* Spacer pushes hamburger to vertical center */}
@@ -638,7 +701,7 @@ export function Navigation({
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
             {[0, 1, 2].map((n) => (
-              <div key={n} style={{ width: 20, height: 1.5, backgroundColor: "#1a1a1a" }} />
+              <div key={n} style={{ width: 20, height: 1.5, backgroundColor: C.dark }} />
             ))}
           </div>
         </button>
@@ -668,7 +731,7 @@ export function Navigation({
                   style={{
                     width: 32,
                     height: 20,
-                    backgroundColor: isActive ? "#1a1a1a" : "transparent",
+                    backgroundColor: isActive ? C.button : "transparent",
                     color: isActive ? "#ffffff" : "#999",
                     fontFamily: sans,
                     fontSize: "10px",
@@ -681,7 +744,7 @@ export function Navigation({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    transition: `background-color 0.25s ${EASE}, color 0.25s ${EASE}`,
+                    transition: `background-color 0.25s ${EASE.nav}, color 0.25s ${EASE.nav}`,
                     outline: "none",
                   }}
                 >
@@ -710,10 +773,10 @@ export function Navigation({
               alignItems: "center",
               gap: "5px",
               padding: 0,
-              transition: `color 0.25s ${EASE}`,
+              transition: `color 0.25s ${EASE.nav}`,
             }}
           >
-            <LockIcon size={18} color={loginHover ? "#989071" : "#1a1a1a"} strokeWidth={1.5} />
+            <LockIcon size={18} color={loginHover ? C.button : C.dark} strokeWidth={1.5} />
             <span
               style={{
                 fontFamily: sans,
@@ -721,8 +784,8 @@ export function Navigation({
                 fontWeight: 600,
                 letterSpacing: "1.5px",
                 textTransform: "uppercase",
-                color: loginHover ? "#989071" : "#1a1a1a",
-                transition: `color 0.25s ${EASE}`,
+                color: loginHover ? C.button : C.dark,
+                transition: `color 0.25s ${EASE.nav}`,
                 userSelect: "none",
               }}
             >
@@ -739,7 +802,7 @@ export function Navigation({
           width: BAR_W,
           borderRight: "1px solid #D8D5CF",
           opacity: introComplete && visible && !expanded ? 0.3 : 0,
-          transition: `opacity 0.9s ${EASE}`,
+          transition: `opacity 0.9s ${EASE.nav}`,
         }}
       />
 
@@ -755,7 +818,7 @@ export function Navigation({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.45, ease: EASE_ARR }}
+              transition={{ duration: 0.45, ease: EASE.navArr }}
               style={{ backgroundColor: "rgba(0,0,0,0.08)" }}
               onClick={() => setExpanded(false)}
             />
@@ -763,11 +826,11 @@ export function Navigation({
             {/* Panel */}
             <motion.div
               className="fixed top-0 left-0 z-[60] flex h-screen flex-col"
-              style={{ width: PANEL_W, backgroundColor: "#F2F1EC" }}
+              style={{ width: PANEL_W, backgroundColor: C.bgSecondary }}
               initial={{ x: -PANEL_W + BAR_W, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -PANEL_W + BAR_W, opacity: 0 }}
-              transition={{ duration: 0.6, ease: EASE_ARR }}
+              transition={{ duration: 0.6, ease: EASE.navArr }}
             >
               {/* Header */}
               <div
@@ -791,19 +854,12 @@ export function Navigation({
                     padding: 0,
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: sans,
-                      fontSize: "12px",
-                      letterSpacing: "2px",
-                      color: "#1a1a1a",
-                      textTransform: "uppercase",
-                      userSelect: "none",
-                    }}
-                  >
-                    <span style={{ fontWeight: 700 }}>{brandPrimary}</span>
-                    {"\u00A0"}
-                    <span style={{ fontWeight: 400 }}>{brandSecondary}</span>
+                  <span>
+                    <img
+                      src={logoHorizontal.src}
+                      alt="Tellian Capital"
+                      style={{ width: "140px", height: "auto" }}
+                    />
                   </span>
                 </button>
 
@@ -825,7 +881,7 @@ export function Navigation({
                       y1="1.5"
                       x2="14.5"
                       y2="14.5"
-                      stroke="#1a1a1a"
+                      stroke={C.dark}
                       strokeWidth="1.25"
                       strokeLinecap="round"
                     />
@@ -834,7 +890,7 @@ export function Navigation({
                       y1="1.5"
                       x2="1.5"
                       y2="14.5"
-                      stroke="#1a1a1a"
+                      stroke={C.dark}
                       strokeWidth="1.25"
                       strokeLinecap="round"
                     />
@@ -856,7 +912,7 @@ export function Navigation({
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -8 }}
-                        transition={{ duration: 0.4, delay: 0.06 + i * 0.04, ease: EASE_ARR }}
+                        transition={{ duration: 0.4, delay: 0.06 + i * 0.04, ease: EASE.navArr }}
                         onClick={() => {
                           onNavigate(item.progress);
                           setExpanded(false);
@@ -889,9 +945,9 @@ export function Navigation({
                                 transform: "translateY(-50%)",
                                 width: 2,
                                 height: 32,
-                                backgroundColor: "#989071",
+                                backgroundColor: C.button,
                               }}
-                              transition={{ duration: 0.35, ease: EASE_ARR }}
+                              transition={{ duration: 0.35, ease: EASE.navArr }}
                             />
                           )}
                         </AnimatePresence>
@@ -900,10 +956,10 @@ export function Navigation({
                           style={{
                             fontFamily: sans,
                             fontSize: "11px",
-                            color: isActive ? "#989071" : "#bbb",
+                            color: isActive ? C.purple : "#bbb",
                             display: "block",
                             marginBottom: "3px",
-                            transition: `color 0.35s ${EASE}`,
+                            transition: `color 0.35s ${EASE.nav}`,
                           }}
                         >
                           {item.num}
@@ -912,7 +968,7 @@ export function Navigation({
                           style={{
                             fontFamily: serif,
                             fontSize: "16px",
-                            color: "#1a1a1a",
+                            color: C.dark,
                             display: "block",
                             lineHeight: 1.2,
                           }}
@@ -947,23 +1003,93 @@ export function Navigation({
                 <div style={{ height: "0.5px", backgroundColor: "#ddd" }} />
                 <div style={{ height: 24 }} />
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "space-between",
-                    gap: "12px",
-                  }}
-                >
-                  {/* Language */}
-                  <div
+                {/* PRIMÄR: Kundenportal — the one prominent CTA */}
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <button
+                    onMouseEnter={() => setPortalHover(true)}
+                    onMouseLeave={() => setPortalHover(false)}
+                    onClick={() => {
+                      setExpanded(false);
+                      onLoginClick();
+                    }}
+                    aria-haspopup="dialog"
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "6px",
-                      paddingTop: "14px",
+                      gap: "8px",
+                      backgroundColor: portalHover ? C.buttonHover : C.button,
+                      color: C.dark,
+                      fontFamily: sans,
+                      fontSize: "11px",
+                      fontWeight: 700,
+                      letterSpacing: "1.5px",
+                      textTransform: "uppercase",
+                      padding: "12px 20px",
+                      border: "none",
+                      borderRadius: 0,
+                      cursor: "pointer",
+                      transition: `background-color 0.25s ${EASE.nav}`,
+                      outline: "none",
+                      whiteSpace: "nowrap",
                     }}
                   >
+                    <LockIcon size={14} color={C.bgSecondary} strokeWidth={1.5} />
+                    {kundenportalLabel}
+                  </button>
+                  <span
+                    style={{
+                      fontFamily: sans,
+                      fontSize: "10px",
+                      color: "#999",
+                      marginTop: "6px",
+                      userSelect: "none",
+                    }}
+                  >
+                    {kundenportalCaption}
+                  </span>
+                </div>
+
+                {/* SEKUNDÄR: Solutions — quiet text link with arrow */}
+                <a
+                  href="https://solutions.telliancapital.ch"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    marginTop: "20px",
+                    fontFamily: sans,
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    letterSpacing: "0.06em",
+                    color: C.stone,
+                    textDecoration: "none",
+                    transition: `color 0.25s ${EASE.nav}`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = C.dark;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = C.stone;
+                  }}
+                >
+                  <span>Tellian Capital Solutions</span>
+                  <span aria-hidden style={{ fontSize: "11px" }}>
+                    →
+                  </span>
+                </a>
+
+                {/* TERTIÄR: Language + LinkedIn — utility row */}
+                <div
+                  style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     {(["DE", "EN"] as const).map((l, idx) => (
                       <React.Fragment key={l}>
                         {idx > 0 && (
@@ -990,9 +1116,9 @@ export function Navigation({
                             fontWeight: 700,
                             letterSpacing: "0.08em",
                             textTransform: "uppercase",
-                            color: lang === l ? "#1a1a1a" : "#bbb",
+                            color: lang === l ? C.dark : "#bbb",
                             padding: 0,
-                            transition: `color 0.25s ${EASE}`,
+                            transition: `color 0.25s ${EASE.nav}`,
                           }}
                         >
                           {l}
@@ -1000,52 +1126,6 @@ export function Navigation({
                       </React.Fragment>
                     ))}
                   </div>
-
-                  {/* Kundenportal */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                    <button
-                      onMouseEnter={() => setPortalHover(true)}
-                      onMouseLeave={() => setPortalHover(false)}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        backgroundColor: portalHover ? "#989071" : "#1a1a1a",
-                        color: "#F2F1EC",
-                        fontFamily: sans,
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        letterSpacing: "1.5px",
-                        textTransform: "uppercase",
-                        padding: "12px 20px",
-                        border: "none",
-                        borderRadius: 0,
-                        cursor: "pointer",
-                        transition: `background-color 0.25s ${EASE}`,
-                        outline: "none",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <LockIcon size={14} color="#F2F1EC" strokeWidth={1.5} />
-                      {kundenportalLabel}
-                    </button>
-                    <span
-                      style={{
-                        fontFamily: sans,
-                        fontSize: "10px",
-                        color: "#999",
-                        marginTop: "6px",
-                        textAlign: "right",
-                        userSelect: "none",
-                      }}
-                    >
-                      {kundenportalCaption}
-                    </span>
-                  </div>
-                </div>
-
-                {/* LinkedIn */}
-                <div style={{ marginTop: "16px" }}>
                   <button
                     onMouseEnter={() => setLiHover(true)}
                     onMouseLeave={() => setLiHover(false)}
@@ -1056,11 +1136,10 @@ export function Navigation({
                       cursor: "pointer",
                       padding: 0,
                       lineHeight: 0,
-                      transition: `opacity 0.2s`,
                     }}
                     aria-label="LinkedIn"
                   >
-                    <LinkedInIcon color={liHover ? "#1a1a1a" : "#999"} />
+                    <LinkedInIcon color={liHover ? C.dark : "#999"} />
                   </button>
                 </div>
               </motion.div>

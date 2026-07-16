@@ -3,21 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-const sans = "var(--font-inter), sans-serif";
-const serif = "var(--font-cormorant), serif";
-
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-  muted: "#B0ACA5",
-  line: "#D8D5CF",
-  hover: "#989071",
-};
-
-const EASE_OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
-const EASE_IN = "cubic-bezier(0.4, 0, 0.2, 1)";
+import { C, serif, sans } from "@/tokens";
+import { EASE } from "@/styles/motion";
 
 const PORTALS = [
   {
@@ -112,8 +99,8 @@ export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProp
           transform: open ? "translate(-50%, -50%) scale(1)" : "translate(-50%, -50%) scale(0.92)",
           opacity: open ? 1 : 0,
           transition: open
-            ? `transform 450ms ${EASE_OUT} 50ms, opacity 450ms ${EASE_OUT} 50ms`
-            : `transform 300ms ${EASE_IN}, opacity 300ms ${EASE_IN}`,
+            ? `transform 450ms ${EASE.standard} 50ms, opacity 450ms ${EASE.standard} 50ms`
+            : `transform 300ms ${EASE.in}, opacity 300ms ${EASE.in}`,
           width: "440px",
           maxWidth: "calc(100vw - 32px)",
           maxHeight: "calc(100vh - 32px)",
@@ -240,7 +227,7 @@ function PortalRow({ portal }: { portal: (typeof PORTALS)[number] }) {
           width: hover ? "24px" : "14px",
           height: "0.5px",
           backgroundColor: hover ? C.dark : C.stone,
-          transition: `width 300ms ${EASE_OUT}, background-color 300ms ${EASE_OUT}`,
+          transition: `width 300ms ${EASE.standard}, background-color 300ms ${EASE.standard}`,
           flexShrink: 0,
         }}
       />
@@ -253,8 +240,8 @@ function PortalRow({ portal }: { portal: (typeof PORTALS)[number] }) {
             fontWeight: 600,
             letterSpacing: "0.16em",
             textTransform: "uppercase",
-            color: hover ? C.hover : C.dark,
-            transition: `color 300ms ${EASE_OUT}`,
+            color: hover ? C.warm : C.dark,
+            transition: `color 300ms ${EASE.standard}`,
           }}
         >
           {portal.label}
@@ -278,7 +265,7 @@ function PortalRow({ portal }: { portal: (typeof PORTALS)[number] }) {
           fontFamily: sans,
           fontSize: "14px",
           color: hover ? C.dark : C.muted,
-          transition: `color 300ms ${EASE_OUT}, transform 300ms ${EASE_OUT}`,
+          transition: `color 300ms ${EASE.standard}, transform 300ms ${EASE.standard}`,
           transform: hover ? "translate(2px, -2px)" : "translate(0, 0)",
           flexShrink: 0,
         }}
@@ -321,7 +308,7 @@ function SupportLink({ onClick }: { onClick: () => void }) {
           width: hover ? "24px" : "14px",
           height: "0.5px",
           backgroundColor: hover ? C.dark : C.stone,
-          transition: `width 300ms ${EASE_OUT}, background-color 300ms ${EASE_OUT}`,
+          transition: `width 300ms ${EASE.standard}, background-color 300ms ${EASE.standard}`,
         }}
       />
       <span>
@@ -329,7 +316,7 @@ function SupportLink({ onClick }: { onClick: () => void }) {
         <span
           style={{
             color: hover ? C.dark : C.charcoal,
-            transition: `color 300ms ${EASE_OUT}`,
+            transition: `color 300ms ${EASE.standard}`,
           }}
         >
           Support kontaktieren

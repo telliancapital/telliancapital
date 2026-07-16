@@ -28,6 +28,8 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   philosophyImageAlt,
   philosophyQuote,
   philosophyParagraphs,
+  philosophyValuesLabel,
+  philosophyValues[]{ name, readout },
 
   // 03 — Method
   methodEyebrow,
@@ -42,6 +44,16 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   methodTimelineSteps[]{ title, description },
   methodTimelineDividerLabel,
   methodTimelineFooterLabel,
+  methodPartiesCaption,
+  methodPartyKundeLabel,
+  methodPartyKundeProsa,
+  methodPartyTellianLabel,
+  methodPartyTellianProsa,
+  methodPartyBankenLabel,
+  methodPartyBankenProsa,
+  methodEdgeLabelAuftrag,
+  methodEdgeLabelDepot,
+  methodEdgeLabelVollmacht,
   methodDetailSteps[]{
     shortLabel,
     eyebrow,
@@ -65,6 +77,12 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   strategyHeadingLine2,
   strategyParagraphs,
   strategyCtaLabel,
+  strategyFlowchartTier1,
+  strategyFlowchartConnectorLabel,
+  strategyFlowchartTier2,
+  strategyFlowchartTier3,
+  strategyFlowchartTier4,
+  strategyFlowchartTier5,
   strategyDetailEyebrow,
   strategyDetailHeadingLine1,
   strategyDetailHeadingLine2,
@@ -104,6 +122,8 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   teamMembers[]{
     name,
     role,
+    email,
+    linkedin,
     bio,
     "imageAsset": image.asset->{ url },
     imageUrl
@@ -123,10 +143,14 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   contactFormResponseTime,
   contactFormThanksTitle,
   contactFormThanksBody,
+  contactPrivacyPrefix,
+  contactPrivacyLinkLabel,
+  contactPrivacySuffix,
   contactCompanyName,
   contactCompanyTagline,
   contactAddress,
   contactPhone,
+  contactPhoneHours,
   contactEmail,
   contactMapLinkLabel,
   contactFooterTagline,
@@ -151,7 +175,118 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   navItems[]{ label, sub },
   navLoginButtonLabel,
   navKundenportalLabel,
-  navKundenportalCaption
+  navKundenportalCaption,
+
+  // 10 — Portfolio Management
+  pmDetailEyebrow,
+  pmDetailHeadingLine1,
+  pmDetailHeadingLine2,
+  pmIntroParagraphs,
+  pmProcessEyebrow,
+  pmProcessHeadingLine1,
+  pmProcessHeadingLine2,
+  pmProcessClosing,
+  pmProcessStages[]{ name, bullets },
+  pmCommitteeEyebrow,
+  pmCommitteeHeadingLine1,
+  pmCommitteeHeadingLine2,
+  pmCommitteeParagraphs,
+  pmStrategiesEyebrow,
+  pmStrategiesHeadingLine1,
+  pmStrategiesHeadingLine2,
+  pmStrategiesSubline,
+  pmStrategies[]{ name, tag, goal, volatility, allocation, allocationLegend, focus },
+  pmUniverseEyebrow,
+  pmUniverseHeadingLine1,
+  pmUniverseHeadingLine2,
+  pmUniverseParagraphs,
+  pmCtaEyebrow,
+  pmCtaHeadingLine1,
+  pmCtaHeadingLine2,
+  pmCtaDescription,
+  pmCtaButtonLabel,
+  pmFooterTagline
+}`);
+
+/**
+ * All published FAQs across every page bucket, ordered by `page` then `order`.
+ * Used by the dedicated /faq page (which groups client-side by the `page`
+ * field) and by the FAQ JSON-LD emitter.
+ */
+export const FAQ_ALL_QUERY = defineQuery(`*[
+  _type == "faq" && isPublished == true
+] | order(page asc, order asc, _createdAt asc){
+  _id,
+  question,
+  answer,
+  page,
+  order
+}`);
+
+/**
+ * Published FAQs for a single page bucket, e.g. "vermoegensverwaltung".
+ * Accepts `$page` as a GROQ parameter.
+ */
+export const FAQ_BY_PAGE_QUERY = defineQuery(`*[
+  _type == "faq" && isPublished == true && page == $page
+] | order(order asc, _createdAt asc){
+  _id,
+  question,
+  answer,
+  page,
+  order
+}`);
+
+/**
+ * SEO-only query — returns just the per-page meta tag blocks from the
+ * homepage doc, so `generateMetadata` doesn't have to fetch the full
+ * document. Each block follows the `seoMeta` schema: localized title /
+ * description (`{ de, en }`), a flat keywords array, and an optional
+ * Open Graph image (the asset URL is resolved with `->`).
+ */
+export const SEO_QUERY = defineQuery(`*[_type == "homepage"][0]{
+  "home": seoHome{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "vermoegensverwaltung": seoVermoegensverwaltung{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "anlagestrategien": seoAnlagestrategien{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "impressum": seoImpressum{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "datenschutz": seoDatenschutz{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "kundeninformation": seoKundeninformation{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  },
+  "faq": seoFaq{
+    title,
+    description,
+    keywords,
+    "ogImageUrl": ogImage.asset->url
+  }
 }`);
 
 /**
@@ -174,11 +309,74 @@ export const CONTACT_QUERY = defineQuery(`*[_type == "homepage"][0]{
   contactFormResponseTime,
   contactFormThanksTitle,
   contactFormThanksBody,
+  contactPrivacyPrefix,
+  contactPrivacyLinkLabel,
+  contactPrivacySuffix,
   contactCompanyName,
   contactCompanyTagline,
   contactAddress,
   contactPhone,
+  contactPhoneHours,
   contactEmail,
   contactMapLinkLabel,
   contactFooterTagline
+}`);
+
+/**
+ * Solutions site homepage — separate Next.js app (Tellian Capital Solutions,
+ * solutions.telliancapital.ch). Three languages (DE/EN/FR), hence the
+ * `triLocaleString`/`triLocaleText` fields resolving to `{ de, en, fr }`.
+ */
+export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepage"][0]{
+  navItems[]{ label, sub },
+
+  heroEyebrow,
+  heroTaglineLine1,
+  heroTaglineLine2,
+  heroTaglineLine3,
+  heroLeadSentence,
+  heroClosingLine,
+
+  servicesEyebrow,
+  servicesHeadingLine1,
+  servicesHeadingLine2,
+  servicesIntro,
+  servicesColumns[]{ title, body },
+
+  teamEyebrow,
+  teamHeadingLine1,
+  teamHeadingLine2,
+  teamSendMessageLabel,
+  teamCtaLabel,
+  teamMembers[]{
+    name,
+    role,
+    email,
+    linkedin,
+    "imageAsset": image.asset->{ url },
+    imageUrl
+  },
+
+  contactEyebrow,
+  contactHeadingLine1,
+  contactHeadingLine2,
+  contactIntro,
+  contactHours,
+  contactFormEyebrow,
+  contactFieldFirstName,
+  contactFieldLastName,
+  contactFieldEmail,
+  contactFieldPhone,
+  contactFieldMessage,
+  contactSubmitLabel,
+  contactResponseHint,
+  contactPrivacyNotice,
+  contactMapLink,
+  contactThankYou,
+  contactThankYouSub,
+  contactPhone,
+  contactEmailAddr,
+  contactCompanyName,
+  contactCompanySubtitle,
+  contactAddressLine
 }`);

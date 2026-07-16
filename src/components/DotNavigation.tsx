@@ -1,26 +1,26 @@
-/* Six sections — thresholds determine when a section becomes active.
-   Layout (total 864vw, scrollable 764vw):
-   Hero(0-110) + Breathing(8) + Philo(118-228) + Breathing(8)
-   + Vermögen(236-346) + Breathing(8) + Strategien(354-464) + Breathing(8)
-   + Über uns(472-756) + Breathing(8) + Kontakt(764-864, 100vw)
-   targets = sectionStart / 764 */
+"use client";
+
+import { sans } from "../tokens";
+import { useLanguage } from "@/i18n/LanguageContext";
+
 const SECTIONS = [
-  { label: "Start", target: 0.0, threshold: 0.0 }, // Hero
-  { label: "Haltung", target: 0.154, threshold: 0.08 }, // Anlagephilosophie
-  { label: "Methode", target: 0.309, threshold: 0.23 }, // Vermögensverwaltung
-  { label: "Strategie", target: 0.463, threshold: 0.39 }, // Anlagestrategien
-  { label: "Team", target: 0.618, threshold: 0.54 }, // Über uns
-  { label: "Kontakt", target: 1.0, threshold: 0.94 }, // Kontakt
+  { labels: { de: "Start", en: "Start" }, target: 0.0, threshold: 0.0 },
+  { labels: { de: "Philosophie", en: "Approach" }, target: 0.154, threshold: 0.08 },
+  { labels: { de: "Mandat", en: "Method" }, target: 0.309, threshold: 0.23 },
+  { labels: { de: "Portfolio", en: "Strategy" }, target: 0.463, threshold: 0.39 },
+  { labels: { de: "Team", en: "Team" }, target: 0.618, threshold: 0.54 },
+  { labels: { de: "Kontakt", en: "Contact" }, target: 1.0, threshold: 0.94 },
 ];
 
-const sans = "'Inter', sans-serif";
+const NAV_ARIA_LABEL = { de: "Sektion-Navigation", en: "Section navigation" };
 
-/* Palette — matches the rest of the design system */
-const COLOR = {
-  dotInactive: "#C8C5BB",
-  dotActive: "#8A8575",
-  labelInactive: "#8A857C",
-  labelActive: "#3A3835",
+const V = {
+  bg: "var(--tellian-nav-bg)",
+  text: "var(--tellian-nav-text)",
+  textInactive: "var(--tellian-nav-text-inactive)",
+  indicator: "var(--tellian-nav-indicator)",
+  indicatorInactive: "var(--tellian-nav-indicator-inactive)",
+  border: "var(--tellian-nav-border)",
 };
 
 function getActiveIndex(progress: number): number {
@@ -38,83 +38,94 @@ interface DotNavigationProps {
 
 export function DotNavigation({ scrollProgress, onNavigate }: DotNavigationProps) {
   const activeIndex = getActiveIndex(scrollProgress);
+  const { lang } = useLanguage();
 
   return (
-    <div
+    <nav
+      aria-label={NAV_ARIA_LABEL[lang]}
       style={{
         position: "fixed",
-        bottom: "20px",
+        bottom: "clamp(16px, 2.5vh, 24px)",
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 150,
+        height: "36px",
+        padding: "0 20px",
+        borderRadius: "18px",
+        background: V.bg,
+        backdropFilter: "blur(16px) saturate(120%)",
+        WebkitBackdropFilter: "blur(16px) saturate(120%)",
+        border: `0.5px solid ${V.border}`,
         display: "flex",
         alignItems: "center",
-        gap: "4px",
+        gap: "clamp(16px, 2.5vw, 24px)",
         pointerEvents: "auto",
       }}
     >
       {SECTIONS.map((section, i) => {
         const isActive = activeIndex === i;
+        const label = section.labels[lang];
         return (
           <button
             key={i}
             onClick={() => onNavigate(section.target)}
-            aria-label={section.label}
-            aria-current={isActive ? "true" : undefined}
+            aria-label={label}
+            aria-current={isActive ? "page" : undefined}
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "6px",
-              padding: "10px 12px",
-              borderRadius: "8px",
+              gap: "4px",
+              padding: 0,
               border: "none",
               background: "transparent",
-              cursor: isActive ? "default" : "pointer",
+              cursor: "pointer",
               outline: "none",
-              transition: "background-color 200ms ease-out",
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive) e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.03)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
             }}
           >
-            {/* Dot */}
+            {/* Indicator */}
             <span
               aria-hidden
               style={{
                 display: "block",
-                width: isActive ? "22px" : "8px",
-                height: "8px",
-                borderRadius: isActive ? "4px" : "50%",
-                backgroundColor: isActive ? COLOR.dotActive : COLOR.dotInactive,
-                opacity: isActive ? 0.6 : 0.5,
-                transition:
-                  "width 350ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 350ms cubic-bezier(0.16, 1, 0.3, 1), background-color 350ms cubic-bezier(0.16, 1, 0.3, 1), opacity 350ms cubic-bezier(0.16, 1, 0.3, 1)",
+                width: isActive ? "12px" : "4px",
+                height: isActive ? "1.5px" : "4px",
+                borderRadius: isActive ? "1px" : "50%",
+                backgroundColor: isActive ? V.indicator : V.indicatorInactive,
+                transition: "all 200ms ease",
               }}
             />
 
             {/* Label */}
             <span
+              className="hidden sm:block"
               style={{
                 fontFamily: sans,
                 fontSize: "8px",
-                letterSpacing: "1.5px",
+                letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                color: isActive ? COLOR.labelActive : COLOR.labelInactive,
-                fontWeight: isActive ? 500 : 400,
                 lineHeight: 1,
                 userSelect: "none",
-                transition: "color 200ms ease-out, font-weight 200ms ease-out",
+                color: isActive ? V.text : V.textInactive,
+                fontWeight: isActive ? 500 : 400,
+                transition: "color 200ms ease",
               }}
             >
-              {section.label}
+              {label}
             </span>
           </button>
         );
       })}
-    </div>
+
+      {/* Fallback for browsers without backdrop-filter */}
+      <style>{`
+        @supports not (backdrop-filter: blur(24px)) {
+          nav[aria-label="${NAV_ARIA_LABEL.de}"],
+          nav[aria-label="${NAV_ARIA_LABEL.en}"] {
+            background: rgba(255, 255, 255, 0.8) !important;
+          }
+        }
+      `}</style>
+    </nav>
   );
 }

@@ -1,13 +1,10 @@
 import { useRef, useEffect, useState } from "react";
+import { EASE } from "@/styles/motion";
 
-const EASE = "cubic-bezier(0.25, 0.1, 0.25, 1)";
-const T_FAST = `0.35s ${EASE}`;
-const T_MEDIUM = `0.55s ${EASE}`;
-const T_SLOW = `0.8s ${EASE}`;
-
-// Ultra-smooth transitions for cinematic image panels
-const EASE_CINEMATIC = "cubic-bezier(0.16, 1, 0.3, 1)";
-const T_CINEMATIC = `1.8s ${EASE_CINEMATIC}`;
+const T_FAST = `0.35s ${EASE.nav}`;
+const T_MEDIUM = `0.55s ${EASE.nav}`;
+const T_SLOW = `0.8s ${EASE.nav}`;
+const T_CINEMATIC = `1.8s ${EASE.standard}`;
 
 /* ═══════════════════════════════════════════════════════════
    VERTICAL SCROLL PROGRESS (IntersectionObserver-based)
@@ -115,7 +112,7 @@ export function ScrollImage({
           transform: `scale(${scale})`,
           clipPath: isVertical ? undefined : `inset(0 ${clipRight} 0 0)`,
           transition: isVertical
-            ? `transform 1.2s ${EASE_CINEMATIC}`
+            ? `transform 1.2s ${EASE.standard}`
             : `transform ${T_MEDIUM}, clip-path ${T_MEDIUM}`,
         }}
       >
@@ -223,7 +220,7 @@ export function ParallaxText({
         transform: isVertical ? `translate3d(0, ${offset}px, 0)` : `translate3d(${offset}px, 0, 0)`,
         opacity,
         transition: isVertical
-          ? `transform 0.8s ${EASE_CINEMATIC}, opacity 0.8s ${EASE}`
+          ? `transform 0.8s ${EASE.standard}, opacity 0.8s ${EASE.nav}`
           : `transform ${T_FAST}, opacity ${T_SLOW}`,
         ...style,
       }}
@@ -281,7 +278,7 @@ export function ScrollFade({
         transform: `translate3d(0, ${y}px, 0)`,
         opacity,
         transition: isVertical
-          ? `transform 0.7s ${EASE_CINEMATIC}, opacity 0.7s ${EASE}`
+          ? `transform 0.7s ${EASE.standard}, opacity 0.7s ${EASE.nav}`
           : `transform ${T_FAST}, opacity ${T_SLOW}`,
         ...style,
       }}
@@ -329,7 +326,7 @@ export function RevealLine({
         backgroundColor: dark ? "rgba(30, 28, 25, 0.12)" : "rgba(181, 175, 166, 0.25)",
         transform: direction === "horizontal" ? `scaleX(${scale})` : `scaleY(${scale})`,
         transformOrigin: "left center",
-        transition: isVerticalMode ? `transform 0.8s ${EASE_CINEMATIC}` : `transform ${T_MEDIUM}`,
+        transition: isVerticalMode ? `transform 0.8s ${EASE.standard}` : `transform ${T_MEDIUM}`,
       }}
     />
   );
@@ -385,8 +382,8 @@ export function CinematicPanelImage({
         style={{
           transform: `scale(${scale}) translate3d(0, ${shiftY}px, 0)`,
           transition: isVerticalMode
-            ? `transform 1.2s ${EASE_CINEMATIC}`
-            : `transform 2.4s ${EASE_CINEMATIC}`,
+            ? `transform 1.2s ${EASE.standard}`
+            : `transform 2.4s ${EASE.standard}`,
         }}
       >
         <img

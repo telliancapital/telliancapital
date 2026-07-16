@@ -4,17 +4,9 @@ import { useEffect, useState } from "react";
 import { CtaButton } from "./CtaButton";
 import type { Breakpoint } from "./useBreakpoint";
 
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  charcoal: "#3A3835",
-  stone: "#8A857C",
-  muted: "#B0ACA5",
-};
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
+import { C, serif, sans } from "../tokens";
+import { EASE } from "../styles/motion";
 
-const EASE_SLIDE = "cubic-bezier(0.16, 1, 0.3, 1)";
 const EASE_FADE = "ease-out";
 
 interface HeroVerticalProps {
@@ -74,7 +66,7 @@ export function HeroVertical({
   const fadeUp = (delayMs: number, durationMs = 600, distance = 24) => ({
     opacity: animate ? 1 : 0,
     transform: animate ? "translateY(0)" : `translateY(${distance}px)`,
-    transition: `opacity ${durationMs}ms ${EASE_FADE} ${delayMs}ms, transform ${durationMs}ms ${EASE_SLIDE} ${delayMs}ms`,
+    transition: `opacity ${durationMs}ms ${EASE_FADE} ${delayMs}ms, transform ${durationMs}ms ${EASE.standard} ${delayMs}ms`,
   });
 
   const fade = (delayMs: number, durationMs = 600) => ({
@@ -85,7 +77,7 @@ export function HeroVertical({
   const slideX = (delayMs: number, durationMs = 450, distance = -16) => ({
     opacity: animate ? 1 : 0,
     transform: animate ? "translateX(0)" : `translateX(${distance}px)`,
-    transition: `opacity ${durationMs}ms ${EASE_FADE} ${delayMs}ms, transform ${durationMs}ms ${EASE_SLIDE} ${delayMs}ms`,
+    transition: `opacity ${durationMs}ms ${EASE_FADE} ${delayMs}ms, transform ${durationMs}ms ${EASE.standard} ${delayMs}ms`,
   });
 
   /* ── Spec timeline ── */
@@ -146,7 +138,7 @@ export function HeroVertical({
             backgroundSize: "cover",
             backgroundPosition: "center",
             clipPath: animate ? "inset(0 0 0 0)" : "inset(100% 0 0 0)",
-            transition: `clip-path 1000ms ${EASE_SLIDE} ${T.image}ms`,
+            transition: `clip-path 1000ms ${EASE.standard} ${T.image}ms`,
           }}
         />
       </div>
@@ -178,7 +170,7 @@ export function HeroVertical({
               backgroundColor: C.dark,
               marginTop: "16px",
               width: animate ? "24px" : "0px",
-              transition: `width 400ms ${EASE_SLIDE} ${T.accent}ms`,
+              transition: `width 400ms ${EASE.standard} ${T.accent}ms`,
             }}
           />
 
