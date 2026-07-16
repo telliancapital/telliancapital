@@ -14,7 +14,28 @@ import { Navigation } from "./components/Navigation";
 import { DotNavigation } from "./components/DotNavigation";
 import { PreloadScreen } from "./components/PreloadScreen";
 import { CONTENT, type Locale } from "./content";
+import type { LocaleValue } from "./i18n/types";
 import heroImg from "./assets/zh-3.jpg";
+
+/* ═══════════════════════════════════════════════════════════
+   CMS MERGE HELPERS — every field below is optional on the CMS
+   document; a missing/empty value falls back to the bundled
+   CONTENT constants so the page renders identically until a
+   field is filled in from Sanity Studio.
+   ═══════════════════════════════════════════════════════════ */
+type TriLocaleValue = LocaleValue;
+type LocaleStrings = Record<Locale, string>;
+
+function mergeStr(cms: TriLocaleValue, fallback: LocaleStrings): LocaleStrings {
+  if (typeof cms === "string") {
+    return { de: cms || fallback.de, en: cms || fallback.en, fr: cms || fallback.fr };
+  }
+  return {
+    de: cms?.de?.trim() || fallback.de,
+    en: cms?.en?.trim() || fallback.en,
+    fr: cms?.fr?.trim() || fallback.fr,
+  };
+}
 
 /* ═══════════════════════════════════════════════════════════
    SCROLL ARROW — bottom center, bounce, fades on scroll.
@@ -104,7 +125,7 @@ function ScrollArrow({ visible }: { visible: boolean }) {
    Desktop: horizontal scroll. Tablet/Mobile: vertical scroll.
    ═══════════════════════════════════════════════════════════ */
 
-function AppInner() {
+function AppInner({ homepage }: { homepage?: any }) {
   const { breakpoint, isMobile, isVertical } = useBreakpoint();
   const { containerRef, scrollProgress, scrollX, scrollTo, scrollDirection } = useHorizontalScroll({
     disabled: isVertical,
@@ -129,10 +150,118 @@ function AppInner() {
     setTimeout(() => setHeroAnimate(true), 80);
   }, []);
 
-  const h = CONTENT.hero;
-  const s = CONTENT.services;
-  const t = CONTENT.team;
-  const c = CONTENT.contact;
+  const FB = CONTENT;
+
+  /* ── Hero ── */
+  const heroTaglineLine1 = mergeStr(homepage?.heroTaglineLine1, {
+    de: FB.hero.taglineLines.de[0],
+    en: FB.hero.taglineLines.en[0],
+    fr: FB.hero.taglineLines.fr[0],
+  });
+  const heroTaglineLine2 = mergeStr(homepage?.heroTaglineLine2, {
+    de: FB.hero.taglineLines.de[1],
+    en: FB.hero.taglineLines.en[1],
+    fr: FB.hero.taglineLines.fr[1],
+  });
+  const heroTaglineLine3 = mergeStr(homepage?.heroTaglineLine3, {
+    de: FB.hero.taglineLines.de[2],
+    en: FB.hero.taglineLines.en[2],
+    fr: FB.hero.taglineLines.fr[2],
+  });
+  const h = {
+    eyebrow: mergeStr(homepage?.heroEyebrow, {
+      de: "Tellian Capital Solutions",
+      en: "Tellian Capital Solutions",
+      fr: "Tellian Capital Solutions",
+    }),
+    taglineLines: {
+      de: [heroTaglineLine1.de, heroTaglineLine2.de, heroTaglineLine3.de],
+      en: [heroTaglineLine1.en, heroTaglineLine2.en, heroTaglineLine3.en],
+      fr: [heroTaglineLine1.fr, heroTaglineLine2.fr, heroTaglineLine3.fr],
+    } as Record<Locale, string[]>,
+    leadSentence: mergeStr(homepage?.heroLeadSentence, FB.hero.leadSentence),
+    closingLine: mergeStr(homepage?.heroClosingLine, FB.hero.closingLine),
+  };
+
+  /* ── Services ── */
+  const FB_SERVICES_HEADING2: LocaleStrings = { de: "tun.", en: "do.", fr: "faisons." };
+  const s = {
+    eyebrow: mergeStr(homepage?.servicesEyebrow, FB.services.eyebrow),
+    headingLine1: mergeStr(homepage?.servicesHeadingLine1, { de: "Was wir", en: "What we", fr: "Ce que nous" }),
+    headingLine2: mergeStr(homepage?.servicesHeadingLine2, FB_SERVICES_HEADING2),
+    intro: mergeStr(homepage?.servicesIntro, FB.services.intro),
+    columns: FB.services.columns.map((fb, i) => {
+      const cms = homepage?.servicesColumns?.[i];
+      return {
+        title: mergeStr(cms?.title, fb.title),
+        body: mergeStr(cms?.body, fb.body),
+      };
+    }),
+  };
+
+  /* ── Team ── */
+  const FB_TEAM_HEADING1: LocaleStrings = { de: "Wer dahinter", en: "Who's behind", fr: "Qui est" };
+  const FB_TEAM_HEADING2: LocaleStrings = { de: "steht.", en: "it.", fr: "derrière." };
+  type CmsTeamMember = {
+    name?: string;
+    role?: TriLocaleValue;
+    email?: string;
+    linkedin?: string;
+    imageAsset?: { url?: string };
+    imageUrl?: string;
+  };
+  const cmsTeamMembers: CmsTeamMember[] = homepage?.teamMembers ?? [];
+  const tm = {
+    eyebrow: mergeStr(homepage?.teamEyebrow, FB.team.eyebrow),
+    headingLine1: mergeStr(homepage?.teamHeadingLine1, FB_TEAM_HEADING1),
+    headingLine2: mergeStr(homepage?.teamHeadingLine2, FB_TEAM_HEADING2),
+    sendMessage: mergeStr(homepage?.teamSendMessageLabel, FB.team.sendMessage),
+    ctaLabel: mergeStr(homepage?.teamCtaLabel, FB.team.ctaLabel),
+    members:
+      cmsTeamMembers.length > 0
+        ? cmsTeamMembers.map((m, i) => {
+            const fb = FB.team.members[i];
+            return {
+              name: m.name?.trim() || fb?.name || "",
+              role: mergeStr(m.role, fb?.role ?? { de: "", en: "", fr: "" }),
+              photo: m.imageAsset?.url || m.imageUrl || fb?.photo || "",
+              email: m.email?.trim() || fb?.email || "",
+              linkedin: m.linkedin?.trim() || fb?.linkedin || "",
+            };
+          })
+        : FB.team.members,
+  };
+
+  /* ── Contact ── */
+  const FB_CONTACT_HEADING1: LocaleStrings = { de: "Sprechen", en: "Let's", fr: "Parlons-en." };
+  const FB_CONTACT_HEADING2: LocaleStrings = { de: "wir.", en: "talk.", fr: "" };
+  const c = {
+    eyebrow: mergeStr(homepage?.contactEyebrow, FB.contact.eyebrow),
+    headingLine1: mergeStr(homepage?.contactHeadingLine1, FB_CONTACT_HEADING1),
+    headingLine2: mergeStr(homepage?.contactHeadingLine2, FB_CONTACT_HEADING2),
+    intro: mergeStr(homepage?.contactIntro, FB.contact.intro),
+    hours: mergeStr(homepage?.contactHours, FB.contact.hours),
+    formEyebrow: mergeStr(homepage?.contactFormEyebrow, FB.contact.formEyebrow),
+    submitLabel: mergeStr(homepage?.contactSubmitLabel, FB.contact.submitLabel),
+    responseHint: mergeStr(homepage?.contactResponseHint, FB.contact.responseHint),
+    privacyNotice: mergeStr(homepage?.contactPrivacyNotice, FB.contact.privacyNotice),
+    mapLink: mergeStr(homepage?.contactMapLink, FB.contact.mapLink),
+    thankYou: mergeStr(homepage?.contactThankYou, FB.contact.thankYou),
+    thankYouSub: mergeStr(homepage?.contactThankYouSub, FB.contact.thankYouSub),
+    fieldLabels: {
+      firstName: mergeStr(homepage?.contactFieldFirstName, FB.contact.fieldLabels.firstName),
+      lastName: mergeStr(homepage?.contactFieldLastName, FB.contact.fieldLabels.lastName),
+      email: mergeStr(homepage?.contactFieldEmail, FB.contact.fieldLabels.email),
+      phone: mergeStr(homepage?.contactFieldPhone, FB.contact.fieldLabels.phone),
+      message: mergeStr(homepage?.contactFieldMessage, FB.contact.fieldLabels.message),
+    },
+    phone: (homepage?.contactPhone as string | undefined)?.trim() || FB.contact.phone,
+    emailAddr: (homepage?.contactEmailAddr as string | undefined)?.trim() || FB.contact.emailAddr,
+    companyName: (homepage?.contactCompanyName as string | undefined)?.trim() || FB.contact.companyName,
+    companySubtitle:
+      (homepage?.contactCompanySubtitle as string | undefined)?.trim() || FB.contact.companySubtitle,
+    addressLine: mergeStr(homepage?.contactAddressLine, FB.contact.addressLine),
+  };
 
   /* ═══════════════════════════════════════════════════════════
      VERTICAL MODE (Tablet + Mobile)
@@ -156,6 +285,7 @@ function AppInner() {
             onNavigate={() => {}}
             introComplete={introComplete}
             isVertical
+            homepage={homepage}
           />
         </div>
 
@@ -213,7 +343,7 @@ function AppInner() {
                 transition: "opacity 600ms ease-out 700ms",
               }}
             >
-              Tellian Capital Solutions
+              {h.eyebrow[lang]}
             </span>
 
             {/* Accent line */}
@@ -323,7 +453,7 @@ function AppInner() {
                   lineHeight: 1,
                 }}
               >
-                <span>{t.ctaLabel[lang]}</span>
+                <span>{tm.ctaLabel[lang]}</span>
                 <span aria-hidden>→</span>
               </a>
             </div>
@@ -365,11 +495,9 @@ function AppInner() {
                   marginTop: SPACING.accentToHeadline,
                 }}
               >
-                Was wir
+                {s.headingLine1[lang]}
                 <br />
-                <em style={{ fontStyle: "italic", fontWeight: 400 }}>
-                  {lang === "fr" ? "faisons." : lang === "en" ? "do." : "tun."}
-                </em>
+                <em style={{ fontStyle: "italic", fontWeight: 400 }}>{s.headingLine2[lang]}</em>
               </h2>
             </FadeIn>
 
@@ -471,7 +599,7 @@ function AppInner() {
                   display: "block",
                 }}
               >
-                {t.eyebrow[lang]}
+                {tm.eyebrow[lang]}
               </span>
               <div style={{ width: 28, height: 1.5, backgroundColor: C.dark, marginTop: SPACING.eyebrowToAccent }} />
             </FadeIn>
@@ -488,9 +616,9 @@ function AppInner() {
                   marginTop: SPACING.accentToHeadline,
                 }}
               >
-                {t.headline[lang].replace(/\.$/, "").split(" ").slice(0, -1).join(" ")}{" "}
+                {tm.headingLine1[lang]}{" "}
                 <br />
-                <em style={{ fontStyle: "italic", fontWeight: 400 }}>{t.headline[lang].split(" ").pop()}</em>
+                <em style={{ fontStyle: "italic", fontWeight: 400 }}>{tm.headingLine2[lang]}</em>
               </h2>
             </FadeIn>
           </div>
@@ -504,7 +632,7 @@ function AppInner() {
               padding: isMobile ? "32px 20px" : "40px clamp(32px, 6vw, 80px)",
             }}
           >
-            {t.members.map((m, i) => (
+            {tm.members.map((m, i) => (
               <FadeIn key={i} yOffset={16} delay={i * 120}>
                 <div style={{ maxWidth: isMobile ? "100%" : 320 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -607,7 +735,7 @@ function AppInner() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span>{t.sendMessage[lang]}</span>
+                      <span>{tm.sendMessage[lang]}</span>
                     </a>
                   </div>
                 </div>
@@ -635,7 +763,7 @@ function AppInner() {
                   lineHeight: 1,
                 }}
               >
-                <span>{t.ctaLabel[lang]}</span>
+                <span>{tm.ctaLabel[lang]}</span>
                 <span aria-hidden>→</span>
               </a>
             </FadeIn>
@@ -675,6 +803,7 @@ function AppInner() {
           scrollDirection={scrollDirection}
           onNavigate={scrollTo}
           introComplete={introComplete}
+          homepage={homepage}
         />
         {introComplete && <DotNavigation scrollProgress={scrollProgress} onNavigate={scrollTo} />}
       </div>
@@ -713,7 +842,7 @@ function AppInner() {
                 transition: "opacity 600ms ease-out 200ms",
               }}
             >
-              Tellian Capital Solutions
+              {h.eyebrow[lang]}
             </span>
 
             {/* Headline */}
@@ -936,11 +1065,9 @@ function AppInner() {
                   marginTop: SPACING.accentToHeadline,
                 }}
               >
-                Was wir
+                {s.headingLine1[lang]}
                 <br />
-                <em style={{ fontStyle: "italic", fontWeight: 400 }}>
-                  {lang === "fr" ? "faisons." : lang === "en" ? "do." : "tun."}
-                </em>
+                <em style={{ fontStyle: "italic", fontWeight: 400 }}>{s.headingLine2[lang]}</em>
               </h2>
             </FadeIn>
 
@@ -988,7 +1115,7 @@ function AppInner() {
                   display: "block",
                 }}
               >
-                {t.eyebrow[lang]}
+                {tm.eyebrow[lang]}
               </span>
               <div style={{ width: 28, height: 1.5, backgroundColor: C.dark, marginTop: SPACING.eyebrowToAccent }} />
             </FadeIn>
@@ -1005,9 +1132,9 @@ function AppInner() {
                   marginTop: SPACING.accentToHeadline,
                 }}
               >
-                {t.headline[lang].replace(/\.$/, "").split(" ").slice(0, -1).join(" ")}{" "}
+                {tm.headingLine1[lang]}{" "}
                 <br />
-                <em style={{ fontStyle: "italic", fontWeight: 400 }}>{t.headline[lang].split(" ").pop()}</em>
+                <em style={{ fontStyle: "italic", fontWeight: 400 }}>{tm.headingLine2[lang]}</em>
               </h2>
             </FadeIn>
 
@@ -1043,7 +1170,7 @@ function AppInner() {
                   e.currentTarget.style.backgroundColor = C.button;
                 }}
               >
-                <span>{t.ctaLabel[lang]}</span>
+                <span>{tm.ctaLabel[lang]}</span>
                 <span aria-hidden>→</span>
               </a>
             </FadeIn>
@@ -1064,7 +1191,7 @@ function AppInner() {
               paddingRight: "clamp(24px, 3vw, 48px)",
             }}
           >
-            {t.members.map((m, i) => (
+            {tm.members.map((m, i) => (
               <FadeIn key={i} yOffset={16} delay={i * 120}>
                 <div style={{ width: "21vw", maxWidth: 285 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1179,7 +1306,7 @@ function AppInner() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span>{t.sendMessage[lang]}</span>
+                      <span>{tm.sendMessage[lang]}</span>
                     </a>
                   </div>
                 </div>
@@ -1210,6 +1337,33 @@ function AppInner() {
    CONTACT SECTION — exact mirror of Section6Kontakt.
    Supports both desktop (horizontal) and vertical (mobile) modes.
    ═══════════════════════════════════════════════════════════ */
+interface ContactContent {
+  eyebrow: LocaleStrings;
+  headingLine1: LocaleStrings;
+  headingLine2: LocaleStrings;
+  intro: LocaleStrings;
+  hours: LocaleStrings;
+  formEyebrow: LocaleStrings;
+  submitLabel: LocaleStrings;
+  responseHint: LocaleStrings;
+  privacyNotice: LocaleStrings;
+  mapLink: LocaleStrings;
+  thankYou: LocaleStrings;
+  thankYouSub: LocaleStrings;
+  fieldLabels: {
+    firstName: LocaleStrings;
+    lastName: LocaleStrings;
+    email: LocaleStrings;
+    phone: LocaleStrings;
+    message: LocaleStrings;
+  };
+  phone: string;
+  emailAddr: string;
+  companyName: string;
+  companySubtitle: string;
+  addressLine: LocaleStrings;
+}
+
 function ContactSection({
   lang,
   c,
@@ -1217,7 +1371,7 @@ function ContactSection({
   isMobile = false,
 }: {
   lang: Locale;
-  c: typeof CONTENT.contact;
+  c: ContactContent;
   isVertical?: boolean;
   isMobile?: boolean;
 }) {
@@ -1424,7 +1578,7 @@ function ContactSection({
                 fontWeight: 400,
               }}
             >
-              Sprechen <em style={{ fontStyle: "italic", fontWeight: 400 }}>wir.</em>
+              {c.headingLine1[lang]} <em style={{ fontStyle: "italic", fontWeight: 400 }}>{c.headingLine2[lang]}</em>
             </h2>
           </FadeIn>
 
@@ -1627,7 +1781,7 @@ function ContactSection({
                 fontWeight: 400,
               }}
             >
-              Sprechen <em style={{ fontStyle: "italic", fontWeight: 400 }}>wir.</em>
+              {c.headingLine1[lang]} <em style={{ fontStyle: "italic", fontWeight: 400 }}>{c.headingLine2[lang]}</em>
             </h2>
           </FadeIn>
 
@@ -1786,10 +1940,10 @@ function ContactSection({
   );
 }
 
-export default function Home() {
+export default function Home({ homepage }: { homepage?: any }) {
   return (
     <LanguageProvider>
-      <AppInner />
+      <AppInner homepage={homepage} />
     </LanguageProvider>
   );
 }

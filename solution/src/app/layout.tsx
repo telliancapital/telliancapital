@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { VisualEditing } from "next-sanity/visual-editing";
+import { draftMode } from "next/headers";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -33,10 +35,16 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.svg" },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { isEnabled } = await draftMode();
+  const showVisualEditing = isEnabled || process.env.NODE_ENV === "development";
+
   return (
     <html lang="de" className={`${cormorant.variable} ${inter.variable} ${lustria.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        {showVisualEditing && <VisualEditing />}
+      </body>
     </html>
   );
 }

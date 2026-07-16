@@ -3,6 +3,7 @@ import { C, serif, sans } from "../tokens";
 import { EASE } from "../styles/motion";
 import { useLanguage } from "../context/LanguageContext";
 import type { Locale } from "../content";
+import type { LocaleValue } from "../i18n/types";
 
 /* Logo: Solutions-specific SVG pending — placeholder. Single-line swap later. */
 import logoHorizontal from "../assets/logo/Tellian__Imperial purple logo.svg";
@@ -11,11 +12,36 @@ const BAR_W = 48;
 const PANEL_W = 300;
 const LOCALES: Locale[] = ["de", "en", "fr"];
 
-const NAV_ITEMS = [
-  { num: "01", label: "Start", sub: "Einführung", target: 0.0 },
-  { num: "02", label: "Dienstleistungen", sub: "Was wir tun", target: 0.333 },
-  { num: "03", label: "Team", sub: "Wer dahinter steht", target: 0.667 },
-  { num: "04", label: "Kontakt", sub: "Gespräch vereinbaren", target: 1.0 },
+const NAV_ITEMS: {
+  num: string;
+  target: number;
+  label: Record<Locale, string>;
+  sub: Record<Locale, string>;
+}[] = [
+  {
+    num: "01",
+    target: 0.0,
+    label: { de: "Start", en: "Start", fr: "Début" },
+    sub: { de: "Einführung", en: "Introduction", fr: "Introduction" },
+  },
+  {
+    num: "02",
+    target: 0.333,
+    label: { de: "Dienstleistungen", en: "Services", fr: "Services" },
+    sub: { de: "Was wir tun", en: "What we do", fr: "Ce que nous faisons" },
+  },
+  {
+    num: "03",
+    target: 0.667,
+    label: { de: "Team", en: "Team", fr: "Équipe" },
+    sub: { de: "Wer dahinter steht", en: "Who's behind it", fr: "Qui est derrière" },
+  },
+  {
+    num: "04",
+    target: 1.0,
+    label: { de: "Kontakt", en: "Contact", fr: "Contact" },
+    sub: { de: "Gespräch vereinbaren", en: "Schedule a meeting", fr: "Prendre rendez-vous" },
+  },
 ];
 
 function getActiveIndex(progress: number): number {
@@ -56,6 +82,7 @@ interface NavigationProps {
   onNavigate: (target: number) => void;
   introComplete: boolean;
   isVertical?: boolean;
+  homepage?: any;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -69,13 +96,26 @@ export function Navigation({
   onNavigate,
   introComplete,
   isVertical = false,
+  homepage,
 }: NavigationProps) {
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(true);
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [linkHover, setLinkHover] = useState(false);
   const activeIndex = getActiveIndex(scrollProgress);
   const hideTimer = useRef<number>(0);
+
+  /* ── Nav item labels: CMS override merged with the bundled fallback ── */
+  const cmsNavItems: { label?: LocaleValue; sub?: LocaleValue }[] = homepage?.navItems ?? [];
+  const navItems = NAV_ITEMS.map((fb, i) => {
+    const cms = cmsNavItems[i];
+    return {
+      num: fb.num,
+      target: fb.target,
+      label: t(cms?.label, fb.label[lang]),
+      sub: t(cms?.sub, fb.sub[lang]),
+    };
+  });
 
   /* Show/hide bar based on scroll direction (desktop only) */
   useEffect(() => {
@@ -99,7 +139,7 @@ export function Navigation({
   }, [scrollDirection, expanded, isVertical]);
 
   const handleNavigate = (index: number) => {
-    onNavigate(NAV_ITEMS[index].target);
+    onNavigate(navItems[index].target);
     setExpanded(false);
   };
 
@@ -399,7 +439,7 @@ export function Navigation({
         {/* Nav items */}
         <nav style={{ flex: 1, overflowY: "auto", padding: "32px 32px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-            {NAV_ITEMS.map((item, i) => {
+            {navItems.map((item, i) => {
               const isActive = activeIndex === i;
               return (
                 <button
