@@ -25,4 +25,6 @@ export const DURATION = {
   medium: 400,
   slow: 600,
   cinematic: 800,
+  valueCycle: 3000, // LeistungsethikStage auto-cycle interval
+  valueCyclePause: 6000, // Resume delay after interaction
 } as const;

@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { C, serif } from "@/tokens";
 
 /* ═══════════════════════════════════════════════════════════
    Single step ordinal number, shared between Section3Timeline
@@ -27,13 +28,11 @@ interface AnlageprozessStepOrdinalProps {
 
 export function AnlageprozessStepOrdinal({
   num,
-  color = "#1A1916",
+  color = C.dark,
   opacity = 0.2,
   enableFlip = true,
   layoutDelay = 0,
 }: AnlageprozessStepOrdinalProps) {
-  const serif = "'Cormorant Garamond', serif";
-
   const baseStyle: React.CSSProperties = {
     fontFamily: serif,
     fontSize: `${ORDINAL_FONT_SIZE}px`,

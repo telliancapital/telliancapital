@@ -537,6 +537,7 @@ function ContactForm({ stack = false, labels }: { stack?: boolean; labels: Conta
       <button
         type="submit"
         disabled={loading}
+        className="hover:bg-tellian-button-hover active:scale-[0.98]"
         style={{
           fontFamily: sans,
           fontSize: "11px",
@@ -626,7 +627,9 @@ function LegalLinksRow({
         rowGap: "6px",
       }}
     >
-      {LEGAL_PATHS.map((path, i) => (
+      {/* "/impressum" temporarily hidden from the footer — see LegalPage.tsx
+         (TEMP_DISABLED_LEGAL_PATHS) for the matching direct-URL block. */}
+      {LEGAL_PATHS.filter((path) => path !== "/impressum").map((path, i) => (
         <span key={path} style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
           {i > 0 && (
             <span
@@ -667,6 +670,41 @@ function LegalLinksRow({
           </a>
         </span>
       ))}
+
+      <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+        <span
+          aria-hidden
+          style={{
+            fontFamily: sans,
+            fontSize: "10px",
+            color: C.muted,
+            lineHeight: 1,
+          }}
+        >
+          ·
+        </span>
+        <a
+          href="https://solutions.telliancapital.ch"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            fontFamily: sans,
+            fontSize: "10px",
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: C.stone,
+            textDecoration: "none",
+            transition: "color 300ms cubic-bezier(0.16, 1, 0.3, 1)",
+            outline: "none",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = C.dark)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = C.stone)}
+          onFocus={(e) => (e.currentTarget.style.color = C.dark)}
+          onBlur={(e) => (e.currentTarget.style.color = C.stone)}
+        >
+          Tellian Capital Solutions
+        </a>
+      </span>
     </div>
   );
 }
@@ -752,7 +790,9 @@ function LegalLinksStackedMobile({
         flexDirection: "column",
       }}
     >
-      {LEGAL_PATHS.map((path) => (
+      {/* "/impressum" temporarily hidden from the footer — see LegalPage.tsx
+         (TEMP_DISABLED_LEGAL_PATHS) for the matching direct-URL block. */}
+      {LEGAL_PATHS.filter((path) => path !== "/impressum").map((path) => (
         <LegalLinkMobileRow
           key={path}
           path={path}
@@ -760,7 +800,59 @@ function LegalLinksStackedMobile({
           onOpenLegal={onOpenLegal}
         />
       ))}
+      <SolutionsLinkMobileRow />
     </div>
+  );
+}
+
+/* ─── Mobile-only: external "Tellian Capital Solutions" link, same row style ─── */
+function SolutionsLinkMobileRow() {
+  const [hover, setHover] = useState(false);
+  const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+  return (
+    <a
+      href="https://solutions.telliancapital.ch"
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: "10px 0",
+        minHeight: "36px",
+        textDecoration: "none",
+        outline: "none",
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          display: "inline-block",
+          width: hover ? "22px" : "14px",
+          height: "0.5px",
+          backgroundColor: hover ? C.charcoal : C.muted,
+          transition: `width 300ms ${EASE}, background-color 300ms ${EASE}`,
+          flexShrink: 0,
+        }}
+      />
+      <span
+        style={{
+          fontFamily: sans,
+          fontSize: "10px",
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+          color: hover ? C.dark : C.stone,
+          transition: `color 300ms ${EASE}`,
+          lineHeight: 1,
+        }}
+      >
+        Tellian Capital Solutions
+      </span>
+    </a>
   );
 }
 

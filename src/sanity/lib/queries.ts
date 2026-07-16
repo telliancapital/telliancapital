@@ -28,6 +28,8 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   philosophyImageAlt,
   philosophyQuote,
   philosophyParagraphs,
+  philosophyValuesLabel,
+  philosophyValues[]{ name, readout },
 
   // 03 — Method
   methodEyebrow,
@@ -42,6 +44,16 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   methodTimelineSteps[]{ title, description },
   methodTimelineDividerLabel,
   methodTimelineFooterLabel,
+  methodPartiesCaption,
+  methodPartyKundeLabel,
+  methodPartyKundeProsa,
+  methodPartyTellianLabel,
+  methodPartyTellianProsa,
+  methodPartyBankenLabel,
+  methodPartyBankenProsa,
+  methodEdgeLabelAuftrag,
+  methodEdgeLabelDepot,
+  methodEdgeLabelVollmacht,
   methodDetailSteps[]{
     shortLabel,
     eyebrow,
@@ -65,6 +77,12 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   strategyHeadingLine2,
   strategyParagraphs,
   strategyCtaLabel,
+  strategyFlowchartTier1,
+  strategyFlowchartConnectorLabel,
+  strategyFlowchartTier2,
+  strategyFlowchartTier3,
+  strategyFlowchartTier4,
+  strategyFlowchartTier5,
   strategyDetailEyebrow,
   strategyDetailHeadingLine1,
   strategyDetailHeadingLine2,
@@ -104,6 +122,8 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   teamMembers[]{
     name,
     role,
+    email,
+    linkedin,
     bio,
     "imageAsset": image.asset->{ url },
     imageUrl
@@ -155,7 +175,37 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   navItems[]{ label, sub },
   navLoginButtonLabel,
   navKundenportalLabel,
-  navKundenportalCaption
+  navKundenportalCaption,
+
+  // 10 — Portfolio Management
+  pmDetailEyebrow,
+  pmDetailHeadingLine1,
+  pmDetailHeadingLine2,
+  pmIntroParagraphs,
+  pmProcessEyebrow,
+  pmProcessHeadingLine1,
+  pmProcessHeadingLine2,
+  pmProcessClosing,
+  pmProcessStages[]{ name, bullets },
+  pmCommitteeEyebrow,
+  pmCommitteeHeadingLine1,
+  pmCommitteeHeadingLine2,
+  pmCommitteeParagraphs,
+  pmStrategiesEyebrow,
+  pmStrategiesHeadingLine1,
+  pmStrategiesHeadingLine2,
+  pmStrategiesSubline,
+  pmStrategies[]{ name, tag, goal, volatility, allocation, allocationLegend, focus },
+  pmUniverseEyebrow,
+  pmUniverseHeadingLine1,
+  pmUniverseHeadingLine2,
+  pmUniverseParagraphs,
+  pmCtaEyebrow,
+  pmCtaHeadingLine1,
+  pmCtaHeadingLine2,
+  pmCtaDescription,
+  pmCtaButtonLabel,
+  pmFooterTagline
 }`);
 
 /**
@@ -270,4 +320,63 @@ export const CONTACT_QUERY = defineQuery(`*[_type == "homepage"][0]{
   contactEmail,
   contactMapLinkLabel,
   contactFooterTagline
+}`);
+
+/**
+ * Solutions site homepage — separate Next.js app (Tellian Capital Solutions,
+ * solutions.telliancapital.ch). Three languages (DE/EN/FR), hence the
+ * `triLocaleString`/`triLocaleText` fields resolving to `{ de, en, fr }`.
+ */
+export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepage"][0]{
+  navItems[]{ label, sub },
+
+  heroEyebrow,
+  heroTaglineLine1,
+  heroTaglineLine2,
+  heroTaglineLine3,
+  heroLeadSentence,
+  heroClosingLine,
+
+  servicesEyebrow,
+  servicesHeadingLine1,
+  servicesHeadingLine2,
+  servicesIntro,
+  servicesColumns[]{ title, body },
+
+  teamEyebrow,
+  teamHeadingLine1,
+  teamHeadingLine2,
+  teamSendMessageLabel,
+  teamCtaLabel,
+  teamMembers[]{
+    name,
+    role,
+    email,
+    linkedin,
+    "imageAsset": image.asset->{ url },
+    imageUrl
+  },
+
+  contactEyebrow,
+  contactHeadingLine1,
+  contactHeadingLine2,
+  contactIntro,
+  contactHours,
+  contactFormEyebrow,
+  contactFieldFirstName,
+  contactFieldLastName,
+  contactFieldEmail,
+  contactFieldPhone,
+  contactFieldMessage,
+  contactSubmitLabel,
+  contactResponseHint,
+  contactPrivacyNotice,
+  contactMapLink,
+  contactThankYou,
+  contactThankYouSub,
+  contactPhone,
+  contactEmailAddr,
+  contactCompanyName,
+  contactCompanySubtitle,
+  contactAddressLine
 }`);

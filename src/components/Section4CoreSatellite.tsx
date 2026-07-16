@@ -1,10 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-
-/* ─── Tokens ─── */
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
+import { C, serif, sans } from "@/tokens";
 
 /* ─── Satellite word definitions ─── */
 interface Satellite {
@@ -25,40 +22,40 @@ const SATELLITES: Satellite[] = [
     word: "Aktien",
     subtitle: "EQUITY",
     size: 38,
-    color: "#989071",
+    color: C.warm,
     style: { top: "52px", left: "14px" },
   },
   {
     word: "Anleihen",
     subtitle: "FIXED INCOME",
     size: 32,
-    color: "#989071",
+    color: C.warm,
     style: { top: "38px", right: "16px" },
   },
   {
     word: "Taktisch",
     subtitle: "KURZFRISTIG",
     size: 28,
-    color: "#989071",
+    color: C.warm,
     style: { bottom: "120px", right: "18px" },
   },
   {
     word: "Alternativ",
     subtitle: "ALTERNATIVES",
     size: 24,
-    color: "#B0ACA5",
+    color: C.muted,
     style: { bottom: "34px", right: "12px" },
   },
   {
     word: "Hedging",
     size: 20,
-    color: "#B0ACA5",
+    color: C.muted,
     style: { bottom: "56px", left: "244px" },
   },
   {
     word: "Liquidität",
     size: 19,
-    color: "#D8D5CF",
+    color: C.line,
     style: { bottom: "12px", left: "12px" },
   },
 ];
@@ -117,7 +114,7 @@ export function Section4CoreSatellite({ scrollX }: Props) {
             width: "320px",
             height: "320px",
             borderRadius: "50%",
-            backgroundColor: "#1A1916",
+            backgroundColor: C.dark,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -130,7 +127,7 @@ export function Section4CoreSatellite({ scrollX }: Props) {
             style={{
               fontFamily: serif,
               fontSize: "52px",
-              color: "#F9F9F7",
+              color: C.bg,
               lineHeight: 1,
               display: "block",
             }}
@@ -143,7 +140,7 @@ export function Section4CoreSatellite({ scrollX }: Props) {
             style={{
               fontFamily: sans,
               fontSize: "12px",
-              color: "#8A857C",
+              color: C.stone,
               letterSpacing: "0.15em",
               textTransform: "uppercase",
               display: "block",
@@ -158,7 +155,7 @@ export function Section4CoreSatellite({ scrollX }: Props) {
             style={{
               fontFamily: sans,
               fontSize: "13px",
-              color: "#6B665E",
+              color: C.accent,
               display: "block",
               marginTop: "6px",
             }}
@@ -197,7 +194,7 @@ export function Section4CoreSatellite({ scrollX }: Props) {
                 style={{
                   fontFamily: sans,
                   fontSize: "9px",
-                  color: "#D8D5CF",
+                  color: C.line,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   display: "block",
