@@ -15,6 +15,7 @@ import { DotNavigation } from "./components/DotNavigation";
 import { PreloadScreen } from "./components/PreloadScreen";
 import { CONTENT, type Locale } from "./content";
 import type { LocaleValue } from "./i18n/types";
+import { mainSiteUrl } from "./sanity/env";
 import heroImg from "./assets/zh-3.jpg";
 
 /* ═══════════════════════════════════════════════════════════
@@ -1475,7 +1476,7 @@ function ContactSection({
                 .replace("politique de confidentialité", "")
                 .trim()}{" "}
               <a
-                href="https://telliancapital.ch/datenschutz"
+                href={`${mainSiteUrl}/datenschutz`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "inherit", textDecoration: "none" }}
@@ -1708,7 +1709,7 @@ function ContactSection({
           <div style={{ width: "100%", height: 1, backgroundColor: C.dark, opacity: 0.25, marginBottom: 24 }} />
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
             <a
-              href="https://telliancapital.ch/datenschutz"
+              href={`${mainSiteUrl}/datenschutz`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ fontFamily: sans, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: C.stone, textDecoration: "none", opacity: 0.7 }}
@@ -1716,7 +1717,7 @@ function ContactSection({
               Datenschutz
             </a>
             <a
-              href="https://telliancapital.ch/kundeninformation"
+              href={`${mainSiteUrl}/kundeninformation`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ fontFamily: sans, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: C.stone, textDecoration: "none", opacity: 0.7 }}
@@ -1896,7 +1897,7 @@ function ContactSection({
           <div style={{ width: "100%", height: 1, backgroundColor: C.dark, opacity: 0.25, marginBottom: 24 }} />
           <div style={{ display: "flex", gap: 16 }}>
             <a
-              href="https://telliancapital.ch/datenschutz"
+              href={`${mainSiteUrl}/datenschutz`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ fontFamily: sans, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: C.stone, textDecoration: "none", opacity: 0.7 }}
@@ -1904,7 +1905,7 @@ function ContactSection({
               Datenschutz
             </a>
             <a
-              href="https://telliancapital.ch/kundeninformation"
+              href={`${mainSiteUrl}/kundeninformation`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ fontFamily: sans, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: C.stone, textDecoration: "none", opacity: 0.7 }}

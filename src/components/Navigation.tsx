@@ -6,6 +6,7 @@ import React from "react";
 import type { Breakpoint } from "./useBreakpoint";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
+import { solutionsSiteUrl } from "@/sanity/env";
 import { C, serif, sans } from "@/tokens";
 import { EASE } from "@/styles/motion";
 import logoHorizontal from "@/assets/logo/Tellian__Imperial purple logo.svg";
@@ -534,7 +535,7 @@ export function Navigation({
 
                 {/* SEKUNDÄR: Solutions text link */}
                 <a
-                  href="https://solutions.telliancapital.ch"
+                  href={solutionsSiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -1051,7 +1052,7 @@ export function Navigation({
 
                 {/* SEKUNDÄR: Solutions — quiet text link with arrow */}
                 <a
-                  href="https://solutions.telliancapital.ch"
+                  href={solutionsSiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
