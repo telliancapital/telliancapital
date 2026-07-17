@@ -4,6 +4,7 @@ import { EASE } from "../styles/motion";
 import { useLanguage } from "../context/LanguageContext";
 import type { Locale } from "../content";
 import type { LocaleValue } from "../i18n/types";
+import { mainSiteUrl } from "../sanity/env";
 
 /* Logo: Solutions-specific SVG pending — placeholder. Single-line swap later. */
 import logoHorizontal from "../assets/logo/Tellian__Imperial purple logo.svg";
@@ -325,7 +326,7 @@ export function Navigation({
 
             {/* Link to main site */}
             <a
-              href="https://telliancapital.ch"
+              href={mainSiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               onMouseEnter={() => setLinkHover(true)}
@@ -514,7 +515,7 @@ export function Navigation({
         <div style={{ padding: "24px 32px", borderTop: "1px solid #ddd", display: "flex", flexDirection: "column" }}>
           {/* SECONDARY: Main-site text link with arrow — pixel-identical to the main site's Solutions link */}
           <a
-            href="https://telliancapital.ch"
+            href={mainSiteUrl}
             target="_blank"
             rel="noopener noreferrer"
             style={{
