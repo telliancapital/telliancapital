@@ -23,6 +23,14 @@ export const previewSecret = process.env.SANITY_STUDIO_PREVIEW_SECRET;
 export const solutionsSiteUrl =
   process.env.NEXT_PUBLIC_SOLUTIONS_URL || "https://solution-telliancapital.vercel.app";
 
+/**
+ * URL of the Tellian Capital client portal login page — used by the
+ * "Login" button in Navigation.tsx. Override with NEXT_PUBLIC_LOGIN_URL
+ * in .env.local if the portal deployment changes.
+ */
+export const loginUrl =
+  process.env.NEXT_PUBLIC_LOGIN_URL || "https://telliancapitalportal.9a8da0f.deploio.app/login";
+
 function assertValue<T>(v: T | undefined, errorMessage: string): T {
   if (v === undefined) {
     throw new Error(errorMessage);
