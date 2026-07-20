@@ -25,6 +25,7 @@ import { DotNavigation } from "@/components/DotNavigation";
 import { CtaButton } from "@/components/CtaButton";
 import { Section5UeberTellian } from "@/components/Section5UeberTellian";
 import { Section6Kontakt } from "@/components/Section6Kontakt";
+import { loginUrl } from "@/sanity/env";
 import { HeroVertical } from "@/components/HeroVertical";
 import { ExpandableBody } from "@/components/ExpandableBody";
 import { Section2Anlagephilosophie } from "@/components/Section2Anlagephilosophie";
@@ -1480,7 +1481,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
 
   const router = useRouter();
   const handleLogin = () => {
-    router.push("https://tellian-capital-portal.vercel.app/login");
+    router.push(loginUrl);
   };
 
   const vvw = useSubpageMode("/vermoegensverwaltung");

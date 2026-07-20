@@ -14,12 +14,19 @@ export const readToken = process.env.SANITY_API_READ_TOKEN;
 export const previewSecret = process.env.SANITY_STUDIO_PREVIEW_SECRET;
 
 /**
+ * Base URL of the main Tellian Capital site. Used both for the public links
+ * scattered across the UI (footer "Tellian Capital" link, Datenschutz /
+ * Kundeninformation links) and to build the Studio URL below. Defaults to
+ * the real production domain; override with NEXT_PUBLIC_MAIN_SITE_URL in
+ * .env.local (e.g. "http://localhost:3000") when running both apps locally.
+ */
+export const mainSiteUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL || "https://telliancapital.ch";
+
+/**
  * The main Tellian Capital site's Studio lives in the other project — this
  * app has no Studio of its own, so stega click-to-edit links point there.
  */
-export const mainSiteStudioUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL
-  ? `${process.env.NEXT_PUBLIC_MAIN_SITE_URL}/studio`
-  : "http://localhost:3000/studio";
+export const mainSiteStudioUrl = `${mainSiteUrl}/studio`;
 
 function assertValue<T>(v: T | undefined, errorMessage: string): T {
   if (v === undefined) {

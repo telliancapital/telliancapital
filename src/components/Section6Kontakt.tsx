@@ -9,6 +9,7 @@ import type { Breakpoint } from "./useBreakpoint";
 import { FloatingField } from "./FloatingField";
 import { LEGAL_PATHS, LEGAL_LINK_LABELS, type LegalPath } from "../data/legalPages";
 import { CONTACT_QUERY } from "@/sanity/lib/queries";
+import { solutionsSiteUrl } from "@/sanity/env";
 import { useLiveQuery } from "@sanity/preview-kit";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -684,7 +685,7 @@ function LegalLinksRow({
           ·
         </span>
         <a
-          href="https://solutions.telliancapital.ch"
+          href={solutionsSiteUrl}
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -811,7 +812,7 @@ function SolutionsLinkMobileRow() {
   const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
   return (
     <a
-      href="https://solutions.telliancapital.ch"
+      href={solutionsSiteUrl}
       target="_blank"
       rel="noopener noreferrer"
       onMouseEnter={() => setHover(true)}
