@@ -5,22 +5,23 @@ import { createPortal } from "react-dom";
 
 import { C, serif, sans } from "@/tokens";
 import { EASE } from "@/styles/motion";
+import { portalKundeUrl, portalPartnerUrl, portalMitarbeiterUrl } from "@/sanity/env";
 
 const PORTALS = [
   {
     label: "Kunde",
     subtitle: "Portfolio, Reporting, Dokumente",
-    href: "https://kunde.telliancapital.ch",
+    href: portalKundeUrl,
   },
   {
     label: "Partner",
     subtitle: "Beraterbereich und Referral",
-    href: "https://partner.telliancapital.ch",
+    href: portalPartnerUrl,
   },
   {
     label: "Mitarbeiter",
     subtitle: "Internes Backoffice",
-    href: "https://intern.telliancapital.ch",
+    href: portalMitarbeiterUrl,
   },
 ] as const;
 
