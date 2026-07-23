@@ -31,6 +31,18 @@ export const solutionsSiteUrl =
 export const loginUrl =
   process.env.NEXT_PUBLIC_LOGIN_URL || "https://telliancapitalportal.9a8da0f.deploio.app/login";
 
+/**
+ * Portal links shown in the LoginOverlay popup (Kundenportal button) —
+ * override with NEXT_PUBLIC_PORTAL_KUNDE_URL / _PARTNER_URL / _MITARBEITER_URL
+ * in .env.local if any of the portal deployments change.
+ */
+export const portalKundeUrl =
+  process.env.NEXT_PUBLIC_PORTAL_KUNDE_URL;
+export const portalPartnerUrl =
+  process.env.NEXT_PUBLIC_PORTAL_PARTNER_URL;
+export const portalMitarbeiterUrl =
+  process.env.NEXT_PUBLIC_PORTAL_MITARBEITER_URL;
+
 function assertValue<T>(v: T | undefined, errorMessage: string): T {
   if (v === undefined) {
     throw new Error(errorMessage);

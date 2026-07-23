@@ -12,6 +12,7 @@ import { ANLAGEPROZESS_STEPS } from "@/data/anlageprozessSteps";
 import { AnlageprozessStepOrdinal, ORDINAL_FONT_SIZE } from "@/components/AnlageprozessStepOrdinal";
 import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
 import { Navigation } from "@/components/Navigation";
+import { LoginOverlay } from "@/components/LoginOverlay";
 import { LegalPage, useLegalRoute } from "@/components/LegalPage";
 import { useHorizontalScroll } from "@/components/useHorizontalScroll";
 import { useBreakpoint } from "@/components/useBreakpoint";
@@ -1484,6 +1485,11 @@ export default function HomeClient({ homepage }: { homepage: any }) {
     router.push(loginUrl);
   };
 
+  const [loginOpen, setLoginOpen] = useState(false);
+  const handleKundenportalClick = () => {
+    setLoginOpen(true);
+  };
+
   const vvw = useSubpageMode("/vermoegensverwaltung");
   const ast = useSubpageMode("/anlagestrategien");
   const pm = useSubpageMode("/portfolio-management");
@@ -1528,6 +1534,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
         <Navigation
           isVertical={true}
           onLoginClick={handleLogin}
+          onKundenportalClick={handleKundenportalClick}
           scrollProgress={0}
           scrollDirection="idle"
           onNavigate={() => {}}
@@ -1610,6 +1617,12 @@ export default function HomeClient({ homepage }: { homepage: any }) {
         >
           <PortfolioManagementDetail isMobile={true} onContactClick={navigateToContact} homepage={homepage} />
         </SubpageOverlay>
+
+        <LoginOverlay
+          open={loginOpen}
+          onClose={() => setLoginOpen(false)}
+          onSupportClick={navigateToContact}
+        />
       </div>
     );
   }
@@ -1619,6 +1632,7 @@ export default function HomeClient({ homepage }: { homepage: any }) {
       <Navigation
         isVertical={false}
         onLoginClick={handleLogin}
+        onKundenportalClick={handleKundenportalClick}
         scrollProgress={scrollProgress}
         scrollDirection={scrollDirection}
         onNavigate={scrollTo}
@@ -1836,6 +1850,12 @@ export default function HomeClient({ homepage }: { homepage: any }) {
       >
         <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} homepage={homepage} />
       </SubpageOverlay>
+
+      <LoginOverlay
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSupportClick={navigateToContact}
+      />
     </div>
   );
 }
