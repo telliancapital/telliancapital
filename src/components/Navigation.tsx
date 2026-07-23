@@ -118,6 +118,7 @@ interface NavigationProps {
   breakpoint: Breakpoint;
   isVertical: boolean;
   onLoginClick: () => void;
+  onKundenportalClick: () => void;
   homepage?: any;
 }
 
@@ -134,6 +135,7 @@ export function Navigation({
   breakpoint,
   isVertical,
   onLoginClick,
+  onKundenportalClick,
   homepage,
 }: NavigationProps) {
   const [expanded, setExpanded] = useState(false);
@@ -498,7 +500,7 @@ export function Navigation({
                   onClick={(e) => {
                     (e.currentTarget as HTMLElement).focus();
                     setExpanded(false);
-                    onLoginClick();
+                    onKundenportalClick();
                   }}
                   aria-haspopup="dialog"
                   style={{
@@ -763,7 +765,6 @@ export function Navigation({
               (e.currentTarget as HTMLElement).focus();
               onLoginClick();
             }}
-            aria-haspopup="dialog"
             style={{
               outline: "none",
               border: "none",
@@ -1011,7 +1012,7 @@ export function Navigation({
                     onMouseLeave={() => setPortalHover(false)}
                     onClick={() => {
                       setExpanded(false);
-                      onLoginClick();
+                      onKundenportalClick();
                     }}
                     aria-haspopup="dialog"
                     style={{
