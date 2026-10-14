@@ -576,6 +576,7 @@ export function ParteiDreieck({ compact = false, onNavigate, homepage }: Props) 
 
   return (
     <div
+      data-tellian-dunkelzone
       style={{
         position: "absolute",
         top: 0,

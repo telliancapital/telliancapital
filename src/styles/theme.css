@@ -2,7 +2,7 @@
 
 :root {
   --font-size: 16px;
-  --background: #f4f4f0;
+  --background: #F4F4F0;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
@@ -32,48 +32,95 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
 
-  /* ── Tellian Capital — brand palette (Brand Guidelines 2026) ── */
-  --tellian-bg: #f4f4f0; /* Archive White */
-  --tellian-bg-secondary: #eceae5; /* Archive White darkened */
-  --tellian-dark: #191718; /* Iron Veil */
-  --tellian-charcoal: #191718; /* Iron Veil */
-  --tellian-stone: #8a857c;
-  --tellian-muted: #b8aea3; /* Mushroom */
-  --tellian-line: #d8d5cf;
+  /* ── Tellian Capital — Brand Guidelines 2026 ── */
+  --tellian-bg: #F4F4F0;            /* Archive White */
+  --tellian-bg-secondary: #ECEAE5;  /* Archive White darkened */
+  --tellian-dark: #191718;           /* Iron Veil */
+  --tellian-charcoal: #191718;       /* Iron Veil */
+  --tellian-stone: #8A857C;
+  --tellian-muted: #B8AEA3;          /* Mushroom */
+  --tellian-line: #D8D5CF;
   --tellian-warm: #989071;
-  --tellian-subtle: #e8e6e1;
-  --tellian-accent: #6b665e;
-  --tellian-button: #b8aea3; /* Mushroom */
-  --tellian-button-hover: #a69d93; /* Mushroom darkened */
-  --tellian-dot-inactive: #c8c5bb;
-  --tellian-dot-active: #8a8575;
-  --tellian-purple: #281f33; /* Imperial Purple */
-  --tellian-silver-mist: #bfbfbf; /* Silver Mist */
-  --tellian-ink: #191718; /* Semantic: active typography (= Iron Veil) */
-  --tellian-greige-soft: #c8c3ba; /* Warm greige for inactive/subdued type */
-  --tellian-party-kunde: #b8aea3; /* Mushroom — Kunde block */
-  --tellian-party-tellian: #281f33; /* Imperial Purple — Tellian block */
-  --tellian-party-banken: #bfbfbf; /* Silver Mist — Banken block */
+  --tellian-subtle: #E8E6E1;
+  --tellian-accent: #6B665E;
+  --tellian-button: #B8AEA3;         /* Mushroom */
+  --tellian-button-hover: #A69D93;   /* Mushroom darkened */
+  --tellian-dot-inactive: #C8C5BB;
+  --tellian-dot-active: #8A8575;
+  --tellian-purple: #281F33;          /* Imperial Purple */
+  /* ── AKZENT-RÜCKBAU (14.09) ──
+     Die Gold-Welt vom 12.09 (#C6A15B/#B28F4C) ist auf Kundenwunsch
+     KOMPLETT abgelöst: Akzente, Punkte und alle Primär-CTAs tragen
+     wieder Mushroom aus dem Brandbook (--tellian-muted, Aktivstufe
+     --tellian-button-hover). Kontraste: Tinte auf Mushroom 8.17:1,
+     auf der Aktivstufe ~6.9:1; Mushroom auf Imperial Purple 6.7:1. */
+
+  /* ══ DIE DUNKLE STATIONSFLÄCHE ══
+     Eine Definition für alle drei dunklen Stationen (02, 04, 06).
+     Vorher trug nur Station 4 den Lichtschein; 2 und 6 standen flach
+     und wirkten daneben tot. Gemessen war Station 4 in der Mitte um
+     13/11/15 Punkte heller und lief zu den Rändern auf denselben
+     Wert aus.
+
+     Der Schein sitzt bei 50 % / 46 % und ist ab 60 % Radius weg. In
+     Station 4 liegt damit das Rad darin — in 2 und 6 sitzt er in der
+     Mitte der Station, nicht hinter ihrem Motiv. Wenn er dort dem
+     Motiv folgen soll, gehört je Station ein eigener Mittelpunkt
+     hierher. */
+  --tellian-flaeche-glanz: #372B44;
+  --tellian-flaeche-dunkel: radial-gradient(
+    ellipse at 50% 46%,
+    var(--tellian-flaeche-glanz) 0%,
+    var(--tellian-purple) 60%
+  );
+  /* Schmal ist die Station höher als breit; der Schein sitzt dort
+     weiter oben, damit er nicht im Fussbereich landet. */
+  --tellian-flaeche-dunkel-schmal: radial-gradient(
+    ellipse at 50% 34%,
+    var(--tellian-flaeche-glanz) 0%,
+    var(--tellian-purple) 60%
+  );
+  --tellian-silver-mist: #BFBFBF;    /* Silver Mist */
+  --tellian-ink: #191718;             /* Semantic: active typography (= Iron Veil) */
+  --tellian-greige-soft: #C8C3BA;     /* Warm greige for inactive/subdued type */
+  --tellian-party-kunde: #B8AEA3;     /* Mushroom — Kunde block */
+  --tellian-party-tellian: #281F33;   /* Imperial Purple — Tellian block */
+  --tellian-party-banken: #BFBFBF;   /* Silver Mist — Banken block */
 
   /* ── Form states ── */
-  --tellian-error: #b5453a;
-  --tellian-error-bg: #fdf2f1;
-  --tellian-success: #3d7b5f;
-  --tellian-success-bg: #f0f7f3;
-  --tellian-warning: #a68b3c;
-  --tellian-warning-bg: #fbf7ee;
+  --tellian-error: #B5453A;
+  /* Auf Imperial Purple trägt #B5453A gemessene 2.91 : 1 — als
+     Fehlertext unbrauchbar. Diese Fassung trägt 5.54 : 1 und bleibt
+     erkennbar dasselbe Rot. */
+  --tellian-error-dunkel: #E8796E;
+  --tellian-error-bg: #FDF2F1;
+
+  /* ── FEHLERFARBE DES FORMULARS ──
+     Zwei Werte, weil einer nicht reicht. Für 4.5 : 1 auf Archive
+     White (#F4F4F0) muss die relative Leuchtdichte unter 0.158
+     liegen, für 4.5 : 1 auf Imperial Purple (#281F33) über 0.264 —
+     die beiden Bereiche überschneiden sich nicht. Ein einziges
+     kräftiges Rot ist deshalb auf einem der beiden Gründe immer
+     falsch; auf Purple wirkt es zusätzlich grell.
+     Beide Werte sind gegen ihren tatsächlichen Grund gemessen. */
+  --tellian-fehler-auf-hell: #A83A2F;    /* 5.75 : 1 auf #F4F4F0 */
+  --tellian-fehler-auf-dunkel: #E8796E;  /* 5.54 : 1 auf #281F33 */
+  --tellian-success: #3D7B5F;
+  --tellian-success-bg: #F0F7F3;
+  --tellian-warning: #A68B3C;
+  --tellian-warning-bg: #FBF7EE;
 
   /* ── Shadows ── */
   --tellian-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --tellian-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --tellian-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
 
-  /* ── Strategy cards (Section 4) — swap these for rebrand ── */
-  --tellian-card-bg: #281f33; /* Imperial Purple */
-  --tellian-card-text: #f4f4f0;
+  /* ── Strategy cards (Section 4) ── */
+  --tellian-card-bg: #281F33;
+  --tellian-card-text: #F4F4F0;
   --tellian-card-bullet: rgba(244, 244, 240, 0.7);
   --tellian-card-eyebrow: rgba(244, 244, 240, 0.6);
-  --tellian-accent-gold: #b8aea3; /* Mushroom */
+  --tellian-accent-gold: #B8AEA3;
   --tellian-accent-gold-text: #191718;
 
   /* ── Section navigation pill ── */
@@ -91,9 +138,1142 @@
   --tellian-z-overlay: 1000;
   --tellian-z-toast: 1100;
 
-  --tellian-font-serif: "Lustria", serif;
-  --tellian-font-sans: "Inter", sans-serif;
-  --tellian-font-cormorant: "Cormorant Garamond", serif;
+  --tellian-font-serif: 'Lustria', serif;
+  --tellian-font-sans: 'Inter', sans-serif;
+  --tellian-font-cormorant: 'Cormorant Garamond', serif;
+
+  /* Eyebrow — section label above headlines (single source of truth) */
+  --tellian-eyebrow-size-desktop: 10px;
+  --tellian-eyebrow-size-mobile: 11px;
+
+  /* ══ Station 1 — Einstieg ══
+     Eigene Werte, weil die Station den Auftritt setzt und nicht den
+     bestehenden Sektionsmustern folgt. */
+
+  /* Titel: Cormorant Garamond Light, bis 80px, Zeilenabstand ~1.0.
+     Die untere clamp-Grenze hält ihn auf kleinen Desktops lesbar,
+     ohne dass er bei 200 % Zoom die Spalte sprengt. */
+  /* REDESIGN: eine Stufe kleiner als vorher (5.6vw/80px). Der
+     englische Titel und der lange EN-Absatz 2 müssen zwischen die
+     Bänder passen — gemessen lief EN bei 1366 bis 1512 unten 31 bis
+     70px in die Stationsleiste und oben in die Kopfzeile. */
+  --tellian-s1-title-size: clamp(38px, 4.4vw, 68px);
+  --tellian-s1-title-weight: 300;
+  --tellian-s1-title-leading: 1.02;
+  --tellian-s1-title-tracking: -0.015em;
+
+  /* Standfirst: rund 45 Zeichen Zeilenmass. Schmaler zerreisst der
+     Flattersatz; das französische Original wird rund 40 % länger und
+     muss in dieselben Spalten passen.
+
+     Bewusst in em, NICHT in ch: `ch` ist die Breite der Ziffer Null,
+     und die ist bei Inter rund ein Viertel breiter als ein mittleres
+     Buchstabenzeichen. 45ch ergeben gemessen 425px und damit rund
+     57 Zeichen je Zeile — zwei Spalten passen dann nicht mehr in die
+     Textspalte. 22em sind gemessen 330px und tragen die geforderten
+     rund 45 Zeichen. */
+  --tellian-s1-lead-size: 15px;
+  --tellian-s1-lead-leading: 1.65;
+  /* 18em statt 22em. Bei 45 % Panelbreite bekommt die Textspalte
+     bei 1366 GEMESSENE 587px (nicht die gerechneten 633 — Bühnen-
+     abstände und Spaltenlücke atmen mit). Zwei Spalten brauchen
+     2×Mass+Gap; erst ab 18em (575px) greift die zweite Spalte auch
+     dort. Mit einer Spalte deckelt jeder Absatz sein Zeilenmass
+     selbst und stapelt sich hoch — der EN-Text lief oben in die
+     Kopfzeile und unten in die Stationsleiste. 18em zu 15px sind
+     rund 40 Zeichen je Zeile — untere Grenze des Üblichen. */
+  --tellian-s1-lead-measure: 18em;
+  --tellian-s1-lead-gap: clamp(24px, 2.6vw, 48px);
+
+  /* ── STATION 2 — WEALTH MANAGEMENT ──
+     Eigene Werte statt Wiederverwendung der s1-Namen: die hiessen
+     dann an zwei Stationen dasselbe, und eine Änderung an Station 1
+     zöge Station 2 stillschweigend mit. Die Zahlen decken sich
+     heute weitgehend, das ist Absicht und kein Zufall. */
+
+  /* Titel eine Spur kleiner als in Station 1: er steht neben einer
+     Grafik statt neben einem hochformatigen Bild und hat dadurch
+     weniger Höhe zur Verfügung. */
+  --tellian-s2-title-size: clamp(38px, 4.6vw, 64px);
+  --tellian-s2-title-weight: 300;
+  --tellian-s2-title-leading: 1.04;
+  --tellian-s2-title-tracking: -0.015em;
+
+  /* Fliesstext: zwei Spalten. Zur Begründung von em statt ch siehe
+     Station 1.
+
+     20em statt der 22em von Station 1, und das ist gerechnet, nicht
+     geschätzt: Station 2 teilt ihre Breite mit einer Grafikfläche,
+     die selbst 520px braucht. Bei 22em fordern zwei Spalten plus
+     Zwischenraum 704px, verfügbar sind bei 1512px Fenster 669 — das
+     Raster klappte auf eine Spalte um. 20em sind rund 41 Zeichen und
+     lassen dem Raster 36px Luft. */
+  --tellian-s2-body-size: 15px;
+  --tellian-s2-body-leading: 1.68;
+  --tellian-s2-body-measure: 20em;
+  --tellian-s2-body-gap: clamp(20px, 2.2vw, 36px);
+  --tellian-s2-body-pad-right: clamp(28px, 3vw, 48px);
+
+  /* Grafikfläche auf Imperial Purple, reicht bis an den rechten
+     Rand der Station.
+
+     Die Fläche ist bewusst deutlich breiter als die Grafik: die soll
+     Luft um sich haben und nicht bis an die Kante laufen. Breite
+     unverändert; der Innenabstand hält den Rand frei. */
+  /* ══ BEZIEHUNGSLINIEN IM DREIECK, SCHMALE FASSUNG ══
+     Gestrichelt mit Kreuzen darauf lasen sich die Linien wie
+     durchtrennte Beziehungen. Jetzt durchgezogen, und die
+     STRICHSTÄRKE trägt die Aussage: das Depot liegt bei der Bank,
+     alles andere sind Aufträge und Vollmachten. */
+  --tellian-s2-linie-dick: 2.5px;
+  --tellian-s2-linie-duenn: 1px;
+  --tellian-s2-linie-depot: var(--tellian-muted);        /* Mushroom */
+  --tellian-s2-linie-auftrag: var(--tellian-silver-mist);
+  --tellian-s2-legende-size: 12px;
+  --tellian-s2-legende-muster: 22px;
+
+  --tellian-s2-panel-width: clamp(560px, 42%, 700px);
+  /* Station 2 ist ganz dunkel. Die Farbe stammt aus dem Kasten, der
+     vorher nur die Grafik trug — jetzt trägt sie die ganze Station.
+     --tellian-s2-panel-bg bleibt als Name für die Grafikfläche
+     stehen, ist aber derselbe Wert wie der Grund. */
+  /* KORREKTUR: Die Station ist an Position 03 getauscht und liegt
+     jetzt auf der HELLEN Fläche — Schrift vom Dunkel- aufs
+     Hell-Schema. Inhalt und Grafik unverändert; die Überarbeitung
+     der Station folgt in einer eigenen Session. */
+  /* TAUSCH 14.09: Wealth Management steht neu an Position 04 auf
+     der DUNKLEN Fläche (Takt-Erhalt) — helle Tinten wie 02/06. */
+  --tellian-s2-bg: var(--tellian-purple);
+  --tellian-s2-ink: var(--tellian-bg);                 /* 14.7 : 1 */
+  --tellian-s2-dim: rgba(249, 249, 247, 0.78);         /* ~10 : 1  */
+  --tellian-s2-title-size: clamp(36px, 3.6vw, 54px);
+  --tellian-s2-panel-bg: var(--tellian-s2-bg);
+  --tellian-s2-panel-pad: clamp(32px, 3.4vw, 72px);
+
+  /* Grösse der Grafik in der Fläche.
+     ParteiDreieck ist in festen Pixeln entworfen (Cluster 380×560)
+     und wird auf diese Masse skaliert — waagrecht und senkrecht
+     zentriert. Beide Werte begrenzen: es gilt der kleinere Faktor,
+     damit die Grafik auf flachen Bildschirmen nicht anstösst.
+
+     Die Werte werden nicht in JavaScript nachgerechnet, sondern über
+     ein unsichtbares Messelement im Bauteil ausgelesen. Damit bleibt
+     diese Zeile die einzige Quelle — auch wenn hier später clamp,
+     Prozent oder etwas anderes steht. */
+  --tellian-s2-graphic-max-width: clamp(260px, 24vw, 420px);
+  --tellian-s2-graphic-max-height: 68%;
+
+  /* ── PORTFOLIO MANAGEMENT ──
+     Benannt nach dem Inhalt, nicht nach der Stationsnummer: die
+     Nummer hat sich im Verlauf schon einmal verschoben, der Inhalt
+     nicht. */
+  /* Gemeinsame linke Textkante der Stationstitel. Station 3 setzt
+     sie, Station 4 und 5 richten sich daran aus. */
+  --tellian-titel-links: calc(
+    var(--tellian-rail-width) + clamp(28px, 3.4vw, 56px)
+  );
+  --tellian-pm-title-size: clamp(38px, 4.6vw, 64px);
+  --tellian-pm-title-weight: 300;
+  --tellian-pm-title-leading: var(--tellian-titel-lh);
+  --tellian-pm-title-tracking: var(--tellian-titel-ls);
+
+  --tellian-pm-body-size: 15px;
+  --tellian-pm-body-leading: 1.68;
+  --tellian-pm-body-measure: 20em;
+  /* ══ DIE STATION IST JETZT DUNKEL (Position 02) ══
+     Schrift auf Imperial Purple — dieselben Stufen wie Station 6:
+     Weiss 14.28 : 1, 72 % Weiss 8.01 : 1. */
+  --tellian-pm-dunkel-ink: var(--tellian-bg);
+  /* Fliesstext im Silver-Ton des v5-Briefings (#C6C0CD) —
+     8.9 : 1 auf Imperial Purple, deutlich über AA. */
+  --tellian-pm-dunkel-dim: #C6C0CD;
+  /* Lauftext-Container: zwei Spalten plus Zwischenraum. */
+  --tellian-pm-lauf-max: calc(var(--tellian-pm-body-measure) * 2 + var(--tellian-pm-body-gap));
+  /* Gesamtbreite der gestapelten Spur. 74em, damit die beiden
+     Textspalten breit laufen und der Stapel FLACH bleibt — bei 62em
+     lief er auf 900px-Fenstern oben in die Kopfzeile und unten über
+     die Stationsleiste. */
+  --tellian-pm-buehne-max: 74em;
+  /* Titel im Stapel eine Stufe unter dem alten Bühnentitel: das
+     einzelne Wort muss keine halbe Station tragen. */
+  /* v5-Briefing: H1 44–64px; der Umbruch läuft über ein weiches
+     Trennzeichen im Titelsatz, nicht über automatische Trennung. */
+  --tellian-pm-titel-dunkel-size: clamp(40px, 4vw, 64px);   /* P2: flache Fenster */
+  /* Senkrechte Abstände der Spur — atmen mit der Fensterhöhe. */
+  --tellian-pm-spur-gap: clamp(12px, 2vh, 32px);   /* P2: flache Fenster */
+  --tellian-pm-body-gap: clamp(20px, 2.2vw, 36px);
+  --tellian-pm-body-pad-right: clamp(28px, 3vw, 48px);
+
+  /* Grafik: Stamm, Gabelung, Zusammenlauf.
+     Sie soll das rechte Feld NICHT ausfüllen — Höchstbreite plus
+     Innenabstand halten Luft an allen vier Seiten. */
+  --tellian-pm-graphic-max: clamp(300px, 28vw, 460px);
+  --tellian-pm-graphic-pad: clamp(32px, 3.4vw, 72px);
+  /* Feld für die Grafik. Breiter als die Grafik selbst — die
+     Differenz ist die Luft. */
+  --tellian-pm-field-width: clamp(420px, 36%, 620px);
+
+  /* Der Kartenabstand ist in Prozent gesetzt, nicht in Pixeln, und
+     das ist keine Kosmetik: die Verbindungslinien treffen die
+     Kartenmitten bei 24 % und 76 % der Grafikbreite. Ein fester
+     Pixelwert würde die Mitten mit der Breite wandern lassen, und
+     die Linien liefen daneben. Ändert sich dieser Wert, müssen die
+     x-Werte im SVG mitgehen. */
+  --tellian-pm-card-gap: 4%;
+  /* ── DIPTYCHON (v5) ──
+     Zwei Karten als EIN Block: 2px Fuge innen, 1px Hairline aussen,
+     beides Mushroom mit 35 % Deckung. Kein Schatten, keine Radien. */
+  --tellian-pm-fuge: rgba(184, 174, 163, 0.35);
+  --tellian-pm-dip-pad-x: 40px;
+  --tellian-pm-dip-pad-unten: 36px;
+  --tellian-pm-cta-pad-oben: 22px;
+
+  --tellian-pm-band-title-size: 14px;
+  /* 9px unterschritt die Untergrenze von 12px. */
+  --tellian-pm-band-sub-size: 12px;
+  --tellian-pm-band-pad-y: 13px;
+  --tellian-pm-card-pad: clamp(14px, 1.3vw, 20px);
+  /* Titel des Auswahlbereichs («Zwei Wege, ein Anspruch») */
+  /* v5: H2 in Mushroom — zweite Ebene, konkurrenziert den H1 nicht.
+     Mushroom trägt 7.4 : 1 auf Imperial Purple. */
+  --tellian-pm-wege-size: clamp(26px, 2.2vw, 34px);
+  /* P2 (12.09): dieselbe Farbe wie der Fliesstext darunter —
+     vorher Mushroom, das stand als dritte Stimme zwischen Titel-
+     Weiss und Lauftext-Silber. */
+  --tellian-pm-wege-color: var(--tellian-pm-dunkel-dim);
+  --tellian-pm-card-eyebrow-size: 12px;   /* war 9px */
+  /* Bei 12px und 0.16em Sperrung bricht "TELLIAN ENTSCHEIDET" um,
+     "SIE ENTSCHEIDEN" nicht — die beiden Karten liefen dadurch
+     auseinander. Engere Sperrung für diese Zeile, und zwei Zeilen
+     fest reserviert, damit beide Namen auf einer Linie stehen. */
+  --tellian-pm-card-eyebrow-tracking: var(--tellian-ls-marker);
+  --tellian-pm-card-eyebrow-leading: 1.35;
+  --tellian-pm-card-name-size: 32px;          /* v5: Lustria 32 */
+  /* P3 (12.09): EIN Wert für beide Kartentitel. Im Quellcode war
+     nie ein zweiter gesetzt (beide erbten normal) — das Token macht
+     die Gleichheit explizit und unumgehbar. */
+  --tellian-pm-card-name-tracking: 0.01em;
+  --tellian-pm-card-text-size: 12px;
+  /* Zielgruppenzeile: Serifenschrift kursiv in Imperial Purple. */
+  --tellian-pm-card-fuer-size: 18px;          /* v5 */
+  --tellian-pm-card-fuer-color: var(--tellian-purple);
+  /* Beschriftung des Knopfs in der Karte. Kleiner als der
+     Hauptknopf in Station 1 (13px), aber nicht unter 12px. */
+  --tellian-pm-card-link-size: 12px;
+  --tellian-pm-caps-tracking: 0.18em;
+  --tellian-pm-radius: 2px;
+
+  --tellian-pm-line: var(--tellian-line);
+  --tellian-pm-line-active: var(--tellian-purple);
+  --tellian-pm-connector: var(--tellian-silver-mist);
+  /* Sehr leichte Mushroom-Tönung — sie soll die Kontur tragen, nicht
+     mit ihr konkurrieren. */
+  /* Jede Karte trägt die Farbe ihres Punkts als sehr leichte
+     Fläche — Mandat Imperial Purple, Advisory Mushroom.
+
+     NUR DER FARBTON WIRD ÜBERNOMMEN, NICHT DIE FARBE SELBST
+     Imperial Purple ist sehr dunkel UND farbarm (OKLCH L 0.26,
+     C 0.039). Als rgba() bei 5% Deckung hellte es nur neutral auf:
+     die beiden Flächen unterschieden sich gemessen um (-2,-2,+1)
+     und waren nicht auseinanderzuhalten. Auch in OKLAB gemischt
+     blieb die Buntheit bei 0.002 — grau.
+
+     Deshalb steht hier nicht die Marke bei kleiner Deckung, sondern
+     eine sehr helle Fläche AUF IHREM FARBTON: 304.5° ist der Ton
+     von Imperial Purple, 70.2° der von Mushroom. Die Helligkeit
+     bleibt knapp unter dem Untergrund (L 0.966), die Buntheit
+     bleibt klein — leicht, aber unterscheidbar. */
+  /* EINE Füllung für beide Karten — Archive White, im Ruhezustand
+     identisch (Korrektur 12.09, P0.2). Der frühere oklch-Ton auf
+     Farbwinkel 300 wirkte violettstichig, sobald der Hover ihn
+     zeigte; die aktive Fläche dunkelt jetzt NEUTRAL über die
+     abgedunkelte Archive-White-Stufe ab, ohne Buntton. */
+  --tellian-pm-card-bg: var(--tellian-bg);
+  --tellian-pm-card-bg-aktiv: var(--tellian-bg-secondary);
+
+  /* Die Knöpfe in den Karten (P1, 12.09): zwei Farbwelten, EINE
+     Form — Grösse, Innenabstand, Schriftgrad, Laufweite und Gewicht
+     teilen sich beide, nur die Füllung unterscheidet sie.
+     Mandat trägt Gold mit dunkler Schrift, Advisory Imperial Purple
+     (die Stationsfarbe) mit Archive White. Hover/Fokus dunkelt das
+     Gold ab bzw. hellt das Purpur auf — dieselbe Geste in beiden
+     Welten. Kontraste: Gold/Purpur 6.48:1, Purpur/Archive White
+     14.28:1, aktiv 5.19:1 bzw. 11.41:1 — alle über AA (4.5:1). */
+  --tellian-pm-knopf-mandat: var(--tellian-muted);
+  --tellian-pm-knopf-mandat-aktiv: var(--tellian-button-hover);
+  --tellian-pm-knopf-mandat-ink: var(--tellian-ink);
+  --tellian-pm-knopf-nacht: var(--tellian-purple);
+  --tellian-pm-knopf-nacht-aktiv: #3A2E4A;
+  --tellian-pm-knopf-nacht-ink: var(--tellian-bg);
+  --tellian-pm-knopf-weight: 500;
+  --tellian-pm-knopf-pad: 9px 14px;
+
+  /* Reaktion der Karte. Kurz und knapp — sie soll antworten, nicht
+     springen. */
+  --tellian-pm-card-hub: -3px;
+  --tellian-pm-card-schatten: 0 10px 24px -12px rgba(40, 31, 51, 0.38);
+  --tellian-pm-card-ms: 200ms;
+  --tellian-pm-focus-ring: var(--tellian-purple);
+  /* Auf dem dunklen Grund wäre der purpurne Ring unsichtbar. */
+  --tellian-pm-focus-ring-dunkel: var(--tellian-bg);
+
+  /* ── STATION 4 — IHRE VORTEILE (Rad) ──
+     Dunkle Station. Der radiale Verlauf ist kein Schmuck: eine grosse
+     einfarbige Fläche wirkt flach, weil das Auge keine Tiefe findet. */
+  /* TAUSCH 14.09: die Station steht neu an Position 03 auf HELLER
+     Fläche (Takt-Erhalt). Die Werte hier sind die helle Fassung;
+     die Akzentspur führt Mushroom (Rückbau 14.09 — die
+     Gold-Fassung ist abgelöst). */
+  --tellian-r4-bg: var(--tellian-bg);
+  --tellian-r4-ink: var(--tellian-ink);                /* 16.18 : 1 */
+  --tellian-r4-ink-dim: var(--tellian-accent);         /*  5.17 : 1 */
+  --tellian-r4-accent: var(--tellian-accent);          /*  5.17 : 1 */
+  /* ── Redesign: vier Punkte, alle sichtbar ── */
+  --tellian-r4-titel-size: clamp(36px, 3.6vw, 54px);
+  --tellian-r4-unter-size: clamp(19px, 1.7vw, 25px);
+  --tellian-r4-num-size: clamp(22px, 2vw, 30px);
+  --tellian-r4-punkt-titel-size: clamp(20px, 1.8vw, 26px);
+  --tellian-r4-punkt-text-size: 14px;
+
+  /* Der Titel trug vorher die Form einer Kapitälchen-Zeile und fiel
+     damit aus der Reihe. Er soll GLEICH GROSS sein wie der in
+     Station 3, deshalb verweist er auf dessen Tokens, statt die
+     Werte zu verdoppeln — verdoppelte Werte laufen auseinander.
+     Nur die Farbe kommt aus der dunklen Palette. */
+  --tellian-r4-heading-size: var(--tellian-pm-title-size);
+  --tellian-r4-heading-weight: var(--tellian-pm-title-weight);
+  --tellian-r4-heading-leading: var(--tellian-pm-title-leading);
+  --tellian-r4-heading-tracking: var(--tellian-pm-title-tracking);
+  /* Dieselbe linke Textkante wie die Titelspalte in Station 3. */
+  --tellian-r4-heading-left: var(--tellian-titel-links);
+
+  /* ── BREITE DER STATION ──
+     Das Rad hing an der Stationsmitte, die Station selbst an 94vw.
+     Weil die Radgrösse von der HÖHE gedeckelt ist, wuchs auf breiten
+     Schirmen nur die Station: rechts vom Rad standen gemessene 400px
+     (1512) bis 798px (2560) Leerfläche, durch die man scrollen
+     musste, bevor die nächste Station kam.
+
+     Jetzt sitzt das Rad rechts neben der Titelspalte, und die
+     Station ist so breit wie ihr Inhalt — nach unten gedeckelt bei
+     70vw, damit sie noch als volle Station liest, nach oben bei den
+     94vw der übrigen. */
+  --tellian-r4-pad-left: var(--tellian-station-pad-x);   /* P2 */
+  --tellian-r4-title-col: clamp(150px, 14vw, 210px);
+  /* Aufgeweitet 17.09: mit den grösseren Beschriftungen (s. u.)
+     reichte die linke Beschriftung bis an die Titelspalte — bei
+     1024px gemessene 8px Überlappung mit «Ihre Vorteile». */
+  --tellian-r4-mid-gap: clamp(58px, 5.4vw, 108px);
+  --tellian-r4-edge: var(--tellian-station-pad-x);       /* P2 */
+  --tellian-r4-block: calc(
+    var(--tellian-r4-wheel)
+    + 2 * (var(--tellian-r4-label-col) + var(--tellian-r4-label-gap))
+  );
+  /* Waagrechte Mitte des Radblocks — Rad und Erklärbehälter hängen
+     beide daran, damit der Behälter unter dem Rad bleibt. */
+  --tellian-r4-block-center: calc(
+    var(--tellian-r4-heading-left) + var(--tellian-r4-title-col)
+    + var(--tellian-r4-mid-gap) + var(--tellian-r4-block) / 2
+  );
+  --tellian-r4-section-width: clamp(
+    70vw,
+    calc(
+      var(--tellian-r4-heading-left) + var(--tellian-r4-title-col)
+      + var(--tellian-r4-mid-gap) + var(--tellian-r4-block)
+      + var(--tellian-r4-edge)
+    ),
+    94vw
+  );
+  /* Deutlich grösser als die ersten 13px: die acht Begriffe sind der
+     Inhalt des Rades und standen zu klein da. Die Ziffern noch eine
+     Spur grösser, weil Cormorant eine kleine x-Höhe hat und bei
+     gleichem Grad optisch zurückfällt. */
+  /* Vergrössert 17.09 (Kundenwunsch): Beschriftungen am Kreis und
+     Inhalt der Box standen zu klein. Rund +12 % auf allen vier
+     Graden; die Boxhöhe rechnet sich aus Titel- und Textgrad und
+     geht von selbst mit (s. --tellian-r4-box-h). */
+  --tellian-r4-label-size: clamp(15px, 1.2vw, 19px);
+  --tellian-r4-numeral-size: clamp(16px, 1.3vw, 21px);
+  /* Der Boxtext folgt jetzt auch der FENSTERHÖHE (Korrektur 18.09).
+     Auf flachen Fenstern — gemessen 1512x823, ein verbreitetes
+     MacBook-Format — stiess der Kasten 29px in die Stationsleiste:
+     die Breite gab ihm den grossen Grad, die Höhe aber nicht den
+     Platz dafür. min(vw, vh) nimmt die knappere der beiden. */
+  --tellian-r4-title-size: clamp(20px, min(1.8vw, 2.9vh), 26px);
+  /* Mitlaufend, damit der längste Text (152 Zeichen) auch auf
+     schmalen Fenstern in ZWEI Zeilen bleibt. Bei festen 14px waren
+     es bei 1024px Fensterbreite gemessene drei. Untergrenze 12px. */
+  /* Untergrenzen unverändert bei 20/14px: schmal greift die Höhe
+     (1.72vh bei 812px = 14px), und der mobile Zweig soll von der
+     Korrektur für flache Desktop-Fenster nichts merken. */
+  --tellian-r4-body-size: clamp(14px, min(1.1vw, 1.72vh), 16px);
+  --tellian-r4-body-leading: 1.65;
+  --tellian-r4-body-measure: 60em;
+
+  /* Ring. Die Segmente wachsen bei Auswahl in der STÄRKE, nicht nur
+     in der Farbe — eine Farbänderung allein trägt auf dunklem Grund
+     zu wenig. */
+  --tellian-r4-arc-idle: 1.5px;
+  --tellian-r4-arc-active: 9px;
+  --tellian-r4-arc-idle-color: rgba(25, 23, 24, 0.22);
+  /* P1 (12.09): der aktive Bogen führt die Gold-Akzentspur —
+     Bogen, Untertitel und Boxtitel gehören zusammen. Die inaktiven
+     Anteile und die Labels bleiben unverändert. */
+  /* RÜCKBAU 14.09 (Kundenwunsch): die Akzentspur der Station
+     trägt wieder Mushroom aus dem Brandbook — löst die kurzlebige
+     Gold-Fassung ab (davor: tiefe Stufe #83682F, davor Gold auf
+     der dunklen Fläche). Gemessen 1.98:1 auf Archive White —
+     grafischer Akzent, als Kundenentscheid dokumentiert. */
+  --tellian-r4-arc-active-color: var(--tellian-muted);
+  /* Lücke zwischen den Segmenten, in Grad. */
+  --tellian-r4-arc-gap: 7;
+
+  --tellian-r4-focus: var(--tellian-accent);
+
+  /* Masse des Rades. Aus der HÖHE abgeleitet, damit nichts über die
+     Stationsleiste läuft — auch auf flachen Notebook-Formaten.
+     Abgezogen werden: Leiste, Innenabstand, die Kopfzeile über dem
+     Rad, der Erklärblock darunter und die Abstände dazwischen. */
+  /* Die Beschriftungen oben und unten stehen AUSSERHALB des Rades;
+     ohne eigenes Band liefen sie in die Kopfzeile und in den
+     Erklärtext. Gemessen ist genau das passiert. */
+  /* Band über und unter dem Rad. Es muss die mittige Beschriftung
+     tragen UND den Überstand ihres Ankerpunkts: der liegt bei 0.53
+     der Radbreite vom Zentrum, also 0.03 ausserhalb des Radkastens.
+     Mit 42px schnitt der Rahmen des Behälters gemessene 3–7px in
+     die Zeile „Finanz-Boutique und Flexibilität". */
+  --tellian-r4-label-row: 46px;   /* P2.2: Labels näher an den Ring */
+  /* Gemessen und nicht geschätzt: Kopfzeile 15 + zwei Bänder à 54 +
+     zwei Abstände à 26 + Behälter bis 250 + Sicherheit. Mit 336 lief
+     es bei 1280×800 um 3px über die Leiste. */
+
+  /* Das Rad hängt mit seiner MITTE an der Stationsmitte, damit es
+     auf einer Linie mit der Grafik links und den Porträts rechts
+     steht. Vorher war die ganze Spalte zentriert und das Rad dadurch
+     gemessene 115px zu hoch.
+
+     Der Durchmesser ergibt sich aus dem Platz unterhalb der Mitte:
+     dort müssen Beschriftungsband, Abstand und der Behälter noch
+     hineinpassen. Oberhalb bleibt dadurch Luft — die kostet der
+     Gleichstand mit den Nachbarn. */
+  /* P1: mit vier statt acht Punkten trägt jeder Punkt mehr Raum —
+     das Rad läuft ~15 % grösser (Deckel 520 → 600, Formel ×1.15).
+     Die Höhenreserve für Band und Behälter bleibt eingerechnet. */
+  /* P2.1: nochmals ~30 % grösser (Faktor 1.5, Deckel 680). Der
+     Versatz unten hält den fixen Kasten über der Leiste. */
+  --tellian-r4-wheel: min(
+    656px,
+    calc(1.4 * 2 * ((100vh - var(--tellian-kopf-height) - var(--tellian-station-height)) / 2
+      - var(--tellian-s1-stage-pad)
+      - var(--tellian-r4-label-row)
+      - var(--tellian-r4-box-gap)
+      - var(--tellian-r4-box-h)))
+  );
+  /* Höchstbreite einer Beschriftung. Sie läuft vom Ankerpunkt nach
+     aussen; der Kasten muss Anker plus Beschriftung tragen. */
+  --tellian-r4-label-col: clamp(150px, 15vw, 230px);
+  --tellian-r4-label-gap: clamp(16px, 1.6vw, 32px);
+  /* Erklärbehälter unter dem Rad.
+
+     Die Fläche liest als Fläche, nicht als Knopf: sehr schwache
+     Mushroom-Füllung, feine Mushroom-Kontur.
+
+     Der Radius ist bewusst gross — ein kleiner Standardradius sähe
+     nach Karte aus. So greift der Behälter die Kreisform des Rades
+     auf.
+
+     Die Höhe steht NICHT hier: sie ergibt sich aus dem längsten der
+     acht Texte, weil alle acht übereinander im selben Rasterfeld
+     liegen und nur der gewählte sichtbar ist. Eine feste Zahl hier
+     wäre beim nächsten Textwechsel falsch. */
+  /* Der Behälter erscheint erst beim Zeigen auf einen Punkt. Er
+     nimmt deshalb keinen Platz im Fluss — das Rad hängt an der
+     Stationsmitte und bleibt dort, ob der Behälter offen ist oder
+     nicht. */
+  --tellian-r4-box-bg: rgba(184, 174, 163, 0.07);
+  --tellian-r4-box-line: rgba(184, 174, 163, 0.22);
+  --tellian-r4-box-radius: clamp(28px, 3.4vw, 52px);
+  --tellian-r4-box-pad-y: clamp(16px, 1.9vh, 24px);
+  --tellian-r4-box-pad-x: clamp(24px, 2.4vw, 40px);
+  /* Breit und flach statt schmal und hoch: der längste der acht
+     Texte hat 152 Zeichen und soll in HÖCHSTENS zwei Zeilen stehen.
+     Zwei Zeilen brauchen rund 76 Zeichen je Zeile — das geht nur
+     über die Breite. Der Behälter ist dadurch breiter als das Rad;
+     untergeordnet bleibt er über Höhe, Farbe und darüber, dass er
+     nur beim Zeigen erscheint. */
+  /* P1: die vier Redesign-Texte sind länger als die alten acht —
+     breiter gestellt, damit der längste (Transparenz, ~340 Zeichen)
+     in vier Zeilen bleibt statt in fünf. */
+  --tellian-r4-box-width: calc(var(--tellian-r4-wheel) + 180px);   /* P2.3: an den Kreisbereich gekoppelt */
+  /* Reservierte Höhe unter dem Rad — GERECHNET aus den Werten
+     darüber, nicht gesetzt. Eine feste Zahl war zu grosszügig und
+     kostete Raddurchmesser; ändert sich ein Schriftgrad, geht sie
+     jetzt von selbst mit.
+     Innenabstand · Ziffer · Titel · zwei Textzeilen · Abstände. */
+  /* P2.3: FIXE Boxhöhe, bemessen am längsten Text (Transparenz DE,
+     fünf Zeilen bei der an den Radbereich gekoppelten Breite). Die
+     Texte liegen ohnehin gestapelt im selben Rasterfeld — die Höhe
+     springt beim Wechsel nicht. */
+  /* Reservierung seit der Vergrösserung (17.09): 2.6 Textzeilen
+     statt zwei. Mit dem grösseren Grad läuft der längste Text
+     (Transparenz DE) eine Zeile weiter, und die Box stiess bei
+     1440x900 gemessene 5px in die Stationsleiste. Nachgemessen bei
+     1024x768 / 1280x800 / 1440x900 / 1728x1080: 34 / 32 / 17 / 26px
+     Luft zur Leiste, 43-54px über der obersten Beschriftung. Der
+     Bruchwert ist bewusst — bei drei vollen Zeilen schrumpfte das
+     Rad um weitere 30px, ohne dass die Luft gebraucht würde. */
+  --tellian-r4-box-h: calc(
+    2 * var(--tellian-r4-box-pad-y)
+    + 1.15 * var(--tellian-r4-title-size)
+    + 2.6 * var(--tellian-r4-body-leading) * var(--tellian-r4-body-size)
+    + 18px
+  );
+  /* Die ECHTE Boxhöhe (fünf Zeilen) steckt im Versatz, nicht in der
+     Formel — dort schrumpfte sie das Rad doppelt (P1-Lektion). */
+  /* P1: Der Radblock hängt 26px ÜBER der Stationsmitte. Die vier
+     Redesign-Texte sind bis zu vier Zeilen lang, die Höhenformel
+     reserviert aber bewusst nur zwei — sonst schrumpfte das Rad um
+     ein Viertel statt zu wachsen. Der Versatz gibt dem Behälter
+     unten exakt die zwei fehlenden Zeilen. Nachgemessen: Behälter
+     endet bei 900/800/768er Fenstern 1–10px über der Leiste. */
+  --tellian-r4-mitte-versatz: 104px;
+  /* Flache Fenster: der Radblock rückt höher, damit der Kasten
+     darunter Platz hat. Über dem Rad bleiben gemessen 41px Luft
+     zur Kopfzeile — genug für die oberste Beschriftung. */
+  --tellian-r4-box-gap: clamp(14px, 2vh, 26px);
+
+  /* ── UNTERSEITE ANLAGEPROZESS ──
+     Alles auf einen Blick: kein Scrollen, weder waagrecht noch
+     senkrecht. Die Seite lebt von Grösse und Abstand, nicht von
+     Menge — deshalb sind die Grade grosszügig und die Textmenge je
+     Spalte auf eine Zeile begrenzt. */
+  /* Der Boden gilt auf dem Telefon: 3.6vw sind dort 14px, gedeckelt
+     also 30px — deutlich kleiner als die 38px der übrigen schmalen
+     Titel. Der Deckel für breite Schirme bleibt unverändert. */
+  --tellian-u1-title-size: clamp(34px, 3.6vw, 54px);
+  --tellian-u1-title-leading: 1.06;
+
+  /* Die Ziffer ist zugleich die Höhe, auf der die Haarlinie läuft:
+     die Linie sitzt auf halber Zifferhöhe. */
+  --tellian-u1-num-size: clamp(30px, 3vw, 46px);
+  --tellian-u1-num-color: var(--tellian-muted);
+  /* Freiraum links und rechts der Ziffer, damit die Linie nicht
+     durch sie hindurchläuft. */
+  --tellian-u1-num-gap: clamp(10px, 1vw, 18px);
+
+  --tellian-u1-step-title-size: clamp(18px, 1.7vw, 26px);
+  --tellian-u1-step-text-size: clamp(12px, 0.92vw, 14px);
+  --tellian-u1-step-text-leading: 1.5;
+
+  --tellian-u1-col-gap: clamp(20px, 2.4vw, 52px);
+  --tellian-u1-pad-x: clamp(28px, 5vw, 110px);
+  --tellian-u1-gap-title: clamp(28px, 5vh, 72px);
+  --tellian-u1-gap-num: clamp(14px, 2.2vh, 28px);
+  --tellian-u1-gap-text: clamp(8px, 1.2vh, 14px);
+  --tellian-u1-line: var(--tellian-line);
+
+  /* ── STATION 5 — TEAM ──
+     Eine Reihe aus zehn Porträtstreifen. Der gezeigte Streifen
+     öffnet sich, die übrigen weichen zusammen.
+
+     Warum nicht das frühere Raster aus fünf Spalten: dort war die
+     Kachel bei 1512px Fenster 167×208 gross, und eine Story von
+     30 Wörtern brauchte gemessene 216px — sie passte erst ab rund
+     1900px Fensterbreite. In der Breite zu wachsen statt in der Höhe
+     löst das, weil die Reihenhöhe stehen bleibt. */
+  --tellian-t5-title-size: clamp(28px, 3vw, 44px);
+  --tellian-t5-title-weight: 300;
+  --tellian-t5-title-leading: 1.06;
+  --tellian-t5-title-tracking: -0.015em;
+  --tellian-t5-meta-size: 13px;
+
+  /* ZWEI Reihen zu fünf. Die Höhe teilt sich damit auf, und die
+     geschlossenen Streifen werden breiter — im Ruhezustand sind sie
+     dadurch schon echte Porträtkacheln (rund 3:4) statt schmaler
+     Bänder. */
+  --tellian-t5-reihen: 2;
+  /* Was der Kopf WIRKLICH braucht: zwei Titelzeilen plus der Abstand
+     zur ersten Reihe. Vorher stand hier ein fester Wert von 150px —
+     auf einem flachen Notebook (1024x720) verschenkte das 69px, die
+     den Kacheln fehlten. Die Formel ist an dieselben Tokens gebunden,
+     aus denen der Kopf entsteht, damit beides nicht auseinanderläuft. */
+  --tellian-t5-head-gap: clamp(14px, 2.2vh, 30px);
+  /* P4: Der Titel steht seit dem Redesign in einer EIGENEN Spalte
+     links — die Reserve über den Reihen war ein Relikt und kostete
+     die Kacheln rund 100px Höhe. */
+  --tellian-t5-head-reserve: 0px;
+  /* Luft zwischen Kachelunterkante und Namensband. */
+  --tellian-t5-label-gap: 10px;
+  --tellian-t5-row-gap: clamp(10px, 1.4vh, 20px);
+  /* Unter der zweiten Reihe lagen gemessen 46px (1512x823) bis zur
+     Stationsleiste brach. Ein Teil davon geht an die Kacheln; der
+     Rest bleibt als Luft vor der Leiste stehen. */
+  --tellian-t5-row-bonus: clamp(12px, 2.4vh, 26px);
+  --tellian-t5-row-h: calc(
+    var(--tellian-t5-row-bonus) +
+    (var(--tellian-buehne-hoehe)
+      - var(--tellian-t5-head-reserve) - var(--tellian-t5-row-gap)
+      - var(--tellian-t5-reihen)
+        * (var(--tellian-t5-label-row) + var(--tellian-t5-label-gap)))
+    / var(--tellian-t5-reihen)
+  );
+  /* Vier je Reihe statt fünf: die Kacheln stehen einzeln statt die
+     Reihe zu fünfteln, deshalb darf der Abstand grosszügiger sein. */
+  --tellian-t5-gap: clamp(14px, 1.5vw, 26px);
+  /* Vorher teilte die Reihe ihre Breite unter den Kacheln auf: fünf
+     in der ersten Reihe wurden 286px breit, drei in der zweiten
+     483px — gemessen bei 1512px. Jetzt gibt die Reihenhöhe die
+     Breite vor, alle Kacheln sind damit gleich.
+
+     Das Format ist das des ZUSCHNITTS (0.9), nicht das schmale
+     Hochformat 0.72: die breite Kachel trägt zusätzlich zwei
+     Rollenzeilen und «Mehr erfahren», sie muss also breiter sein.
+     Bei 0.72 blieben 163px, und «Bryan Anthony Honegger» brach
+     dreizeilig (gemessen). 0.9 deckt sich ausserdem exakt mit der
+     Datei — die Kachel beschneidet das Porträt nicht zusätzlich. */
+  --tellian-t5-tile-ratio-breit: 0.9;
+  /* Die Breite folgt der Reihenhöhe — gedeckelt durch den Platz in
+     der Reihe. Ohne den Deckel lief die Reihe bei hohen, schmalen
+     Fenstern über: bei 1100x900 gemessen 193px Überhang. Greift der
+     Deckel, wird die Kachel schmaler als 0.9 und beschneidet die
+     Seiten, wie im schmalen Band. */
+  --tellian-t5-tile-w-breit: min(
+    calc(var(--tellian-t5-row-h) * var(--tellian-t5-tile-ratio-breit)),
+    calc((var(--tellian-t5-row-w) - 3 * var(--tellian-t5-gap)) / 4)
+  );
+  /* Wie stark der offene Streifen wächst. Bei fünf je Reihe genügt
+     2.0: der geöffnete wird dadurch quer, das Porträt bleibt links
+     vollständig stehen und das Panel fährt von rechts ein. */
+  --tellian-t5-grow: 2;
+
+  /* Der volle Name steht unter der Kachel — um die Personen geht es
+     hier, nicht um die Kacheln. Zwei Zeilen sind fest reserviert:
+     "Bryan Anthony Honegger" bricht auf schmalen Kacheln um, und
+     ohne feste Höhe stünde die zweite Reihe versetzt. */
+  /* 16 statt 14px und halbfett (22.09): der Name trägt die Kachel,
+     seit die Kontaktzeichen dort weg sind. */
+  --tellian-t5-name-size: 16px;
+  --tellian-t5-name-leading: 1.3;
+  /* EINE Namenszeile und ZWEI Rollenzeilen. Die Zeichen stehen auf
+     der Rollenzeile, der Name hat damit die volle Kachelbreite und
+     bleibt einzeilig; die Rolle trägt die Reserve und darf
+     umbrechen, es folgt nichts mehr. Vorher hielt das Namensfeld
+     zwei Zeilen frei, und bei jedem kurzen Namen stand die zweite
+     als Lücke über der Rolle. Die Kachelhöhe rechnet sich aus der
+     Bühne minus Beschriftung, die Reihen wachsen also mit. */
+  /* Luft zwischen Name und Rolle. Vorher 3px — Name und Rolle
+     standen dadurch als ein Block statt als zwei Angaben. */
+  --tellian-t5-name-role-gap: 9px;
+  /* Aufruf «Mehr lesen» unter der Rolle. */
+  --tellian-t5-cta-size: 12px;
+  --tellian-t5-cta-gap: 10px;
+  /* Kreis um den Pfeil (Variante B, 12.10.). Auf Touch grösser. */
+  --tellian-t5-cta-kreis: 26px;
+  /* Wieviele Namenszeilen die breite Beschriftung freihält. Eine
+     reicht, solange neben der Zeichenspalte 155px für den längsten
+     Namen bleiben — das ist ab rund 200px Kachelbreite der Fall.
+     Flache Fenster geben weniger (gemessen 170px bei 1024x768,
+     184px bei 1366x768); dort brechen Name UND Rolle zweizeilig. */
+  --tellian-t5-name-zeilen-breit: 1;
+  --tellian-t5-label-row: calc(
+    var(--tellian-t5-name-zeilen-breit)
+    * var(--tellian-t5-name-size) * var(--tellian-t5-name-leading)
+    + 2 * var(--tellian-t5-role-size) * var(--tellian-t5-role-leading)
+    + var(--tellian-t5-name-role-gap)
+    + var(--tellian-t5-cta-gap)
+    + max(var(--tellian-t5-cta-size) * 1.3, var(--tellian-t5-cta-kreis))
+    + 4px
+  );
+
+  --tellian-t5-dim: 0.42;
+  --tellian-t5-focus: var(--tellian-muted);
+  --tellian-t5-placeholder-bg: var(--tellian-muted);
+  --tellian-t5-placeholder-ink: var(--tellian-purple);
+  --tellian-t5-initial-size: clamp(16px, 1.4vw, 24px);
+
+  /* Panel im geöffneten Streifen. Es fährt von RECHTS ein und lässt
+     das Porträt links vollständig stehen — bei einem queren Kasten
+     ist das die ruhigere Teilung als eine waagrechte. */
+  --tellian-t5-panel-bg: var(--tellian-purple);
+  --tellian-t5-panel-ink: var(--tellian-bg);
+  --tellian-t5-panel-dim: rgba(244, 244, 240, 0.66);
+  --tellian-t5-panel-share: 48%;
+  /* Unter 1400px ist die halbe Kachel zu schmal: die Story brauchte
+     dort gemessene 286px bei 189px Panelhöhe. Das Panel deckt die
+     Kachel dann ganz — das Porträt tritt zurück, der Text bleibt
+     vollständig. Über 1400px bleibt die Person daneben stehen. */
+  --tellian-t5-panel-pad: clamp(14px, 1.3vw, 22px);
+  /* 420ms waren als Klick-Antwort gedacht. Beim Überfahren ist das
+     zu lang: der Zeiger ist längst weiter, während die Kachel noch
+     aufzieht. Zurück geht es schneller als hin — ein Rückzug soll
+     sofort wirken, ein Aufziehen darf sich Zeit nehmen. */
+  --tellian-t5-panel-ms: 300ms;
+  --tellian-t5-panel-ms-zu: 200ms;
+  --tellian-t5-panel-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --tellian-t5-full-name-size: clamp(15px, 1.3vw, 20px);
+  /* 13 statt 12px — eine Stufe grösser, aber weiterhin unter dem
+     Namen (16px) und leichter gesetzt. */
+  --tellian-t5-role-size: 13px;
+  --tellian-t5-role-leading: 1.35;
+  --tellian-t5-story-size: 12.5px;
+  --tellian-t5-story-leading: 1.5;
+  --tellian-t5-link-size: 12px;
+
+  /* Schmal: zwei Spalten, Story klappt unter der Reihe auf. */
+  --tellian-t5-cols-schmal: 2;
+  /* P4: Kachelform = Ausschnittform (0.96) — der Ausschnitt steht
+     vollständig im Bild, nichts wird doppelt beschnitten. */
+  --tellian-t5-tile-ratio: 0.9;   /* P3: Kachelform = neue Ausschnittform */
+  /* Schmal ein deutliches Hochformat (Referenzvergleich 22.09):
+     0.72 statt 0.9 — ein Porträt soll als Porträt lesbar sein. */
+  --tellian-t5-tile-ratio-schmal: 0.72;
+  /* Bildhöhe der schmalen Kachel — Grundlage für die Lage der
+     Zeichenreihe auf der Namenszeile. Spaltenbreite = (100vw
+     − 2 × Rand − Spaltenabstand) / 2, geteilt durch das Verhältnis. */
+  --tellian-t5-bildhoehe-schmal: calc(
+    (100vw - 2 * clamp(18px, 4.6vw, 40px) - 8px) / 2 / 0.72
+  );
+  /* Reserve rechts im Namen, damit er nie unter die Zeichen läuft.
+     Gerechnet aus der TREFFERFLÄCHE (17px Zeichen + 2x8px Polster =
+     33px) plus 6px Fuge — nicht aus der Zeichengrösse; genau dieser
+     Unterschied hat beim ersten Versuch zu Überlappungen geführt. */
+  --tellian-t5-zeichen-hoehe: 33px;
+  /* Zeichenspalte im breiten Band: quadratisch, damit die
+     Trefferfläche in beide Richtungen gleich gross ist. 26px ist der
+     Abstand der beiden Zeilenmitten (halbe Namenszeile + Luft +
+     halbe Rollenzeile) — grössere Felder würden sich überlappen und
+     Fehlgriffe erzeugen. */
+  --tellian-t5-zeichen-spalte: 26px;
+  --tellian-t5-zeichen-abstand: clamp(10px, 0.9vw, 16px);
+  --tellian-t5-zeichen-reserve-eins: 39px;
+  --tellian-t5-zeichen-reserve-zwei: 72px;
+  /* Eigene Grösse: schmal steht unter dem Namen noch die Rolle. */
+  --tellian-t5-name-size-schmal: 15px;
+  /* Wieviele Zeilen das Namensfeld im SCHMALEN Band freihält. Dort
+     stehen die Zeichen weiterhin auf der Namenszeile, der längste
+     Name braucht deshalb zwei — unter 360px drei. */
+  --tellian-t5-name-zeilen: 2;
+
+  /* ── STATION 5 — TEAM: TITELSPALTE UND BREITE ──
+     Der Titel steht links neben den Reihen, auf der Höhe des Titels
+     von Station 3. Die Reihen rücken dafür nach rechts, und die
+     Station wird um genau diese Spalte breiter — dadurch reichen die
+     zehn Kacheln über den Fensterrand hinaus und die letzten kommen
+     beim Scrollen herein.
+
+     WARUM DIE REIHENBREITE FEST STEHT
+     Die Kacheln sollen ihre Grösse behalten. Sie teilen sich die
+     Reihenbreite zu fünft, also muss diese unverändert bleiben:
+     genau die Inhaltsbreite der alten 94vw-Station. Wäre die Reihe
+     flexibel, würde die Titelspalte sie schmaler machen. */
+  --tellian-t5-title-col: clamp(150px, 14vw, 210px);
+  --tellian-t5-mid-gap: clamp(36px, 4vw, 90px);
+  /* Die Reihe füllt genau den freien Platz rechts der Titelspalte —
+     nicht mehr. Vorher waren es 1.1 x 94vw; die Reihe ragte damit
+     gemessen 327px über die Stationskante hinaus und die letzte
+     Kachel stand angeschnitten. Mit acht Personen in zwei Reihen
+     zu vier ist ohnehin alles auf einen Blick da. */
+  --tellian-t5-row-w: calc(
+    100vw - var(--tellian-titel-links) - var(--tellian-t5-title-col)
+    - var(--tellian-t5-mid-gap) - clamp(72px, 7vw, 128px)
+  );
+  /* Der letzte Summand ist die weisse Fläche NACH der letzten
+     Kachel — sie trennt das Porträt von der nächsten Station.
+     Mit den früheren 24…48px endete die Kachel gemessen 4px hinter
+     der Stationskante, das Foto stiess also direkt an die dunkle
+     Fläche der Kontakt-Station. */
+  --tellian-t5-section-width: calc(
+    var(--tellian-titel-links) + var(--tellian-t5-title-col)
+    + var(--tellian-t5-mid-gap) + var(--tellian-t5-row-w)
+    + clamp(72px, 7vw, 128px)
+  );
+  /* Gerendert wird der Titel in der Grösse von Station 3. Die
+     t5-title-*-Tokens darüber bemessen weiterhin NUR die senkrechte
+     Reserve der Reihen (--tellian-t5-head-reserve) — würde die
+     Reserve mitwachsen, schrumpften die Kacheln. */
+  --tellian-t5-heading-size: var(--tellian-pm-title-size);
+  --tellian-t5-heading-weight: var(--tellian-pm-title-weight);
+  --tellian-t5-heading-leading: var(--tellian-pm-title-leading);
+  --tellian-t5-heading-tracking: var(--tellian-pm-title-tracking);
+
+  /* ── UNTERSEITE ADVISORY ──
+     Dieselben Masse wie die Unterseite Anlageprozess, damit die
+     beiden als Paar lesen. Die Seite passt auf einen Bildschirm. */
+  /* P3: kompakter, damit Titel, Intro und CTA bei 1440×900 ohne
+     Scrollen stehen. */
+  /* P4: der Falz-Zwang ist weg — Szene 1 füllt den ersten Viewport
+     allein mit Titel, Intro und CTA. Der Titel darf wieder in der
+     grossen Stufe stehen (er war fürs Über-die-Falz-Pressen auf
+     28…44 geschrumpft). */
+  --tellian-adv-title-size: clamp(34px, 3.4vw, 52px);
+  --tellian-adv-title-leading: 1.06;
+  --tellian-adv-lead-size: 15px;
+  --tellian-adv-lead-leading: 1.68;
+  --tellian-adv-lead-measure: 46em;
+  --tellian-adv-num-size: clamp(30px, 3vw, 46px);
+  --tellian-adv-num-color: var(--tellian-muted);
+  --tellian-adv-num-gap: clamp(8px, 0.8vw, 14px);
+  --tellian-adv-step-title-size: clamp(20px, 1.8vw, 28px);
+  --tellian-adv-step-text-size: 13px;
+  --tellian-adv-block-title-size: 15px;
+  --tellian-adv-block-text-size: 13px;
+  --tellian-adv-block-measure: 24em;
+  --tellian-adv-col-gap: clamp(24px, 3vw, 64px);
+  --tellian-adv-pad-x: clamp(28px, 5vw, 110px);
+  --tellian-adv-weg-max: 60em;
+  /* Mandat: fünf Schritte statt drei brauchen mehr Lauf. */
+  --tellian-mandat-weg-max: 80em;
+  --tellian-adv-line: var(--tellian-line);
+
+  /* ── STATION 6 — KONTAKT ── */
+  --tellian-k6-title-size: clamp(38px, 4.4vw, 64px);
+  --tellian-k6-title-weight: 300;
+  --tellian-k6-title-leading: var(--tellian-titel-lh);
+  --tellian-k6-lead-size: var(--tellian-lauf-size);
+  --tellian-k6-lead-leading: var(--tellian-lauf-lh);
+
+  /* Telefon ist der wichtigste Weg auf der Seite — entsprechend gross. */
+  --tellian-k6-phone-size: clamp(26px, 2.4vw, 34px);
+  --tellian-k6-mail-size: 16px;
+  --tellian-k6-meta-size: 13px;
+  --tellian-k6-firm-size: 13px;
+
+  /* Formularfläche: scharfe Kanten, Haarlinie, nur ein Hauch Füllung.
+     Der frühere Aufbau hatte 16px Radius und eine eigene Fläche und
+     war damit das einzige so gebaute Element der Seite. */
+  /* ══ STATION 6 IST GANZ DUNKEL ══
+     Alle Werte sind gegen Imperial Purple gerechnet; der gemessene
+     Kontrast steht jeweils dabei. */
+  --tellian-k6-bg: var(--tellian-purple);
+  --tellian-k6-ink: var(--tellian-bg);                 /* 14.28 : 1 */
+  --tellian-k6-dim: rgba(244, 244, 240, 0.72);         /*  8.01 : 1 */
+  --tellian-k6-meta: rgba(244, 244, 240, 0.62);        /*  6.32 : 1 */
+  --tellian-k6-line: rgba(244, 244, 240, 0.24);
+  --tellian-k6-form-bg: rgba(244, 244, 240, 0.05);
+  --tellian-k6-form-line: rgba(244, 244, 240, 0.24);  /* nur Zierlinie, kein Bedienelement */
+  --tellian-k6-form-pad: clamp(24px, 2.6vw, 44px);
+  /* Eingabefelder auf dunklem Grund. Die Kontur ist ein
+     Bedienelement und braucht 3 : 1. Gemessen gegen Imperial Purple:
+     24 % Weiss = 2.10, 34 % = 2.88 — beide zu wenig. 45 % trägt
+     4.03 : 1. */
+  --tellian-field-bg: rgba(244, 244, 240, 0.05);
+  --tellian-field-line: rgba(244, 244, 240, 0.45);
+  --tellian-field-ink: var(--tellian-bg);              /* 14.28 : 1 */
+  --tellian-field-label: rgba(244, 244, 240, 0.62);    /*  6.32 : 1 */
+  --tellian-field-focus: var(--tellian-bg);
+  /* Station 6 liegt auf Imperial Purple — also die dunkle Fassung.
+     Sie trägt Text (5.54 : 1) und Feldkontur (dieselbe Farbe, damit
+     der Fehler auch als Kontur die 3 : 1 für Bedienelemente hält). */
+  --tellian-field-error: var(--tellian-fehler-auf-dunkel);
+  /* MINDESTENS 16px IN EINGABEFELDERN
+     Darunter zoomt iOS beim Antippen von selbst in die Seite und
+     der Nutzer landet in einem Ausschnitt, aus dem er sich wieder
+     herausziehen muss. Gilt für input UND textarea. */
+  --tellian-field-size: 16px;
+  /* Feste Beschriftung über dem Feld, nicht im Feld. */
+  --tellian-field-label-size: 14px;
+
+  /* Fussband */
+  /* 11px unterschritt die Untergrenze von 12px. */
+  --tellian-k6-foot-size: 12px;
+  --tellian-k6-foot-tracking: var(--tellian-ls-marker);
+  --tellian-k6-foot-color: var(--tellian-k6-meta);
+  /* Markenzeichen im Fussband (LinkedIn).
+     Das Zeichen steht in voller Deckung, das Wort daneben im
+     Fussband-Ton: das Zeichen ist der wiedererkennbare Teil, und die
+     Originaldatei ist reines Weiss — eingefaerbt wird nichts. */
+  --tellian-k6-marke-size: 12px;
+  --tellian-k6-marke-gap: 7px;
+
+  --tellian-k6-focus: var(--tellian-bg);
+
+  /* Grosse Bedienflächen für Anrufen und E-Mail — nur schmal.
+     Die Kontur ist ein Bedienelement und braucht 3 : 1; 45 % Weiss
+     auf Imperial Purple trägt 4.03 : 1. */
+
+  /* ══ DIE BEIDEN BÄNDER ══
+     Kopfzeile oben, Stationsleiste unten, beide über die volle
+     Breite und ohne Trennlinie zum Inhalt. Die frühere senkrechte
+     Schiene am linken Rand entfällt; --tellian-rail-width steht
+     deshalb auf 0 und bleibt nur als Nullstelle stehen, damit alte
+     Rechnungen nicht ins Leere greifen.
+
+     ZUSAMMEN HÖCHSTENS 12 % DER HÖHE
+     6.4vh + 5.6vh = 12vh. Die Böden (44/40px) greifen erst unter
+     688px Fensterhöhe — dort liegt der schmale Zweig ohnehin schon
+     an, und der hat keine Stationsleiste. Die Deckel halten die
+     Bänder auf hohen Schirmen bei ihrer Inhaltshöhe, statt sie
+     mitwachsen zu lassen. */
+  --tellian-rail-width: 0px;
+
+  /* --tellian-kopf-height steht weiter unten bei der Kopfzeile. */
+  --tellian-station-height: clamp(40px, 5.6vh, 56px);
+  --tellian-band-pad-x: clamp(20px, 3.2vw, 56px);
+  /* TIPPZIELE
+     Gemessen lagen fast alle Bedienelemente auf dem Telefon bei 12
+     bis 29px Höhe — DE/EN 19x12, Kundenportal 118x12, die
+     Fussverweise 27–160x18. Die Richtgrösse ist 44px. Der Zuwachs
+     kommt aus Innenabstand, nicht aus grösserer Schrift: das
+     Schriftbild bleibt, die Trefferfläche wächst. */
+  --tellian-tippziel: 44px;
+
+  /* ══ P2 — SPACING-SYSTEM (8er-Raster) ══
+     Ein Satz Abstände für alle sechs Stationen, statt je Station
+     eigener clamp-Werte. Dokumentierte Tokens:
+
+     --tellian-station-pad-x   Stationskante → erster Inhalt,
+                               waagrecht. Richtwert 96–128px auf
+                               Desktop, nie unter 64 (Briefing P2).
+                               6.5vw: 94px @1440, 125px @1920.
+     --tellian-abstand-titel   Titel → Fliesstext (32…48, 8er).
+     --tellian-abstand-block   Block → Block     (40…64, 8er).
+
+     Der Hell/Dunkel-Wechsel bekommt damit von selbst Luft: die
+     Farbkante liegt an der Stationskante, der Inhalt beginnt erst
+     nach pad-x. */
+  --tellian-station-pad-x: clamp(64px, 6.5vw, 128px);
+  --tellian-abstand-titel: clamp(32px, 4vh, 48px);
+  --tellian-abstand-block: clamp(40px, 5vh, 64px);
+
+  /* Zeilenabstand des Stations-Lauftexts (v5: 1.75). Auf flachen
+     Fenstern eine Stufe enger, sonst lief die EN-Textspalte von
+     Station 02 bei 1280×800 exakt 2px in die Stationsleiste. */
+  --tellian-lauf-lh: 1.75;
+
+  /* ══ P4 (12.09) — TYPOGRAFIE-ROLLEN ══
+     EIN Wertesatz für beide Welten, alle Stationen und die
+     Subpages Mandat/Advisory. Vor der Konsolidierung führten die
+     Bauteile je eigene Zahlen (Audit im Abschlussbericht 12.09):
+     Titel-Zeilenabstand 1.04/1.05/1.1/1.12, Titel-Laufweite
+     −0.01/−0.015em, Lauftext 14–16px auf 1.65–1.75, Versal-
+     Laufweiten 0.08–0.22em quer durch die Rollen. Die Referenz ist
+     je Rolle der Wert der Hauptseite; wo zwei Hauptseiten-Werte
+     konkurrierten, der jüngere bewusst gesetzte (v5).
+
+     Schriftgrössen der Titel bleiben je Station eigene clamp()-
+     Treppen — die Stationen sind auf EINE Ansicht gerechnet, ihre
+     Grade sind Layoutmasse. Vereinheitlicht ist, was die Stimme
+     ausmacht: Zeilenabstand, Laufweite, Gewicht, Lauftext. */
+  --tellian-titel-lh: 1.05;        /* H1/H2 — Serif-Stationstitel */
+  /* A2-Grad des Hero-Titels (beide Welten). Flache Fenster eine
+     Stufe zurück — siehe Media-Block unten. */
+  --tellian-hero-titel-size: clamp(54px, 4.9vw, 80px);
+  /* Hälften-Aufteilung (18.09): in der halbierten Textzone nimmt der
+     Titel eine Stufe zurück, sonst drängt er gegen die Bildkante. */
+  --tellian-hero-titel-size-halb: clamp(50px, 4.6vw, 74px);
+  --tellian-titel-ls: -0.015em;
+  --tellian-zwischen-lh: 1.15;     /* H3, Karten- und Wegtitel */
+  --tellian-lauf-size: 16px;       /* Stations-Fliesstext (v5) */
+  --tellian-kursiv-lh: 1.4;        /* Cormorant-Kursivzeilen */
+  --tellian-ziffer-weight: 300;    /* Serif-Ziffern der Wege */
+  --tellian-ziffer-ls: 0.04em;
+  --tellian-ziffer-lh: 1;
+
+  /* Versal-Standard (Briefing 12.09, «Ebene 1 — Marker»): ALLE
+     Versalzeilen — Header-Chrome, Eyebrows/Kicker, Knotennamen,
+     Kartenköpfe, «Zurück» — laufen auf EINER Stufe. Die früheren
+     Stufen eyebrow (0.22) / caps (0.14) / cta-gross (0.16) sind
+     darin aufgegangen. Versalien entstehen ausschliesslich per
+     text-transform (Klasse .tellian-marker bzw. Inline-Transform),
+     nie im String — Screenreader lesen Wörter, keine Buchstaben.
+     cta-klein bleibt: die Laufweite der INHALT-CTAs, die in
+     Satzschreibweise stehen (Ebene 2). */
+  --tellian-ls-marker: 0.12em;
+  --tellian-ls-cta-klein: 0.08em;
+
+  /* Abstands-Skala, ergänzend zum P2-System oben: die zwei
+     Wiederholtäter, die bisher als Kopien durch die Bauteile
+     liefen. */
+  --tellian-abstand-absatz: clamp(14px, 2.2vh, 24px);
+  --tellian-rand-schmal: clamp(20px, 6vw, 48px);
+  --tellian-stapel-schmal: clamp(24px, 3.6vh, 40px);
+
+  /* ── KOPFZEILE ──
+     Feste Höhe statt vh: der Inhalt wächst nicht mit dem Fenster.
+     Logo 26px, Portalfeld 36px — 64px lassen oben und unten je 14px.
+     Vorher clamp(44px, 6.4vh, 60px), gemessen 58px bei 900er Fenster. */
+  --tellian-kopf-height: 64px;
+  --tellian-kopf-logo-h: 35px;   /* P5: +33 % (26 → 35) */
+  /* 11px ist die Untergrenze im Band; die Sprachwahl darf sie nutzen,
+     das Kundenportal steht als Hauptsache eine Stufe darüber. */
+  /* 12px statt 11: die Untergrenze der Seite gilt auch für die
+     Kopfzeile — Zielgruppe 65+, und DE/EN ist ein Tippziel. */
+  --tellian-kopf-size: 12px;
+  --tellian-kopf-sprache-gap: var(--tellian-kopf-gap-innen);
+  /* Dritte Lockup-Zeile auf Solutions — klar untergeordnet
+     gegenüber der Lustria-Wortmarke, mobil nie unter 9px. */
+  --tellian-kopf-zusatz-size: 9.5px;
+  --tellian-kopf-portal-size: 12px;
+  --tellian-kopf-tracking: var(--tellian-ls-marker);
+  --tellian-kopf-gap: clamp(14px, 1.6vw, 28px);
+  /* Abstand innerhalb der rechten Gruppe: Sprache | Trenner | Portal */
+  --tellian-kopf-gruppe-gap: calc((var(--tellian-kopf-gap-einheit) - 1px) / 2);
+  /* Eigener Randabstand, damit sich das Band auf sehr schmalen
+     Geräten zusammenziehen kann, ohne die Stationsleiste oder das
+     mobile Menü mitzunehmen — die lesen weiter --tellian-band-pad-x. */
+  --tellian-kopf-pad-x: var(--tellian-band-pad-x);
+
+  /* Senkrechter Trenner — kurze Haarlinie, keine Linie unter dem Band. */
+  /* Ausrichtung (12.09): EIN Trennermass für alle drei Linien der
+     Kopfgruppe — 14px, 1px breit, mittig zur Textzeile (Klasse
+     .tellian-kopf-trenner in der Kopfzeile). */
+  --tellian-kopf-trenner-h: 14px;
+  /* Abstands-Skala der Kopfgruppe: innerhalb einer Einheit klein,
+     zwischen den Einheiten (Umschalter | Sprache | Portal) gross —
+     der Container-gap ist die halbe Einheit minus Trennerbreite,
+     damit Gruppe→Trenner→Gruppe zusammen das Einheitenmass ergibt. */
+  --tellian-kopf-gap-innen: 8px;
+  --tellian-kopf-gap-einheit: 28px;
+  --tellian-kopf-trenner-hell: rgba(25, 23, 24, 0.30);
+  --tellian-kopf-trenner-dunkel: rgba(244, 244, 240, 0.30);
+
+  /* ── KUNDENPORTAL ──
+     Das einzige Element der Kopfzeile mit einer Form, und die einzige
+     Farbfläche im Band. Die Kontur ist ein Bedienelement und braucht
+     3 : 1 gegen ihren Grund.
+
+     Auf Archive White: Iron Veil mit 45 % Deckung trägt 2.87 : 1 —
+     zu wenig. 55 % trägt 3.86 : 1.
+     Auf Imperial Purple: 45 % Weiss trägt 4.02 : 1. */
+  --tellian-kopf-portal-line-hell: rgba(25, 23, 24, 0.55);    /* 3.86 : 1 */
+  /* Rückbau 14.09: auf dunklem Grund trägt das Portalfeld wieder
+     Mushroom (Kontur und Schrift, auf Imperial Purple 6.7:1); der
+     Hover füllt Mushroom mit Tinte (8.17:1). Hell bleibt das Feld
+     unverändert Chrome (dunkle Kontur, purpurne Füllung beim
+     Zeigen). */
+  --tellian-kopf-portal-line-dunkel: var(--tellian-muted);
+  --tellian-kopf-portal-h: 36px;
+  --tellian-kopf-portal-pad-x: clamp(12px, 1.1vw, 18px);
+  /* Gefüllter Zustand bei Zeiger und Tastaturfokus. Die Füllung ist
+     jeweils die Gegenfarbe des Grundes, die Schrift die des Grundes —
+     hell auf Purple 14.28 : 1, Iron auf Mushroom 8.17 : 1. */
+  --tellian-kopf-portal-fuell-hell: var(--tellian-purple);
+  --tellian-kopf-portal-ink-fuell-hell: var(--tellian-bg);
+  --tellian-kopf-portal-fuell-dunkel: var(--tellian-muted);
+  --tellian-kopf-portal-ink-fuell-dunkel: var(--tellian-ink);
+
+  /* Unter 360px reicht die Breite nicht mehr: gemessen stand die
+     Menükante bei 320px auf 341. Enger gesetzt und mit knapperem
+     Portalfeld passt es. Weiter gekürzt wird nichts — das
+     Kundenportal bleibt, die Wortmarke ist schon weg. */
+  /* DECKENDE FLÄCHE — NUR IM SCHMALEN ZWEIG
+     Dort scrollt die Seite senkrecht unter der festen Kopfzeile
+     durch; ohne Fläche lag das Logo im Formular. Auf Desktop bleibt
+     die Kopfzeile durchsichtig, weil der Track waagrecht läuft und
+     die Farbgrenze durch das Band wandert. */
+  --tellian-kopf-flaeche-hell: var(--tellian-bg);
+  --tellian-kopf-flaeche-dunkel: var(--tellian-purple);
+
+  /* Stationsleiste — 13px in Iron Veil, Ziffern in Mushroom.
+     Vorher 10px in Silver Mist, das trug den Auftritt nicht. */
+  --tellian-station-size: 13px;
+  --tellian-station-numeral: var(--tellian-muted);
+  --tellian-station-label: var(--tellian-ink);
+  /* Greige Soft trug auf Archive White gemessene 1.59 : 1 — als
+     Schrift unbrauchbar, auch wenn der Ruhezustand zurücktreten
+     soll. Accent trägt 5.17 : 1 und bleibt gegenüber dem aktiven
+     Namen (Iron Veil, 16.18 : 1) deutlich zurückgenommen. */
+  --tellian-station-inactive: var(--tellian-accent);
+
+  /* ══ LESBARKEIT DER BÄNDER ══
+     Beide Bänder sind durchsichtig — keine eigene Fläche, keine
+     Trennlinie. Ihre Schriftfarbe wird stetig zwischen diesen beiden
+     Werten gemischt (siehe useBandTon).
+
+     DER SCHLEIER
+     Weil immer ein Streifen der Nachbarstation im Fenster steht,
+     läuft ständig eine Farbgrenze durch beide Bänder. Über dem
+     Streifen der Gegenfarbe wäre die Schrift sonst unlesbar. Der
+     Schleier hat deshalb die Farbe der AKTIVEN Station: über ihr
+     liegt er auf seiner eigenen Farbe und ist unsichtbar, über dem
+     fremden Streifen trägt er die Schrift. Er verläuft von der
+     Aussenkante nach innen aus, damit er nirgends als Kante liest. */
+  --tellian-band-ink-hell: var(--tellian-ink);
+  --tellian-band-ink-dunkel: var(--tellian-bg);
+  --tellian-band-dim-hell: var(--tellian-accent);
+  --tellian-band-dim-dunkel: rgba(244, 244, 240, 0.62);
+  /* ON-IMAGE: über einem Foto trägt dieselbe Dämpfung weniger als
+     über einer flachen Fläche — der Grund ist unruhig und stellen-
+     weise hell. Die Nebenrolle bleibt erkennbar (0.88 statt 1.0),
+     der Text aber lesbar. */
+  --tellian-band-dim-bild: rgba(244, 244, 240, 0.88);
+
+  /* WELTEN-UMSCHALTER (P1, Briefing 08.09)
+     Der inaktive Eintrag ist deutlich gedämpfter als die übrigen
+     Nebenrollen — aber nie unter WCAG AA. Das Briefing nennt 42 %
+     als Startwert; gemessen am echten Bild reisst das die Grenze
+     (AA verlangt 4.5:1), deshalb 62 % auf Bild und dunkel sowie
+     ein Ink bei 58 % auf hell. Endwerte im Bericht. */
+  --tellian-welt-dim-bild: rgba(244, 244, 240, 0.78);
+  --tellian-welt-dim-dunkel: rgba(244, 244, 240, 0.62);
+  --tellian-welt-dim-hell: rgba(26, 23, 32, 0.68);
+  /* Abstand des Umschalters zur Nachbargruppe (P1.3). */
+  --tellian-band-grund-hell: 244, 244, 240;
+  --tellian-band-grund-dunkel: 40, 31, 51;
+  /* Deckung des Schleiers an der Aussenkante. Genug, um Schrift über
+     der Gegenfarbe zu tragen, wenig genug, um über der eigenen Farbe
+     nicht als Fläche zu lesen. */
+  --tellian-band-schleier: 0.82;
+  --tellian-band-ms: 260ms;
+
+  /* Bildpanel: Fläche von Anfang an reserviert, damit nichts
+     springt und die Station ohne Foto vollständig bleibt. */
+  /* VERHÄLTNIS FOLGT DER QUELLE, NICHT UMGEKEHRT
+     Redesign-Motiv 4992x3328 — exakt 3:2. Das Panel trägt dasselbe
+     Verhältnis, beschnitten wird nur die Ganzzahlrundung. */
+  --tellian-s1-panel-ratio: 1.5;          /* Breite / Höhe = 3:2 */
+
+  --tellian-s1-stage-pad: clamp(24px, 4vh, 56px);
+
+  /* ══ BÜHNE ══
+     Die Fläche, in der TEXT stehen darf. Sie hält Abstand zu beiden
+     Bändern; Flächen, Bilder und Farbfelder tun das nicht — die
+     laufen über die volle Stationshöhe darunter durch. */
+  --tellian-buehne-oben: calc(
+    var(--tellian-kopf-height) + var(--tellian-s1-stage-pad)
+  );
+  --tellian-buehne-unten: calc(
+    var(--tellian-station-height) + var(--tellian-s1-stage-pad)
+  );
+  --tellian-buehne-hoehe: calc(
+    100vh - var(--tellian-buehne-oben) - var(--tellian-buehne-unten)
+  );
+  /* Höhe der festen Kopfzeile im schmalen Zweig. Nur der Hero
+     braucht sie: er ist das Einzige, was bei Scrollstellung 0 unter
+     ihr liegt. Spiegelt den Wert aus Navigation.tsx — dort steht er
+     ebenfalls fest, geändert wird dort nichts. */
+  --tellian-kopfzeile-schmal: 56px;
+  /* SENKRECHTER ATEM DER ABSCHNITTE IM SCHMALEN ZWEIG
+     Stand vorher in jeder Station einzeln — meist clamp(56px, 9vh,
+     96px) oben und 6 bis 8vh unten. Zwei Stationen stossen
+     aneinander, die Lücke war also die SUMME beider Werte: gemessen
+     135 bis 235px auf einem 390er Telefon, bei 5px zwischen den
+     letzten beiden. Ein Wert für alle macht den Rhythmus gleichmässig
+     und halbiert ihn ungefähr. */
+  /* Mobil-Überarbeitung: Kapitelanfänge brauchen Bühne — 36…60
+     las sich als Fliesstext-Abstand, nicht als Stationswechsel. */
+  --tellian-abschnitt-luft-schmal: clamp(64px, 9vh, 96px);
+  /* Nutzbare Höhe der Bühne. Die Panelbreite wird daraus abgeleitet,
+     damit das Format 3:2 auch auf flachen Fenstern exakt bleibt,
+     statt beschnitten oder gestaucht zu werden. */
+  --tellian-s1-stage-height: var(--tellian-buehne-hoehe);
+  /* Breite des Panels, nie mehr als die Resthöhe im Verhältnis 3:2
+     zulässt. Die 32 % waren für das frühere HOCHKANTE 4:5-Motiv
+     gerechnet; quer ergaben sie gemessene 422x281px — das Bild stand
+     verloren in der Fläche. 36 % ist der grösste Wert, bei dem der
+     Standfirst bei 1512px noch zwei Spalten behält: die Grid braucht
+     687px, bei 36 % bleiben ihr 714px.
+
+     REDESIGN: 45 %. Das Bild soll auf dem ersten Schirm die
+     dominante Wirkung tragen. Der Standfirst bricht damit unter
+     rund 1600px auf eine Spalte um — beim Redesign gewollt: eine
+     Spalte mit festem Zeilenmass liest sich für die Zielgruppe
+     ohnehin ruhiger als zwei knappe. */
+  --tellian-s1-panel-width: min(
+    45%,
+    calc(var(--tellian-s1-stage-height) * var(--tellian-s1-panel-ratio))
+  );
+  --tellian-s1-panel-placeholder: var(--tellian-muted);
 
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -104,6 +1284,81 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
+@media (max-height: 830px) {
+  :root {
+    --tellian-lauf-lh: 1.6;
+    /* P4: die Lauftext-Rolle geht auf flachen Fenstern gesamthaft
+       eine Stufe zurück — vorher stand der EN-Hero bei 1280×800
+       mit 15px/1.75 bereits 63px in der Stationsleiste (vorbe-
+       stehender Bruch, vom Rollen-Audit aufgedeckt). */
+    --tellian-lauf-size: 15px;
+    /* Der A2-Grad braucht die 830er-Stufe ebenfalls: 62.7px×3
+       Zeilen + zweispaltiger EN-Text passen bei 800er Höhe sonst
+       nicht zwischen die Bänder. */
+    --tellian-hero-titel-size: clamp(48px, 4.4vw, 72px);
+    /* Auch die Zwei-Wege-Karten (S02) gehen eine Stufe zurück:
+       vor der Stufe stand der EN-Kartenfuss bei 1280×800 90px in
+       der Stationsleiste — ebenfalls vorbestehend. */
+    --tellian-pm-wege-size: clamp(24px, 1.9vw, 30px);
+    --tellian-pm-card-name-size: 24px;
+    --tellian-pm-card-fuer-size: 16px;
+    --tellian-pm-dip-pad-unten: 18px;
+    --tellian-pm-cta-pad-oben: 12px;
+  }
+}
+
+/* Drei Spracheinträge (Solutions: DE/EN/FR) trieben den Menüknopf
+   bei 375px rund 18px hinaus — unter 420px gelten die kompakten
+   Abstände schon, nicht erst unter 360. */
+/* P3.1 (Station 03 mobil, gilt seitenweit): Ankerspruenge landen
+   nicht unter der festen Kopfzeile. */
+@media (max-width: 1023px) {
+  html {
+    scroll-padding-top: var(--tellian-kopfzeile-schmal, 64px);
+  }
+}
+
+/* Drei Spracheinträge (Solutions: DE/EN/FR) trieben den Menüknopf
+   bei 375px rund 18px hinaus — unter 420px gelten die kompakten
+   Abstände schon, nicht erst unter 360. */
+/* P3.1 (Station 03 mobil, gilt seitenweit): Ankerspruenge landen
+   nicht unter der festen Kopfzeile. */
+@media (max-width: 1023px) {
+  html {
+    scroll-padding-top: var(--tellian-kopfzeile-schmal, 64px);
+  }
+}
+
+@media (max-width: 419px) {
+  :root {
+    --tellian-kopf-pad-x: 14px;
+    --tellian-kopf-gruppe-gap: 9px;
+    --tellian-kopf-portal-pad-x: 9px;
+    --tellian-kopf-gap: 12px;
+  }
+}
+
+@media (max-width: 359px) {
+  :root {
+    /* P5: das +33 %-Logo (35px) trieb das Band bei 320px wieder
+       hinaus; hier gilt die alte Höhe. */
+    --tellian-kopf-logo-h: 26px;
+    /* Engste Stufe: bei 320px stehen Logo, Sprache, Portal und
+       Menüknopf zusammen bis auf wenige Pixel im Bild. */
+    --tellian-kopf-pad-x: 8px;
+    --tellian-kopf-gruppe-gap: 5px;
+    --tellian-kopf-portal-pad-x: 6px;
+    --tellian-kopf-gap: 4px;
+    /* Drei Spracheinträge (Solutions) brauchen bei 320px jeden
+       Pixel — sonst wird der Menüknopf angeschnitten. */
+    --tellian-kopf-sprache-gap: 2px;
+    --tellian-kopf-gap: 6px;
+    /* Drei Spracheinträge brauchen bei 320px jeden Pixel. */
+    --tellian-kopf-sprache-gap: 3px;
+  }
+}
+
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -231,13 +1486,21 @@
     @apply bg-background text-foreground;
   }
 
-  /* Desktop: lock body so horizontal scroll container takes over.
-     Tablet/Mobile (< 1024px): allow natural vertical scrolling. */
+  /* Desktop: lock body so the horizontal scroll container takes over.
+     Tablet/Mobile (< 1024px): natural vertical scrolling. */
   @media (min-width: 1024px) {
     body {
       overflow: hidden;
     }
   }
+
+  /* SCRUB-MODELL (12.09): die Seite scrollt auf ALLEN Breiten
+     nativ — auf Desktop treibt der vertikale Scroll den
+     horizontalen Track (useHorizontalScroll). Die frühere
+     Desktop-Sperre (body overflow:hidden, damit der alte
+     Overflow-Container übernimmt) würde genau dieses native
+     Scrollen ersticken. Overlays sperren gezielt über
+     documentElement.style.overflow — nicht hier. */
 
   /**
   * Default typography styles for HTML elements (h1-h4, p, label, button, input).
@@ -289,4 +1552,55 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
+}
+
+/* Siehe --tellian-t5-panel-share. Muss NACH dem :root-Block stehen —
+   bei gleicher Spezifität gewinnt die spätere Regel, davor wurde sie
+   von der Voreinstellung überschrieben. */
+@media (max-width: 1400px) {
+  :root { --tellian-t5-panel-share: 100%; }
+}
+
+/* ── Mobil: Titelgrad Station 03 ──
+   «Geschäftsbeziehungen» misst bei 36px rund 400px — mehr als die
+   ganze Telefonbreite. Unterhalb der Breitschwelle eine Stufe
+   kleiner; die Silbentrennung im h2 bleibt als Netz. */
+@media (max-width: 1023px) {
+  :root {
+    --tellian-s2-title-size: clamp(30px, 8.2vw, 44px);
+  }
+}
+
+/* ── FLACHE FENSTER (18.09) ──
+   Bei Höhen bis 880px reicht der Raum unter dem Rad nicht für den
+   Erklärkasten: gemessen stiess er bei 1512x823 um 29px in die
+   Stationsleiste. Der Block rückt hier 12px höher; zusammen mit dem
+   höhenabhängigen Schriftgrad (s. r4-body-size) hält der Abstand. */
+@media (max-height: 880px) {
+  :root {
+    --tellian-r4-mitte-versatz: 116px;
+  }
+}
+
+/* Sehr schmale Geräte (iPhone SE der ersten Reihe): dort ist die
+   Kachel 138px schmal und der längste Name bricht zweizeilig. Alle
+   Karten halten den Platz frei, damit die Reihe bündig bleibt. */
+@media (max-width: 359px) {
+  :root {
+    --tellian-t5-name-zeilen: 3;
+  }
+}
+
+/* Flache Fenster: dort ist die Kachel schmal genug, dass neben der
+   Zeichenspalte weder der längste Name noch die längste Rolle auf
+   eine Zeile passen. Die Beschriftung hält deshalb zwei Namenszeilen
+   frei, damit nichts über die Reihe hinausläuft. */
+@media (min-width: 1024px) and (max-height: 800px) {
+  :root {
+    --tellian-t5-name-zeilen-breit: 2;
+  }
+}
+
+@media (pointer: coarse) {
+  :root { --tellian-t5-cta-kreis: 30px; }
 }

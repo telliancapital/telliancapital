@@ -13,16 +13,16 @@ const PORTALS = [
     subtitle: "Portfolio, Reporting, Dokumente",
     href: portalKundeUrl,
   },
-  {
-    label: "Partner",
-    subtitle: "Beraterbereich und Referral",
-    href: portalPartnerUrl,
-  },
-  {
-    label: "Mitarbeiter",
-    subtitle: "Internes Backoffice",
-    href: portalMitarbeiterUrl,
-  },
+  // {
+  //   label: "Partner",
+  //   subtitle: "Beraterbereich und Referral",
+  //   href: portalPartnerUrl,
+  // },
+  // {
+  //   label: "Mitarbeiter",
+  //   subtitle: "Internes Backoffice",
+  //   href: portalMitarbeiterUrl,
+  // },
 ] as const;
 
 interface LoginOverlayProps {

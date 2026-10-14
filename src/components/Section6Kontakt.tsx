@@ -186,7 +186,7 @@ interface MapOverlayProps {
   address: string;
 }
 
-function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverlayProps) {
+export function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverlayProps) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const isAnimatingRef = useRef(false);
   const [rendered, setRendered] = useState(open);
@@ -1308,6 +1308,7 @@ export function Section6Kontakt({
         width: "100vw",
         backgroundColor: C.bg,
       }}
+      data-tellian-station="5"
     >
       {/* ═══ COLUMN 1 — Editorial ═══ */}
       <div

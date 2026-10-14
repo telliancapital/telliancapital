@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, FormEvent } from "react";
+import { memo, useEffect, useState, useCallback, useMemo, useRef, FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, LayoutGroup } from "motion/react";
 import { useSubpageMode } from "@/components/useSubpageMode";
@@ -11,7 +11,12 @@ import { PortfolioManagementDetail } from "@/components/PortfolioManagementDetai
 import { ANLAGEPROZESS_STEPS } from "@/data/anlageprozessSteps";
 import { AnlageprozessStepOrdinal, ORDINAL_FONT_SIZE } from "@/components/AnlageprozessStepOrdinal";
 import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
-import { Navigation } from "@/components/Navigation";
+import { Kopfzeile } from "@/components/Kopfzeile";
+import { MobilMenue } from "@/components/MobilMenue";
+import { PreloadScreen } from "@/components/PreloadScreen";
+import { useBandZonen } from "@/components/useBandTon";
+import { useVerticalSectionIndex } from "@/components/useVerticalSectionIndex";
+import { SECTIONS, sectionOrdinal, leisteSektionen, activeIndexFromProgress, type Sprache } from "@/sections";
 import { LoginOverlay } from "@/components/LoginOverlay";
 import { LegalPage, useLegalRoute } from "@/components/LegalPage";
 import { useHorizontalScroll } from "@/components/useHorizontalScroll";
@@ -24,24 +29,42 @@ import {
 } from "@/components/ScrollAnimations";
 import { DotNavigation } from "@/components/DotNavigation";
 import { CtaButton } from "@/components/CtaButton";
-import { Section5UeberTellian } from "@/components/Section5UeberTellian";
-import { Section6Kontakt } from "@/components/Section6Kontakt";
-import { loginUrl } from "@/sanity/env";
-import { HeroVertical } from "@/components/HeroVertical";
+import { SectionEnteredProvider } from "@/components/SectionEntry";
+import { Station1Einstieg } from "@/components/Station1Einstieg";
+import { StationVermoegensverwaltung } from "@/components/StationVermoegensverwaltung";
+import { StationVorteile } from "@/components/StationVorteile";
+import { StationGeschaeftsbeziehungen } from "@/components/StationGeschaeftsbeziehungen";
+import { StationTeam } from "@/components/StationTeam";
+import { StationKontakt } from "@/components/StationKontakt";
+
+/* ── Stationen memoisiert ──
+   Beim Stationswechsel ändern sich in HomeClient nur activeIndex und
+   der Eintritts-Latch EINER Station. Ohne memo rendern trotzdem alle
+   sechs Stationen neu (gemessen ein 90-ms-Ruckler je Wechsel bei
+   vierfach gedrosselter CPU). Alle Props der breiten Spur sind
+   referenzstabil (useCallback-Handler, CMS-Dokument, Konstanten);
+   Sprache und Eintritt kommen per Context an den memoisierten
+   Komponenten vorbei. (14.10., Scroll-Performance) */
+const Station1EinstiegM = memo(Station1Einstieg);
+const StationVermoegensverwaltungM = memo(StationVermoegensverwaltung);
+const StationVorteileM = memo(StationVorteile);
+const StationGeschaeftsbeziehungenM = memo(StationGeschaeftsbeziehungen);
+const StationTeamM = memo(StationTeam);
+const StationKontaktM = memo(StationKontakt);
+import { UnterseiteMandat } from "@/components/UnterseiteMandat";
+import { UnterseiteAdvisory } from "@/components/UnterseiteAdvisory";
+import { zweiZeilenRegel } from "@/zweiZeilen";
+import { solutionsSiteUrl } from "@/sanity/env";
 import { ExpandableBody } from "@/components/ExpandableBody";
-import { Section2Anlagephilosophie } from "@/components/Section2Anlagephilosophie";
 import { ParteiDreieck } from "@/components/ParteiDreieck";
 import { LAYOUT, TEXT_COLUMN_STYLE, getLayout, getTextColumnStyle, SPACING } from "@/layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
 import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.webp";
-import heroDesktopImg from "@/assets/zh-3.jpg";
 import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.webp";
 import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.webp";
 import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.webp";
 import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.webp";
-import { useRouter } from "next/navigation";
-import preloadLogo from "@/assets/logo/Tellian__archive white logo horizontal.svg";
 import { C, serif, sans } from "../tokens";
 import { EASE } from "../styles/motion";
 
@@ -66,46 +89,28 @@ const IMG = {
 };
 // const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
-/* ═════════════════════════════════════════════════════════
-   PRELOAD SCREEN
-   ═══════════════════════════════════════════════════════════ */
-function PreloadScreen({ onComplete }: { onComplete: () => void }) {
-  const [textVisible, setTextVisible] = useState(false);
-  const [sliding, setSliding] = useState(false);
-
-  useEffect(() => {
-    const t1 = setTimeout(() => setTextVisible(true), 500);
-    const t2 = setTimeout(() => setSliding(true), 2700);
-    const t3 = setTimeout(() => onComplete(), 3500);
-    return () => [t1, t2, t3].forEach(clearTimeout);
-  }, [onComplete]);
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[200] flex items-center justify-center"
-      style={{ backgroundColor: C.purple }}
-      animate={{ y: sliding ? "-100%" : "0%" }}
-      transition={sliding ? { duration: 0.8, ease: [0.76, 0, 0.24, 1] } : { duration: 0 }}
-    >
-      <img
-        src={preloadLogo.src}
-        alt="Tellian Capital"
-        style={{
-          width: "clamp(560px, 80vw, 920px)",
-          height: "auto",
-          opacity: textVisible ? 1 : 0,
-          transition: textVisible ? "opacity 0.6s ease-out" : "none",
-          userSelect: "none",
-          pointerEvents: "none",
-        }}
-      />
-    </motion.div>
-  );
-}
-
 /* ══════════════════════════════════════════════════════════
    CONTACT FORM — minimalist line inputs
    ═══════════════════════════════════════════════════════════ */
+/* ── Bänder mit eigener Tonmessung ──
+   useBandZonen misst je Frame, welche Stationsflächen unter Kopfzeile
+   und Stationsleiste liegen, und liefert beim Scrollen fast jeden Frame
+   neue Zonen. Lag dieser State in HomeClient, renderte die GANZE Seite
+   samt sechs Stationen 60-mal pro Sekunde (gemessen ~90 ms je Frame bei
+   vierfach gedrosselter CPU). In diesen Hüllen bleibt der Frame-State
+   bei den zwei kleinen Bändern. (14.10., Scroll-Performance) */
+type KopfzeileProps = Omit<React.ComponentProps<typeof Kopfzeile>, "zonen">;
+function KopfzeileBand({ aktiv, activeIndex, ...rest }: KopfzeileProps & { aktiv: boolean; activeIndex: number }) {
+  const zonen = useBandZonen(aktiv, activeIndex, "oben");
+  return <Kopfzeile zonen={zonen} {...rest} />;
+}
+
+type DotNavigationProps = Omit<React.ComponentProps<typeof DotNavigation>, "zonen">;
+function DotNavigationBand({ aktiv, ...rest }: DotNavigationProps & { aktiv: boolean }) {
+  const zonen = useBandZonen(aktiv, rest.activeIndex, "unten");
+  return <DotNavigation zonen={zonen} {...rest} />;
+}
+
 function ContactForm({ scrollX, isVertical = false }: { scrollX: number; isVertical?: boolean }) {
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -329,6 +334,9 @@ interface Section3Props {
   onCloseDetail?: () => void;
   onContactClick?: () => void;
   homepage?: any;
+  /** Nur die Unterseite /vermoegensverwaltung rendern — die Station im
+      Track ist seit dem Redesign StationVermoegensverwaltung. */
+  nurUnterseite?: boolean;
 }
 
 function Section3Vermoegensverwaltung({
@@ -340,16 +348,13 @@ function Section3Vermoegensverwaltung({
   onCloseDetail,
   onContactClick,
   homepage,
+  nurUnterseite = false,
 }: Section3Props) {
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
   const isDetail = viewMode === "detail";
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleAnlageprozess = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -406,6 +411,19 @@ function Section3Vermoegensverwaltung({
       : ANLAGEPROZESS_STEPS.map((s) => ({ num: s.num, shortLabel: s.shortLabel }));
 
   if (isVertical) {
+    if (nurUnterseite) {
+      return (
+        <VermoegensverwaltungMobileOverlay
+          isOpen={isDetail}
+          onClose={() => onCloseDetail?.()}
+          onContactClick={() => onContactClick?.()}
+          homepage={homepage}
+          detailEyebrow={detailEyebrow}
+          detailHeadingLine1={detailHeadingLine1}
+          detailHeadingLine2={detailHeadingLine2}
+        />
+      );
+    }
     return (
       <section id="section-vermoegensverwaltung" style={{ backgroundColor: C.bg }}>
         {/* Text content — comes FIRST on mobile/tablet */}
@@ -505,6 +523,7 @@ function Section3Vermoegensverwaltung({
     <div
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
+      data-tellian-station="2"
     >
       {/* Content wrapper — no sticky/scroll-lock, standard flow */}
       <div style={{ position: "relative", width: layout.sectionWidth, height: "100%" }}>
@@ -850,7 +869,7 @@ function Section3Vermoegensverwaltung({
      can be recognized as the same element for a FLIP transition. */
   return (
     <LayoutGroup>
-      {overviewMarkup}
+      {!nurUnterseite && overviewMarkup}
       {detailOverlay}
     </LayoutGroup>
   );
@@ -870,6 +889,9 @@ interface Section4Props {
   /** Opens the Portfolio Management detail subpage (CTA "Mehr zum Anlageprozess") */
   onNavigateToProcess?: () => void;
   homepage?: any;
+  /** Nur die Unterseite /anlagestrategien rendern — die Station im
+      Track ist seit dem Redesign StationVorteile. */
+  nurUnterseite?: boolean;
 }
 
 function Section4Anlagestrategien({
@@ -881,6 +903,7 @@ function Section4Anlagestrategien({
   onContactClick,
   onNavigateToProcess,
   homepage,
+  nurUnterseite = false,
 }: Section4Props) {
   void scrollX;
   const layout = getLayout(breakpoint);
@@ -952,6 +975,19 @@ function Section4Anlagestrategien({
   const detailHeadingLine2 = t(homepage?.strategyDetailHeadingLine2, "ein Portfolio.");
 
   if (isVertical) {
+    if (nurUnterseite) {
+      return (
+        <AnlagestrategienMobileOverlay
+          isOpen={isDetail}
+          onClose={() => onCloseDetail?.()}
+          onContactClick={() => onContactClick?.()}
+          homepage={homepage}
+          detailEyebrow={detailEyebrow}
+          detailHeadingLine1={detailHeadingLine1}
+          detailHeadingLine2={detailHeadingLine2}
+        />
+      );
+    }
     return (
       <section id="section-anlagestrategien" style={{ backgroundColor: C.bg }}>
         <div style={{ ...textColStyle }}>
@@ -1167,6 +1203,7 @@ function Section4Anlagestrategien({
     <div
       className="relative h-screen flex-shrink-0"
       style={{ width: layout.sectionWidth, backgroundColor: C.bg }}
+      data-tellian-station="3"
     >
       {/* ── Right column: Methodik-Schaubild ──
            Section4: 40/60 instead of 50/50 — deliberate, the diagram needs width.
@@ -1424,7 +1461,7 @@ function Section4Anlagestrategien({
          can match headline layoutIds across the React Portal. ─── */
   return (
     <LayoutGroup>
-      {overviewMarkup}
+      {!nurUnterseite && overviewMarkup}
       <SubpageOverlay
         isOpen={isDetail}
         onClose={() => onCloseDetail?.()}
@@ -1456,344 +1493,365 @@ export default function HomeClient({ homepage }: { homepage: any }) {
   const { breakpoint, isVertical } = useBreakpoint();
   const layout = getLayout(breakpoint);
   const textColStyle = getTextColumnStyle(breakpoint);
-  const { t } = useLanguage();
-
-  // Localized hero strings (with fallbacks to the original German copy)
-  const heroEyebrow = t(
-    homepage?.startEyebrow,
-    "Unabhängige Vermögensverwaltung · Zürich · Seit 1996",
+  const { t, lang, setLang } = useLanguage();
+  const sprache: Sprache = lang === "en" ? "EN" : "DE";
+  const onSprache = useCallback(
+    (s: Sprache) => setLang(s === "EN" ? "en" : "de"),
+    [setLang],
   );
-  const heroLine1 = t(homepage?.startHeadingLine1, "Vermögen");
-  const heroLine2 = t(homepage?.startHeadingLine2, "mit Methode");
-  const heroCta = t(homepage?.startCtaLabel, "Gespräch vereinbaren");
-  const heroBottomLabel = t(homepage?.startBottomLabel, "FINMA-LIZENZIERT · ZÜRICH");
-  // Hero image: prefer uploaded asset, then external URL, then bundled fallback.
-  const heroImageSrc: string =
-    homepage?.startImageAsset?.url || homepage?.startImageUrl || heroDesktopImg.src;
+
+  /* ── Navigation copy from Sanity (same fields the sidebar used) ──
+        Section order, scroll targets and IDs stay in code (structural);
+        only the labels and the portal copy are CMS-driven. */
+  const cmsNavItems = homepage?.navItems;
+  const leisteNamen = useMemo(
+    () => leisteSektionen(sprache, cmsNavItems, t),
+    [sprache, cmsNavItems, t],
+  );
+  const kundenportalLabel = t(homepage?.navKundenportalLabel, "Kundenportal");
 
   // Portfolio Management subpage overlay header (localized, with fallback to the original German copy)
   const pmDetailEyebrow = t(homepage?.pmDetailEyebrow, "Portfolio Management");
   const pmDetailHeadingLine1 = t(homepage?.pmDetailHeadingLine1, "Wie wir Ihr Portfolio");
   const pmDetailHeadingLine2 = t(homepage?.pmDetailHeadingLine2, "führen.");
 
-  const { scrollX, scrollProgress, scrollDirection, containerRef, scrollTo } = useHorizontalScroll({
-    disabled: isVertical || !introComplete,
-  });
+  /* ── Gemessene Stationskanten (Desktop) ──
+     Die Stationen sind unterschiedlich breit (Hero 100vw, Rad und
+     Team eigene Masse). Sprungziele und aktive Station kommen deshalb
+     aus den gemessenen Kanten der Panels, nicht aus festen Anteilen.
+     Die Kanten liegen zusätzlich in einem Ref, damit die Scroll-
+     Schleife sie je Frame lesen kann, ohne React zu bemühen. */
+  const [kanten, setKanten] = useState<number[] | null>(null);
+  const kantenRef = useRef<number[] | null>(null);
+  useEffect(() => {
+    kantenRef.current = kanten;
+  }, [kanten]);
 
-  const router = useRouter();
-  const handleLogin = () => {
-    router.push(loginUrl);
-  };
+  const indexAt = useCallback((x: number, max: number) => {
+    const k = kantenRef.current;
+    if (!k) return activeIndexFromProgress(max > 0 ? x / max : 0);
+    let idx = 0;
+    for (let i = 1; i < k.length; i++) {
+      if (x >= (k[i - 1] + k[i]) / 2) idx = i;
+    }
+    return idx;
+  }, []);
+
+  const { activeIndex: horizontalIndex, containerRef, scrollTo } = useHorizontalScroll({
+    disabled: isVertical || !introComplete,
+    indexAt,
+  });
 
   const [loginOpen, setLoginOpen] = useState(false);
   const handleKundenportalClick = () => {
     setLoginOpen(true);
   };
+  const [menueOffen, setMenueOffen] = useState(false);
+
+  /* The page is mounted BENEATH the preload screen right after hydration,
+     so the purple surface slides up and reveals the hero (as in the new
+     design). SSR output stays the preload screen alone — the sections read
+     window/document during render and were never server-rendered before. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const mountedTrack = mounted && introComplete;
+
+  useEffect(() => {
+    if (isVertical) return;
+    const track = containerRef.current;
+    if (!track) return;
+    const messen = () => {
+      const lefts = SECTIONS.map((_, i) => {
+        const el = track.querySelector<HTMLElement>(`[data-tellian-station="${i}"]`);
+        return el ? el.offsetLeft : -1;
+      });
+      setKanten(lefts.every((l) => l >= 0) ? lefts : null);
+    };
+    messen();
+    const ro = new ResizeObserver(messen);
+    ro.observe(track);
+    window.addEventListener("resize", messen);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", messen);
+    };
+  }, [isVertical, mountedTrack]);
+
+  /* Active section: desktop from the scroll position against the
+     measured edges, tablet/mobile from an IntersectionObserver. */
+  const verticalIndex = useVerticalSectionIndex(isVertical);
+  const activeIndex = isVertical ? verticalIndex : horizontalIndex;
+
+  /* Single entry point for direct jumps from header, menu and station bar. */
+  const navigateToSection = useCallback(
+    (index: number) => {
+      const i = Math.max(0, Math.min(SECTIONS.length - 1, index));
+      const section = SECTIONS[i];
+      if (isVertical) {
+        document.getElementById(section.domId)?.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+      const track = containerRef.current;
+      const el = track?.querySelector<HTMLElement>(`[data-tellian-station="${i}"]`);
+      const max = track ? track.scrollWidth - track.clientWidth : 0;
+      if (el && max > 0) {
+        scrollTo(Math.min(1, el.offsetLeft / max));
+      } else {
+        scrollTo(section.progress);
+      }
+    },
+    [isVertical, scrollTo, containerRef],
+  );
+
+  /* Sichtbare Stationsflächen unter den Bändern messen KopfzeileBand
+     und DotNavigationBand selbst (siehe oben). */
+  const bandAktiv = !isVertical && introComplete;
+
+  const handleWelt = useCallback((ziel: "capital" | "solutions") => {
+    if (ziel === "solutions") window.location.href = solutionsSiteUrl;
+  }, []);
+
+  const handleIntroComplete = useCallback(() => setIntroComplete(true), []);
+
 
   const vvw = useSubpageMode("/vermoegensverwaltung");
   const ast = useSubpageMode("/anlagestrategien");
   const pm = useSubpageMode("/portfolio-management");
+  /* Mandat und Advisory hängen an Station 02 (Redesign). */
+  const adv = useSubpageMode("/advisory");
+  const man = useSubpageMode("/mandat");
   const legal = useLegalRoute();
+  /* Personen-Detail der Teamstation. */
+  const [teamDetailOffen, setTeamDetailOffen] = useState(false);
+  void teamDetailOffen;
 
   const isDetailMode =
     vvw.mode === "detail" ||
     ast.mode === "detail" ||
     pm.mode === "detail" ||
+    adv.isDetail ||
+    man.isDetail ||
     legal.activePath !== null;
 
-  const [heroAnimate, setHeroAnimate] = useState(false);
-  const heroArrowHidden = scrollX > 0.02;
-
+  /* ═══ Eintritts-Latch ═══ Rastet die aktuelle Station und nimmt sie
+     nie zurück: Einblendungen laufen genau einmal. Die erste Rastung
+     wartet auf das Ende des Intros und einen Moment für die Schriften. */
+  const [entered, setEntered] = useState<boolean[]>(() => SECTIONS.map(() => false));
+  const firstLatchDone = useRef(false);
   useEffect(() => {
-    if (introComplete) {
-      const t = setTimeout(() => setHeroAnimate(true), 100);
-      return () => clearTimeout(t);
+    if (isVertical || !introComplete) return;
+    const latch = () =>
+      setEntered((prev) => (prev[activeIndex] ? prev : prev.map((v, k) => (k === activeIndex ? true : v))));
+    if (firstLatchDone.current) {
+      latch();
+      return;
     }
-  }, [introComplete]);
+    const t = setTimeout(() => {
+      firstLatchDone.current = true;
+      latch();
+    }, 120);
+    return () => clearTimeout(t);
+  }, [isVertical, introComplete, activeIndex]);
+
+  /* Eingabeart merken (Zeiger oder Tastatur) für den Fokusrahmen, und
+     die Zwei-Zeilen-Regel für Überschriften. */
+  useEffect(() => {
+    const eingabe = (art: "zeiger" | "tastatur") => {
+      if (document.documentElement.dataset.eingabe !== art) document.documentElement.dataset.eingabe = art;
+    };
+    const aufZeiger = () => eingabe("zeiger");
+    const aufTaste = (e: KeyboardEvent) => {
+      if (e.key === "Tab" || e.key.startsWith("Arrow")) eingabe("tastatur");
+    };
+    window.addEventListener("pointerdown", aufZeiger, { capture: true, passive: true });
+    window.addEventListener("keydown", aufTaste, { capture: true });
+    const stop = zweiZeilenRegel();
+    return () => {
+      window.removeEventListener("pointerdown", aufZeiger, { capture: true });
+      window.removeEventListener("keydown", aufTaste, { capture: true });
+      stop();
+    };
+  }, []);
 
   const navigateToContact = useCallback(() => {
     vvw.closeDetail();
     ast.closeDetail();
     pm.closeDetail();
+    adv.closeDetail();
+    man.closeDetail();
     legal.close();
-    if (isVertical) {
-      const el = document.getElementById("section-kontakt");
-      el?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      scrollTo(0.88);
-    }
-  }, [vvw, ast, pm, legal, isVertical, scrollTo]);
+    navigateToSection(SECTIONS.length - 1);
+  }, [vvw, ast, pm, adv, man, legal, navigateToSection]);
 
-  if (!introComplete) {
-    return <PreloadScreen onComplete={() => setIntroComplete(true)} />;
+  const marke = (i: number) => ({ nr: sectionOrdinal(i), name: leisteNamen[i]?.label ?? SECTIONS[i].label });
+  const handleWeltMenue = handleWelt;
+
+  const preload = !introComplete && <PreloadScreen onComplete={handleIntroComplete} />;
+
+  if (!mounted) {
+    return <>{preload}</>;
   }
 
+  /* ═══ Unterseiten Mandat / Advisory (beide Zweige) ═══ */
+  const mandatAdvisoryOverlays = (
+    <>
+      <SubpageOverlay isOpen={adv.isDetail} onClose={adv.closeDetail} eyebrow="" headline={null}>
+        <UnterseiteAdvisory
+          isMobile={isVertical}
+          aktiv={adv.isDetail}
+          sprache={sprache}
+          onContactClick={navigateToContact}
+          onAndereSeite={() => {
+            adv.closeSilently();
+            man.openDetail();
+          }}
+        />
+      </SubpageOverlay>
+      <SubpageOverlay isOpen={man.isDetail} onClose={man.closeDetail} eyebrow="" headline={null}>
+        <UnterseiteMandat
+          isMobile={isVertical}
+          aktiv={man.isDetail}
+          sprache={sprache}
+          onContactClick={navigateToContact}
+          onAndereSeite={() => {
+            man.closeSilently();
+            adv.openDetail();
+          }}
+        />
+      </SubpageOverlay>
+    </>
+  );
+
+  /* ═══ Portfolio Management Subpage (beide Zweige) ═══ */
+  const pmOverlay = (
+    <SubpageOverlay
+      isOpen={pm.isDetail}
+      onClose={() => pm.closeDetail()}
+      eyebrow={pmDetailEyebrow}
+      headline={
+        <>
+          {pmDetailHeadingLine1}
+          <br />
+          <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
+        </>
+      }
+    >
+      <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} homepage={homepage} />
+    </SubpageOverlay>
+  );
+
+  /* ═══════════════════════════════════════════════════════
+     VERTICAL LAYOUT (Tablet + Mobile)
+     ═══════════════════════════════════════════════════════ */
   if (isVertical) {
     return (
-      <div style={{ backgroundColor: C.bg, minHeight: "100vh" }}>
-        <Navigation
-          isVertical={true}
-          onLoginClick={handleLogin}
-          onKundenportalClick={handleKundenportalClick}
-          scrollProgress={0}
-          scrollDirection="idle"
-          onNavigate={() => {}}
-          introComplete={introComplete}
-          breakpoint={breakpoint}
-          homepage={homepage}
+      <div
+        className="min-h-screen w-full cursor-default"
+        style={{
+          backgroundColor: C.bg,
+          opacity: isDetailMode ? 0 : 1,
+          pointerEvents: isDetailMode ? "none" : "auto",
+          transition: "opacity 400ms ease-out",
+        }}
+      >
+        {preload}
+
+        <KopfzeileBand
+          aktiv={bandAktiv}
+          activeIndex={activeIndex}
+          sprache={sprache}
+          onSprache={onSprache}
+          onPortal={handleKundenportalClick}
+          onLogo={() => navigateToSection(0)}
+          welt="capital"
+          onWelt={handleWelt}
+          isVertical
+          menueOffen={menueOffen}
+          onMenue={() => setMenueOffen((o) => !o)}
+          portalLabel={kundenportalLabel}
+          sichtbar={introComplete}
+        />
+
+        <MobilMenue
+          offen={menueOffen}
+          onSchliessen={() => setMenueOffen(false)}
+          activeIndex={activeIndex}
+          sektionen={leisteNamen}
+          onNavigate={navigateToSection}
+          onOpenLegal={legal.open}
+          welt="capital"
+          onWelt={handleWeltMenue}
+          sprache={sprache}
+          sprachen={["DE", "EN"]}
+          onSprache={(s) => onSprache(s as Sprache)}
+          onPortal={handleKundenportalClick}
+          portalLabel={kundenportalLabel}
         />
 
         <main>
-          <HeroVertical
-            imageSrc={heroImageSrc}
-            introComplete={introComplete}
-            breakpoint={breakpoint}
-            onCtaClick={navigateToContact}
-          />
+          {/* 01 — Einstieg */}
+          <Station1Einstieg isVertical bereit={introComplete} sprache={sprache} homepage={homepage} />
 
-          <div id="section-philosophy">
-            <Section2Anlagephilosophie
-              scrollX={0}
-              isVertical={true}
-              breakpoint={breakpoint}
-              homepage={homepage}
-            />
-          </div>
-
-          <Section3Vermoegensverwaltung
-            scrollX={0}
-            isVertical={true}
-            breakpoint={breakpoint}
-            viewMode={vvw.mode}
-            onOpenDetail={vvw.openDetail}
-            onCloseDetail={vvw.closeDetail}
-            onContactClick={navigateToContact}
+          {/* 02 — Vermögensverwaltung (dunkel) */}
+          <StationVermoegensverwaltung
+            isVertical
+            domId={SECTIONS[1].domId}
+            sprache={sprache}
             homepage={homepage}
+            marke={marke(1)}
+            onMandat={man.openDetail}
+            onAdvisory={adv.openDetail}
           />
 
-          <Section4Anlagestrategien
-            scrollX={0}
-            isVertical={true}
-            breakpoint={breakpoint}
-            viewMode={ast.mode}
-            onOpenDetail={ast.openDetail}
-            onCloseDetail={ast.closeDetail}
-            onContactClick={navigateToContact}
-            onNavigateToProcess={pm.openDetail}
+          {/* 03 — Ihre Vorteile (hell) */}
+          <StationVorteile
+            isVertical
+            domId={SECTIONS[2].domId}
+            sprache={sprache}
+            marke={marke(2)}
+            istAktiv={SECTIONS[activeIndex]?.key === "strategien"}
+          />
+
+          {/* 04 — Geschäftsbeziehungen (dunkel) */}
+          <StationGeschaeftsbeziehungen
+            isVertical
+            domId={SECTIONS[3].domId}
+            sprache={sprache}
             homepage={homepage}
+            marke={marke(3)}
+            onMandat={man.openDetail}
           />
 
-          <Section5UeberTellian
-            isVertical={true}
-            breakpoint={breakpoint}
+          {/* 05 — Team */}
+          <StationTeam
+            isVertical
+            domId={SECTIONS[4].domId}
+            sprache={sprache}
             homepage={homepage}
-            onContactClick={navigateToContact}
+            marke={marke(4)}
+            onDetailToggle={setTeamDetailOffen}
           />
 
-          <div id="section-kontakt">
-            <Section6Kontakt
-              initialData={homepage}
-              isVertical={true}
-              breakpoint={breakpoint}
-              onOpenLegal={legal.open}
-            />
-          </div>
+          {/* 06 — Kontakt */}
+          <StationKontakt
+            isVertical
+            domId={SECTIONS[5].domId}
+            sprache={sprache}
+            homepage={homepage}
+            marke={marke(5)}
+            onOpenLegal={legal.open}
+          />
         </main>
 
-        <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+        {mandatAdvisoryOverlays}
 
-        {/* ═══ Portfolio Management Subpage (mobile) ═══ */}
-        <SubpageOverlay
-          isOpen={pm.isDetail}
-          onClose={() => pm.closeDetail()}
-          eyebrow={pmDetailEyebrow}
-          headline={
-            <>
-              {pmDetailHeadingLine1}
-              <br />
-              <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
-            </>
-          }
-        >
-          <PortfolioManagementDetail isMobile={true} onContactClick={navigateToContact} homepage={homepage} />
-        </SubpageOverlay>
-
-        <LoginOverlay
-          open={loginOpen}
-          onClose={() => setLoginOpen(false)}
-          onSupportClick={navigateToContact}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative h-screen w-full overflow-hidden" style={{ backgroundColor: C.bg }}>
-      <Navigation
-        isVertical={false}
-        onLoginClick={handleLogin}
-        onKundenportalClick={handleKundenportalClick}
-        scrollProgress={scrollProgress}
-        scrollDirection={scrollDirection}
-        onNavigate={scrollTo}
-        introComplete={introComplete}
-        breakpoint={breakpoint}
-        homepage={homepage}
-      />
-
-      <DotNavigation scrollProgress={scrollProgress} onNavigate={scrollTo} />
-
-      <div
-        ref={containerRef}
-        className="flex h-screen overflow-x-scroll overflow-y-hidden"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          pointerEvents: !isDetailMode ? "auto" : "none",
-          opacity: isDetailMode ? 0 : 1,
-          transition: isDetailMode ? "opacity 600ms ease-out 150ms" : "opacity 400ms ease-out",
-        }}
-      >
-        <div
-          className="relative h-screen flex-shrink-0"
-          style={{ width: layout.heroWidth, backgroundColor: C.bg }}
-        >
-          <div
-            className="absolute z-0"
-            style={{ top: 0, bottom: 0, left: layout.imageLeft, right: 0 }}
-          >
-            <HeroExpandingImage src={heroImageSrc} scrollX={scrollX} className="h-full w-full" />
-          </div>
-
-          {/* Text column — eyebrow + headline + CTA, vertically centered */}
-          <div
-            className="relative z-10 flex h-full flex-col justify-center"
-            style={{ ...textColStyle }}
-          >
-            {/* Eyebrow — above headline */}
-            <span
-              style={{
-                fontFamily: sans,
-                fontSize: "11px",
-                fontWeight: 400,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: C.stone,
-                opacity: heroAnimate ? 1 : 0,
-                transition: "opacity 600ms ease-out 200ms",
-              }}
-            >
-              {heroEyebrow}
-            </span>
-
-            {/* Headline */}
-            <h1
-              style={{
-                fontFamily: serif,
-                fontSize: "clamp(88px, 12vh, 140px)",
-                lineHeight: 1.0,
-                color: C.dark,
-                letterSpacing: "-0.03em",
-                maxWidth: "520px",
-                fontWeight: 400,
-                margin: 0,
-                marginTop: "28px",
-                opacity: heroAnimate ? 1 : 0,
-                transform: heroAnimate ? "translateY(0)" : "translateY(24px)",
-                transition:
-                  "opacity 800ms ease-out 400ms, transform 800ms cubic-bezier(0.16,1,0.3,1) 400ms",
-              }}
-            >
-              {heroLine1}
-              <br />
-              <em style={{ fontStyle: "italic", fontWeight: 400 }}>{heroLine2}</em>
-            </h1>
-
-            {/* CTA — ghost button */}
-            <div
-              style={{
-                marginTop: "64px",
-                opacity: heroAnimate ? 1 : 0,
-                transform: heroAnimate ? "translateX(0)" : "translateX(-16px)",
-                transition:
-                  "opacity 500ms ease-out 900ms, transform 500ms cubic-bezier(0.16,1,0.3,1) 900ms",
-              }}
-            >
-              <CtaButton
-                href="#contact"
-                variant="ghost"
-                fullWidth={false}
-                style={{
-                  backgroundColor: C.button,
-                  color: C.dark,
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigateToContact();
-                }}
-              >
-                {heroCta}
-              </CtaButton>
-            </div>
-          </div>
-
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              bottom: "56px",
-              right: "calc(10vw + 56px)",
-              zIndex: 5,
-              color: C.purple,
-              opacity: heroAnimate && !heroArrowHidden ? 1 : 0,
-              transform: heroArrowHidden ? "translateX(16px) scale(0.6)" : "scale(1)",
-              transition: heroArrowHidden
-                ? "opacity 600ms cubic-bezier(0.4,0,0.2,1), transform 600ms cubic-bezier(0.4,0,0.2,1)"
-                : "opacity 700ms ease-out 600ms",
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              style={{
-                animation:
-                  heroAnimate && !heroArrowHidden
-                    ? "tellianHeroArrowPulse 2s ease-in-out infinite"
-                    : "none",
-              }}
-            >
-              <svg
-                width="96"
-                height="24"
-                viewBox="0 0 32 8"
-                fill="currentColor"
-                style={{ display: "block" }}
-              >
-                <polygon points="2 2 28 2 30 4 28 6 2 6" />
-              </svg>
-            </div>
-          </div>
-          <style>{`
-            @keyframes tellianHeroArrowPulse {
-              0%, 100% { transform: translateX(0); }
-              50%      { transform: translateX(10px); }
-            }
-          `}</style>
-        </div>
-
-        <div
-          className="h-screen flex-shrink-0"
-          style={{ width: layout.breathingSpace, backgroundColor: C.bg }}
-        />
-
-        <Section2Anlagephilosophie scrollX={scrollX} homepage={homepage} />
-
-        <div
-          className="h-screen flex-shrink-0"
-          style={{ width: layout.breathingSpace, backgroundColor: C.bg }}
-        />
-
+        {/* Unterseiten /vermoegensverwaltung und /anlagestrategien (CMS) */}
         <Section3Vermoegensverwaltung
-          scrollX={scrollX}
+          nurUnterseite
+          scrollX={0}
+          isVertical
           breakpoint={breakpoint}
           viewMode={vvw.mode}
           onOpenDetail={vvw.openDetail}
@@ -1801,14 +1859,10 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           onContactClick={navigateToContact}
           homepage={homepage}
         />
-
-        <div
-          className="h-screen flex-shrink-0"
-          style={{ width: layout.breathingSpace, backgroundColor: C.bg }}
-        />
-
         <Section4Anlagestrategien
-          scrollX={scrollX}
+          nurUnterseite
+          scrollX={0}
+          isVertical
           breakpoint={breakpoint}
           viewMode={ast.mode}
           onOpenDetail={ast.openDetail}
@@ -1818,44 +1872,145 @@ export default function HomeClient({ homepage }: { homepage: any }) {
           homepage={homepage}
         />
 
-        <div
-          className="h-screen flex-shrink-0"
-          style={{ width: layout.breathingSpace, backgroundColor: C.bg }}
+        <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+        {pmOverlay}
+
+        <LoginOverlay open={loginOpen} onClose={() => setLoginOpen(false)} onSupportClick={navigateToContact} />
+      </div>
+    );
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     DESKTOP — HORIZONTAL LAYOUT
+     ═══════════════════════════════════════════════════════ */
+  return (
+    <div className="relative h-screen w-full overflow-hidden cursor-default" style={{ backgroundColor: C.bg }}>
+      {preload}
+
+      {/* Genau zwei Navigationselemente: Kopfzeile und Stationsleiste. */}
+      <div
+        style={{
+          opacity: isDetailMode ? 0 : 1,
+          pointerEvents: isDetailMode ? "none" : "auto",
+          transition: "opacity 400ms ease-out",
+        }}
+      >
+        <KopfzeileBand
+          aktiv={bandAktiv}
+          activeIndex={activeIndex}
+          sprache={sprache}
+          onSprache={onSprache}
+          onPortal={handleKundenportalClick}
+          onLogo={() => navigateToSection(0)}
+          welt="capital"
+          onWelt={handleWelt}
+          portalLabel={kundenportalLabel}
+          sichtbar={introComplete}
         />
 
-        <Section5UeberTellian homepage={homepage} onContactClick={navigateToContact} />
-
-        <div
-          className="h-screen flex-shrink-0"
-          style={{ width: layout.breathingSpace, backgroundColor: C.bg }}
-        />
-
-        <Section6Kontakt onOpenLegal={legal.open} initialData={homepage} />
+        {introComplete && (
+          <DotNavigationBand
+            aktiv={bandAktiv}
+            activeIndex={activeIndex}
+            onNavigate={navigateToSection}
+            sektionen={leisteNamen}
+            ariaLabel={lang === "en" ? "Section navigation" : "Sektion-Navigation"}
+          />
+        )}
       </div>
 
-      <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
-
-      {/* ═══ Portfolio Management Subpage ═══ */}
-      <SubpageOverlay
-        isOpen={pm.isDetail}
-        onClose={() => pm.closeDetail()}
-        eyebrow={pmDetailEyebrow}
-        headline={
-          <>
-            {pmDetailHeadingLine1}
-            <br />
-            <em style={{ fontStyle: "italic", fontWeight: 400 }}>{pmDetailHeadingLine2}</em>
-          </>
-        }
+      <div
+        ref={containerRef}
+        data-tellian-track
+        className="flex h-screen overflow-x-scroll overflow-y-hidden"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          pointerEvents: introComplete && !isDetailMode ? "auto" : "none",
+          opacity: isDetailMode ? 0 : 1,
+          transition: isDetailMode ? "opacity 600ms ease-out 150ms" : "opacity 400ms ease-out",
+        }}
       >
-        <PortfolioManagementDetail isMobile={isVertical} onContactClick={navigateToContact} homepage={homepage} />
-      </SubpageOverlay>
+        {/* STATION 1 — EINSTIEG */}
+        <SectionEnteredProvider value={entered[0]}>
+          <Station1EinstiegM sprache={sprache} homepage={homepage} />
+        </SectionEnteredProvider>
 
-      <LoginOverlay
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onSupportClick={navigateToContact}
+        {/* STATION 2 — VERMÖGENSVERWALTUNG (dunkel) */}
+        <SectionEnteredProvider value={entered[1]}>
+          <StationVermoegensverwaltungM
+            domId={SECTIONS[1].domId}
+            sprache={sprache}
+            homepage={homepage}
+            onMandat={man.openDetail}
+            onAdvisory={adv.openDetail}
+          />
+        </SectionEnteredProvider>
+
+        {/* STATION 3 — IHRE VORTEILE (hell) */}
+        <SectionEnteredProvider value={entered[2]}>
+          <StationVorteileM
+            domId={SECTIONS[2].domId}
+            sprache={sprache}
+            istAktiv={SECTIONS[activeIndex]?.key === "strategien"}
+          />
+        </SectionEnteredProvider>
+
+        {/* STATION 4 — GESCHÄFTSBEZIEHUNGEN (dunkel) */}
+        <SectionEnteredProvider value={entered[3]}>
+          <StationGeschaeftsbeziehungenM
+            domId={SECTIONS[3].domId}
+            sprache={sprache}
+            homepage={homepage}
+            onMandat={man.openDetail}
+          />
+        </SectionEnteredProvider>
+
+        {/* STATION 5 — TEAM */}
+        <SectionEnteredProvider value={entered[4]}>
+          <StationTeamM
+            domId={SECTIONS[4].domId}
+            sprache={sprache}
+            homepage={homepage}
+            onDetailToggle={setTeamDetailOffen}
+          />
+        </SectionEnteredProvider>
+
+        {/* STATION 6 — KONTAKT */}
+        <SectionEnteredProvider value={entered[5]}>
+          <StationKontaktM domId={SECTIONS[5].domId} sprache={sprache} homepage={homepage} onOpenLegal={legal.open} />
+        </SectionEnteredProvider>
+      </div>
+
+      {mandatAdvisoryOverlays}
+
+      {/* Unterseiten /vermoegensverwaltung und /anlagestrategien (CMS) */}
+      <Section3Vermoegensverwaltung
+        nurUnterseite
+        scrollX={0}
+        breakpoint={breakpoint}
+        viewMode={vvw.mode}
+        onOpenDetail={vvw.openDetail}
+        onCloseDetail={vvw.closeDetail}
+        onContactClick={navigateToContact}
+        homepage={homepage}
       />
+      <Section4Anlagestrategien
+        nurUnterseite
+        scrollX={0}
+        breakpoint={breakpoint}
+        viewMode={ast.mode}
+        onOpenDetail={ast.openDetail}
+        onCloseDetail={ast.closeDetail}
+        onContactClick={navigateToContact}
+        onNavigateToProcess={pm.openDetail}
+        homepage={homepage}
+      />
+
+      <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
+      {pmOverlay}
+
+      <LoginOverlay open={loginOpen} onClose={() => setLoginOpen(false)} onSupportClick={navigateToContact} />
     </div>
   );
 }

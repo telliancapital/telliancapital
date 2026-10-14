@@ -13,6 +13,7 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   startEyebrow,
   startHeadingLine1,
   startHeadingLine2,
+  startParagraphs,
   startCtaLabel,
   startBottomLabel,
   "startImageAsset": startImage.asset->{ url },
@@ -125,6 +126,7 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
     email,
     linkedin,
     bio,
+    image,
     "imageAsset": image.asset->{ url },
     imageUrl
   },

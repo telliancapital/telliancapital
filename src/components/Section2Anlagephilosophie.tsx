@@ -423,10 +423,11 @@ export function Section2Anlagephilosophie({
     <div
       className="relative h-screen flex-shrink-0"
       style={{ width: "110vw", backgroundColor: C.bg }}
+      data-tellian-station="1"
     >
       {/* Image — right, narrowed to give the text column more room */}
       <div className="absolute z-0" style={{ top: 0, bottom: 0, left: "54vw", right: 0 }}>
-        <HeroExpandingImage src={imageSrc} scrollX={scrollX} className="h-full w-full" />
+        <HeroExpandingImage src={imageSrc} scrollX={scrollX} className="h-full w-full" bildzone />
       </div>
 
       {/* Left column — eyebrow + headline + body + Leistungsethik, vertically centered.

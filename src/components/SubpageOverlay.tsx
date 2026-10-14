@@ -1,21 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 
-/* ─── Design tokens ─── */
-const C = {
-  bg: "#F9F9F7",
-  dark: "#1A1916",
-  stone: "#8A857C",
-  line: "#D8D5CF",
-};
-
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
-
-const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+import { C, serif, sans } from "@/tokens";
+import { EASE } from "@/styles/motion";
+import logoHorizontal from "@/assets/logo/Tellian__Imperial purple logo.svg";
 
 interface SubpageOverlayProps {
   isOpen: boolean;
@@ -24,32 +15,31 @@ interface SubpageOverlayProps {
   eyebrow: string;
   /** Serif headline with optional <em> — JSX allowed */
   headline: ReactNode;
-  /** Everything rendered inside the overlay below the hero
-   *  (e.g. FLIP anchor area, detail content, footer) */
   children: ReactNode;
 }
 
 /**
- * Reusable subpage overlay shell.
- * Renders via React Portal to document.body, animates open/close, handles
- * the sticky top bar with back button, and the hero title block.
- * Each concrete subpage provides its own `children` (stepper/FLIP/detail).
+ * Reusable subpage overlay shell (Redesign).
+ * Portal to document.body, sticky top bar with logo + back button,
+ * optional hero block; content mounts only while open (plus fade-out).
  */
-export function SubpageOverlay({
-  isOpen,
-  onClose,
-  eyebrow,
-  headline,
-  children,
-}: SubpageOverlayProps) {
-  /* Scroll to top each time overlay opens so long-scroll content starts fresh */
+export function SubpageOverlay({ isOpen, onClose, eyebrow, headline, children }: SubpageOverlayProps) {
+  const [zeigtInhalt, setZeigtInhalt] = useState(isOpen);
+  useEffect(() => {
+    if (isOpen) {
+      setZeigtInhalt(true);
+      return;
+    }
+    const t = window.setTimeout(() => setZeigtInhalt(false), 850);
+    return () => window.clearTimeout(t);
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     const overlay = document.getElementById("tellian-subpage-overlay");
     if (overlay) overlay.scrollTo({ top: 0 });
   }, [isOpen]);
 
-  /* ESC to close */
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -64,10 +54,11 @@ export function SubpageOverlay({
   return createPortal(
     <div
       id="tellian-subpage-overlay"
+      aria-hidden={!isOpen}
       style={{
         position: "fixed",
         inset: 0,
-        zIndex: 90,
+        zIndex: 180,
         backgroundColor: C.bg,
         overflowY: "auto",
         WebkitOverflowScrolling: "touch",
@@ -96,18 +87,7 @@ export function SubpageOverlay({
           transition: `opacity 300ms ease-out ${isOpen ? "900ms" : "0ms"}`,
         }}
       >
-        <span
-          style={{
-            fontFamily: sans,
-            fontSize: "13px",
-            fontWeight: 700,
-            letterSpacing: "2.5px",
-            color: C.dark,
-            textTransform: "uppercase",
-          }}
-        >
-          Tellian<span style={{ fontWeight: 400 }}> Capital</span>
-        </span>
+        <img src={logoHorizontal.src} alt="Tellian Capital" style={{ width: "112px", height: "auto", display: "block" }} />
         <button
           onClick={onClose}
           style={{
@@ -120,8 +100,8 @@ export function SubpageOverlay({
             alignItems: "center",
             gap: "6px",
             fontFamily: sans,
-            fontSize: "11px",
-            letterSpacing: "0.15em",
+            fontSize: "12px",
+            letterSpacing: "var(--tellian-ls-marker)",
             textTransform: "uppercase",
             color: C.stone,
             transition: "color 300ms ease-out",
@@ -134,45 +114,46 @@ export function SubpageOverlay({
         </button>
       </div>
 
-      {/* ═══ Hero — eyebrow + headline ═══ */}
-      <div
-        style={{
-          textAlign: "center",
-          padding: "80px 48px 40px",
-          opacity: isOpen ? 1 : 0,
-          transform: isOpen ? "translateY(0)" : "translateY(-12px)",
-          transition: `opacity 600ms ease-out ${isOpen ? "500ms" : "0ms"}, transform 600ms ${EASE} ${isOpen ? "500ms" : "0ms"}`,
-        }}
-      >
-        <span
+      {/* ═══ Kopf — Eyebrow und Titel (nur wenn vorhanden) ═══ */}
+      {zeigtInhalt && (eyebrow || headline) && (
+        <div
           style={{
-            fontFamily: sans,
-            fontSize: "10px",
-            letterSpacing: "0.28em",
-            color: C.stone,
-            textTransform: "uppercase",
-            display: "block",
+            textAlign: "center",
+            padding: "80px 48px 40px",
+            opacity: isOpen ? 1 : 0,
+            transform: isOpen ? "translateY(0)" : "translateY(-12px)",
+            transition: `opacity 600ms ease-out ${isOpen ? "500ms" : "0ms"}, transform 600ms ${EASE.standard} ${isOpen ? "500ms" : "0ms"}`,
           }}
         >
-          {eyebrow}
-        </span>
-        <h1
-          style={{
-            fontFamily: serif,
-            fontSize: "clamp(40px, 4.5vw, 56px)",
-            lineHeight: 1.05,
-            color: C.dark,
-            letterSpacing: "-0.02em",
-            margin: "20px 0 0 0",
-            fontWeight: 400,
-          }}
-        >
-          {headline}
-        </h1>
-      </div>
+          <span
+            style={{
+              fontFamily: sans,
+              fontSize: "12px",
+              letterSpacing: "var(--tellian-ls-marker)",
+              color: C.stone,
+              textTransform: "uppercase",
+              display: "block",
+            }}
+          >
+            {eyebrow}
+          </span>
+          <h1
+            style={{
+              fontFamily: serif,
+              fontSize: "clamp(40px, 4.5vw, 56px)",
+              lineHeight: 1.05,
+              color: C.dark,
+              letterSpacing: "-0.02em",
+              margin: "20px 0 0 0",
+              fontWeight: 400,
+            }}
+          >
+            {headline}
+          </h1>
+        </div>
+      )}
 
-      {/* ═══ Custom per-subpage content ═══ */}
-      {children}
+      {zeigtInhalt && children}
     </div>,
     document.body,
   );

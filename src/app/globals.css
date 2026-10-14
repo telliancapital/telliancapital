@@ -31,3 +31,25 @@ html {
   background: rgba(26, 25, 22, 0.08);
   color: #1a1916;
 }
+
+/* ── Redesign: schmaler Hero als EINE Bühne ── */
+.tellian-hero-schmal {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Redesign: Ebene 1 — Marker (Versal-Standard) ── */
+.tellian-marker {
+  text-transform: uppercase;
+  letter-spacing: var(--tellian-ls-marker);
+  font-size: 12px;
+}
+
+/* Fokusrahmen nur bei Tastaturbedienung (siehe HomeClient). */
+html[data-eingabe="zeiger"] :is(button, a, [role="button"], [role="dialog"], [tabindex]):not(input, textarea, select):focus-visible {
+  outline: none !important;
+}
+
+html { -webkit-tap-highlight-color: transparent; }
