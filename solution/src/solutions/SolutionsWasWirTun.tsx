@@ -1,0 +1,293 @@
+"use client";
+
+import { cormorant, sans, serif } from "@/tokens";
+import { useSectionEntered } from "@/components/SectionEntry";
+import { usePrefersReducedMotion } from "@/components/usePrefersReducedMotion";
+import { Aufgang, Kapitelmarke } from "@/components/MobilSektion";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
+import type { Sprache } from "@/sections";
+import { SOLUTIONS_INHALT } from "./inhalt";
+
+/* ═══════════════════════════════════════════════════════════
+   SOLUTIONS S2 — WAS WIR TUN + VORGEHEN (dunkel, kombiniert)
+
+   Korrektur 06.09: beide Blöcke in EINER Station. Das Raster der
+   Seite bleibt G1 — links Text, rechts Darstellung: links der
+   Statement-Block (Kicker Mushroom, Statement Lustria, Absatz,
+   Credo in editorialer Kursive), rechts der nummerierte Weg als
+   gestapelte Spalte — Lustria-Ziffern in Mushroom, Haarlinien
+   zwischen den Schritten, Texte in den hellen Tönen der dunklen
+   Stationen. Beide Gruppen vertikal zentriert.
+
+   INHALTE aus Sanity (solutionsHomepage): Kicker ← servicesHeadingLine1/2,
+   Absatz ← servicesIntro, Credo ← servicesCredo, die drei
+   Schritte ← servicesColumns[] (title/body), Statement ← servicesStatement.
+   Der Wortlaut der Vorlage ist überall der Rückfall für leere Felder.
+   ═══════════════════════════════════════════════════════════ */
+
+interface Props {
+  isVertical?: boolean;
+  sprache: Sprache;
+  domId?: string;
+  homepage?: any;
+  marke?: { nr: string; name: string };
+}
+
+const ARCHIVE_WHITE = "#F4F4F0";
+const MUSHROOM = "#B8AEA3";
+const SILBER = "rgba(249, 249, 247, 0.78)";
+const HAARLINIE = "rgba(249, 249, 247, 0.16)";
+
+/* Eintritts-Grammatik der Hauptseiten-Stationen (Station 02):
+   gestaffeltes Erscheinen beim Betreten, Reduced Motion sofort.
+   Links läuft der Statement-Block, rechts zieht der Weg Schritt
+   für Schritt nach. */
+const DAUER = 460;
+const STEP = { kicker: 0, statement: 80, absatz: 220, credo: 340, weg: 160 } as const;
+
+export function SolutionsWasWirTun({ isVertical = false, sprache, domId = "solutions-was-wir-tun", homepage, marke }: Props) {
+  const { t } = useLanguage();
+  const vorlage = SOLUTIONS_INHALT[sprache].wasWirTun;
+  const vorlageSchritte = SOLUTIONS_INHALT[sprache].vorgehen.schritte;
+
+  const kickerCms = [t(homepage?.servicesHeadingLine1, ""), t(homepage?.servicesHeadingLine2, "")]
+    .filter(Boolean)
+    .join(" ");
+  const inhalt = {
+    kicker: kickerCms || vorlage.kicker,
+    statement: t(homepage?.servicesStatement, vorlage.statement),
+    absatz: t(homepage?.servicesIntro, vorlage.absatz),
+    credo: t(homepage?.servicesCredo, vorlage.credo),
+  };
+  const cmsSchritte = ((homepage?.servicesColumns ?? []) as { title?: LocaleValue; body?: LocaleValue }[])
+    .map((c) => ({ titel: t(c?.title, "").trim(), zeile: t(c?.body, "").trim() }))
+    .filter((c) => c.titel || c.zeile);
+  const schritte = cmsSchritte.length > 0 ? cmsSchritte : vorlageSchritte;
+  const entered = useSectionEntered();
+  const reducedMotion = usePrefersReducedMotion();
+  const shown = entered || reducedMotion || isVertical;
+  const enter = (delay: number, distance = 18): React.CSSProperties => ({
+    opacity: shown ? 1 : 0,
+    transform: shown ? "translateY(0)" : `translateY(${distance}px)`,
+    transition: reducedMotion
+      ? "none"
+      : `opacity ${DAUER}ms ease-out ${delay}ms,` +
+        ` transform ${DAUER}ms cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
+  });
+
+  const kicker = (
+    <p
+      style={{
+        margin: 0,
+        fontFamily: sans,
+        fontSize: "12px",
+        letterSpacing: "var(--tellian-ls-marker)",
+        textTransform: "uppercase",
+        color: MUSHROOM,
+      }}
+    >
+      {inhalt.kicker}
+    </p>
+  );
+
+  const statement = (
+    <h2
+      style={{
+        margin: "clamp(18px, 2.4vh, 28px) 0 0",
+        maxWidth: "14em",
+        fontFamily: serif,
+        fontSize: "clamp(30px, 3vw, 48px)",
+        fontWeight: 400,
+        lineHeight: "var(--tellian-titel-lh)" as unknown as number,
+        letterSpacing: "var(--tellian-titel-ls)",
+        color: ARCHIVE_WHITE,
+      }}
+    >
+      {inhalt.statement}
+    </h2>
+  );
+
+  const absatz = (
+    <p
+      lang={sprache === "EN" ? "en" : sprache === "FR" ? "fr" : "de"}
+      style={{
+        margin: "clamp(24px, 3.2vh, 40px) 0 0",
+        maxWidth: "46ch",
+        fontFamily: sans,
+        fontSize: "var(--tellian-lauf-size)",
+        lineHeight: "var(--tellian-lauf-lh, 1.75)",
+        color: SILBER,
+      }}
+    >
+      {inhalt.absatz}
+    </p>
+  );
+
+  const credo = (
+    <p
+      style={{
+        margin: "clamp(28px, 3.8vh, 48px) 0 0",
+        fontFamily: cormorant,
+        fontStyle: "italic",
+        fontSize: "clamp(19px, 1.8vw, 24px)",
+        lineHeight: "var(--tellian-kursiv-lh)" as unknown as number,
+        color: ARCHIVE_WHITE,
+      }}
+    >
+      {inhalt.credo}
+    </p>
+  );
+
+  /* Der Weg — gestapelt, mit Haarlinien im dunklen Vokabular. */
+  const weg = (mitAufgang: boolean) => (
+    <ol
+      style={{
+        listStyle: "none",
+        margin: 0,
+        padding: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: "clamp(22px, 3.2vh, 36px)",
+      }}
+    >
+      {schritte.map((s, i) => {
+        const eintrag = (
+          <>
+            <span
+              style={{
+                display: "block",
+                fontFamily: serif,
+                fontSize: "clamp(18px, 1.5vw, 22px)",
+                fontWeight: "var(--tellian-ziffer-weight)" as unknown as number,
+                lineHeight: "var(--tellian-ziffer-lh)" as unknown as number,
+                letterSpacing: "var(--tellian-ziffer-ls)",
+                color: MUSHROOM,
+              }}
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span
+              style={{
+                display: "block",
+                marginTop: "10px",
+                fontFamily: serif,
+                fontSize: "clamp(20px, 1.7vw, 26px)",
+                lineHeight: "var(--tellian-zwischen-lh)" as unknown as number,
+                color: ARCHIVE_WHITE,
+              }}
+            >
+              {s.titel}
+            </span>
+            <span
+              style={{
+                display: "block",
+                marginTop: "8px",
+                maxWidth: "52ch",
+                fontFamily: sans,
+                fontSize: "var(--tellian-adv-step-text-size)",
+                lineHeight: 1.55,
+                color: SILBER,
+              }}
+            >
+              {s.zeile}
+            </span>
+          </>
+        );
+        return (
+          <li
+            key={s.titel + i}
+            style={{
+              borderTop: i === 0 ? "none" : `1px solid ${HAARLINIE}`,
+              paddingTop: i === 0 ? 0 : "clamp(22px, 3.2vh, 36px)",
+            }}
+          >
+            {mitAufgang ? (
+              <Aufgang stufe={i + 1}>{eintrag}</Aufgang>
+            ) : (
+              <div style={enter(STEP.weg + i * 140)}>{eintrag}</div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+
+  if (isVertical) {
+    return (
+      <section
+        id={domId}
+        style={{
+          backgroundColor: "var(--tellian-purple)",
+          backgroundImage: "var(--tellian-flaeche-dunkel-schmal)",
+          scrollMarginTop: "var(--tellian-kopf-height)",
+        }}
+      >
+        <div
+          style={{
+            paddingTop: "var(--tellian-abschnitt-luft-schmal)",
+            paddingBottom: "var(--tellian-abschnitt-luft-schmal)",
+            paddingLeft: "var(--tellian-rand-schmal)",
+            paddingRight: "var(--tellian-rand-schmal)",
+          }}
+        >
+          {marke && (
+            <div style={{ marginBottom: "clamp(28px, 4vh, 44px)" }}>
+              <Kapitelmarke nr={marke.nr} name={marke.name} hell />
+            </div>
+          )}
+          <Aufgang>
+            {kicker}
+            {statement}
+            {absatz}
+            {credo}
+          </Aufgang>
+          <div style={{ marginTop: "clamp(40px, 6vh, 64px)" }}>{weg(true)}</div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <div
+      id={domId}
+      data-tellian-station="1"
+      className="flex-shrink-0 h-screen relative"
+      style={{
+        width: "100vw",
+        backgroundColor: "var(--tellian-purple)",
+        backgroundImage: "var(--tellian-flaeche-dunkel)",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: "var(--tellian-kopf-height)",
+          bottom: "var(--tellian-station-height)",
+          left: 0,
+          right: 0,
+          paddingTop: "var(--tellian-s1-stage-pad)",
+          paddingBottom: "var(--tellian-s1-stage-pad)",
+          paddingLeft: "calc(var(--tellian-rail-width) + var(--tellian-station-pad-x))",
+          paddingRight: "var(--tellian-station-pad-x)",
+          display: "grid",
+          gridTemplateColumns: "5fr 6fr",
+          columnGap: "clamp(48px, 6vw, 112px)",
+          alignItems: "center",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* ══ Links: Statement-Block, gestaffelt ══ */}
+        <div style={{ minWidth: 0 }}>
+          <div style={enter(STEP.kicker)}>{kicker}</div>
+          <div style={enter(STEP.statement, 24)}>{statement}</div>
+          <div style={enter(STEP.absatz)}>{absatz}</div>
+          <div style={enter(STEP.credo)}>{credo}</div>
+        </div>
+
+        {/* ══ Rechts: der Weg — zieht Schritt für Schritt nach ══ */}
+        <div style={{ minWidth: 0 }}>{weg(false)}</div>
+      </div>
+    </div>
+  );
+}

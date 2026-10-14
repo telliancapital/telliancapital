@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Nested Solutions app: own tsconfig, own eslint config, own build.
+    "solution/**",
   ]),
   {
     rules: {

@@ -20,6 +20,8 @@ export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepa
   servicesHeadingLine1,
   servicesHeadingLine2,
   servicesIntro,
+  servicesStatement,
+  servicesCredo,
   servicesColumns[]{ title, body },
 
   teamEyebrow,
@@ -32,6 +34,8 @@ export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepa
     role,
     email,
     linkedin,
+    bio,
+    image,
     "imageAsset": image.asset->{ url },
     imageUrl
   },
@@ -57,5 +61,12 @@ export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepa
   contactEmailAddr,
   contactCompanyName,
   contactCompanySubtitle,
-  contactAddressLine
+  contactAddressLine,
+
+  footerBrand,
+  footerLegalLine,
+  footerLinks[]{ label, href },
+  linkedinUrl,
+  legalDatenschutzLinkLabel,
+  legalKundeninformationLinkLabel
 }`);

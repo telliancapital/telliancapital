@@ -28,6 +28,11 @@ export const mainSiteUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL || "https://tel
  */
 export const mainSiteStudioUrl = `${mainSiteUrl}/studio`;
 
+/** Portal-Verweise des Kundenportal-Overlays (LoginOverlay). */
+export const portalKundeUrl = process.env.NEXT_PUBLIC_PORTAL_KUNDE_URL;
+export const portalPartnerUrl = process.env.NEXT_PUBLIC_PORTAL_PARTNER_URL;
+export const portalMitarbeiterUrl = process.env.NEXT_PUBLIC_PORTAL_MITARBEITER_URL;
+
 function assertValue<T>(v: T | undefined, errorMessage: string): T {
   if (v === undefined) {
     throw new Error(errorMessage);

@@ -1,6 +1,4 @@
-import type { Locale } from "../content";
-
-export type { Locale };
+export type Locale = "de" | "en" | "fr";
 
 export type LocaleValue =
   | { de?: string | null; en?: string | null; fr?: string | null }
