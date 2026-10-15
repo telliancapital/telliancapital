@@ -21,8 +21,8 @@ const C = {
   lineLight: "#E8E6E1",
 };
 
-const serif = "var(--font-cormorant), serif";
-const sans = "var(--font-inter), sans-serif";
+const serif = "'Cormorant Garamond', serif";
+const sans = "'Inter', sans-serif";
 
 /* ── Scroll-aware progress hook ── */
 function useElementProgress(ref: React.RefObject<HTMLElement | null>, scrollX: number) {

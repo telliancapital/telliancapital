@@ -133,6 +133,8 @@ interface HeroExpandingImageProps {
   scrollX: number;
   className?: string;
   isVertical?: boolean;
+  /** Marks the photo box for the band-tone measurement (useBandTon). */
+  bildzone?: boolean;
 }
 
 export function HeroExpandingImage({
@@ -140,6 +142,7 @@ export function HeroExpandingImage({
   scrollX,
   className = "",
   isVertical = false,
+  bildzone = false,
 }: HeroExpandingImageProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -162,6 +165,7 @@ export function HeroExpandingImage({
           transform: `scale(${scale})`,
           transformOrigin: isVertical ? "center center" : "top right",
         }}
+        {...(bildzone ? { "data-tellian-bildzone": "" } : {})}
       >
         <div
           className="absolute inset-0 bg-cover bg-center"
