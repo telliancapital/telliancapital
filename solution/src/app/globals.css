@@ -1,6 +1,5 @@
 @import "../styles/fonts.css";
-@import "tailwindcss" source(none);
-@source "../**/*.{js,ts,jsx,tsx}";
+@import "../styles/tailwind.css";
 @import "../styles/theme.css";
 
 /* ── Global scrollbar hide ── */
@@ -13,18 +12,44 @@
   -ms-overflow-style: none;
 }
 
+/* ── GPU-accelerated transforms ── */
+.will-change-transform {
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ── Typography anti-aliasing for premium feel ── */
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
+/* ── Light mode selection color ── */
 ::selection {
   background: rgba(26, 25, 22, 0.08);
-  color: #191718;
+  color: #1a1916;
 }
 
-body {
-  margin: 0;
-  background-color: #f4f4f0;
+/* ── Redesign: schmaler Hero als EINE Bühne ── */
+.tellian-hero-schmal {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
 }
+
+/* ── Redesign: Ebene 1 — Marker (Versal-Standard) ── */
+.tellian-marker {
+  text-transform: uppercase;
+  letter-spacing: var(--tellian-ls-marker);
+  font-size: 12px;
+}
+
+/* Fokusrahmen nur bei Tastaturbedienung (siehe HomeClient). */
+html[data-eingabe="zeiger"] :is(button, a, [role="button"], [role="dialog"], [tabindex]):not(input, textarea, select):focus-visible {
+  outline: none !important;
+}
+
+html { -webkit-tap-highlight-color: transparent; }

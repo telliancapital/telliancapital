@@ -44,6 +44,11 @@ export const homepageType = defineType({
       options: { collapsible: true, collapsed: false },
     },
     {
+      name: "startBodySet",
+      title: "Lead paragraphs (below the headline)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
       name: "startCtaSet",
       title: "Call-to-Action Button",
       options: { collapsible: true, collapsed: false },
@@ -411,6 +416,16 @@ export const homepageType = defineType({
       type: "localeString",
       group: "start",
       fieldset: "startHeadlineSet",
+    }),
+    defineField({
+      name: "startParagraphs",
+      title: "Lead paragraphs",
+      description:
+        "Introductory text under the headline (left text column of the hero). Add one entry per paragraph in the order they should appear — the redesign shows two. Leave empty to show the built-in default text.",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "start",
+      fieldset: "startBodySet",
     }),
     defineField({
       name: "startCtaLabel",

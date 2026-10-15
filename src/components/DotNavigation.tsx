@@ -1,129 +1,215 @@
 "use client";
 
-import { sans } from "../tokens";
-import { useLanguage } from "@/i18n/LanguageContext";
+import { useState, useRef, useEffect } from "react";
 
-const SECTIONS = [
-  { labels: { de: "Start", en: "Start" }, target: 0.0, threshold: 0.0 },
-  { labels: { de: "Philosophie", en: "Approach" }, target: 0.154, threshold: 0.08 },
-  { labels: { de: "Mandat", en: "Method" }, target: 0.309, threshold: 0.23 },
-  { labels: { de: "Portfolio", en: "Strategy" }, target: 0.463, threshold: 0.39 },
-  { labels: { de: "Team", en: "Team" }, target: 0.618, threshold: 0.54 },
-  { labels: { de: "Kontakt", en: "Contact" }, target: 1.0, threshold: 0.94 },
-];
+import { sans } from "@/tokens";
+import { SECTIONS, sectionOrdinal, type SectionDef } from "@/sections";
+import { EASE } from "@/styles/motion";
+import { zonenMaske, hatZone, type Zone, type BandSchicht } from "./useBandTon";
 
-const NAV_ARIA_LABEL = { de: "Sektion-Navigation", en: "Section navigation" };
+/* ═══════════════════════════════════════════════════════════
+   STATIONSLEISTE (unten)
 
-const V = {
-  bg: "var(--tellian-nav-bg)",
-  text: "var(--tellian-nav-text)",
-  textInactive: "var(--tellian-nav-text-inactive)",
-  indicator: "var(--tellian-nav-indicator)",
-  indicatorInactive: "var(--tellian-nav-indicator-inactive)",
-  border: "var(--tellian-nav-border)",
-};
+   Sechs nummerierte Stationsnamen über die ganze Breite, keine
+   eigene Fläche, keine Trennlinie. Klick springt zur Station.
+   Die Schriftfarbe folgt dem Grund — drei Schichten wie in der
+   Kopfzeile (siehe useBandTon).
 
-function getActiveIndex(progress: number): number {
-  let active = 0;
-  for (let i = 1; i < SECTIONS.length; i++) {
-    if (progress >= SECTIONS[i].threshold) active = i;
-  }
-  return active;
-}
+   Namen kommen aus der Registry, mit Sanity-Labels aufgelöst.
+   ═══════════════════════════════════════════════════════════ */
+
+/** Dauer eines befohlenen Sprungs (Farbwechsel des aktiven Namens). */
+const JUMP_MS = 600;
 
 interface DotNavigationProps {
-  scrollProgress: number;
-  onNavigate: (target: number) => void;
+  /** Aktive Sektion, direkt aus der Registry. */
+  activeIndex: number;
+  onNavigate: (index: number) => void;
+  /** Sichtbare Stationsbereiche — siehe useBandZonen. */
+  zonen: Zone[];
+  /** Eigene Einträge (mit CMS-Labels). Ohne Angabe: Registry. */
+  sektionen?: readonly SectionDef[];
+  ariaLabel?: string;
 }
 
-export function DotNavigation({ scrollProgress, onNavigate }: DotNavigationProps) {
-  const activeIndex = getActiveIndex(scrollProgress);
-  const { lang } = useLanguage();
+export function DotNavigation({
+  activeIndex,
+  onNavigate,
+  zonen,
+  sektionen = SECTIONS,
+  ariaLabel = "Sektion-Navigation",
+}: DotNavigationProps) {
+  /* KURZNAMEN STATT KLEINERER SCHRIFT
+     Wird die Leiste zu eng, werden die Namen gekürzt — gemessen wird
+     der tatsächliche Platzbedarf. */
+  const [kurz, setKurz] = useState(false);
+  const durationMs = JUMP_MS;
+  const navRef = useRef<HTMLElement>(null);
+  const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
+
+  /* Passen die vollen Namen noch nebeneinander? */
+  useEffect(() => {
+    const pruefen = () => {
+      const nav = navRef.current;
+      const knoepfe = buttonsRef.current.filter(Boolean) as HTMLButtonElement[];
+      if (!nav || knoepfe.length !== sektionen.length) return;
+      const stil = getComputedStyle(nav);
+      const platz = nav.clientWidth - parseFloat(stil.paddingLeft) - parseFloat(stil.paddingRight);
+      const luecke = parseFloat(stil.columnGap || "0") * (knoepfe.length - 1);
+      const gebraucht = knoepfe.reduce((a, b) => a + b.scrollWidth, 0) + luecke;
+      /* Hysterese gegen Flackern an der Grenze. */
+      setKurz((vorher) => (vorher ? gebraucht > platz - 24 : gebraucht > platz));
+    };
+    pruefen();
+    const beobachter = new ResizeObserver(pruefen);
+    if (navRef.current) beobachter.observe(navRef.current);
+    window.addEventListener("resize", pruefen);
+    return () => {
+      beobachter.disconnect();
+      window.removeEventListener("resize", pruefen);
+    };
+  }, [kurz, sektionen]);
+
+  type Schicht = "hell" | "dunkel" | "bild" | "griff";
+
+  const reihe = (schicht: Schicht) => {
+    const griff = schicht === "griff";
+    const aufDunkel = schicht === "dunkel" || schicht === "bild";
+    const ziffer = griff
+      ? "transparent"
+      : schicht === "bild"
+        ? "var(--tellian-band-dim-bild)"
+        : aufDunkel
+          ? "var(--tellian-band-dim-dunkel)"
+          : "var(--tellian-station-numeral)";
+    const aktivFarbe = griff
+      ? "transparent"
+      : aufDunkel
+        ? "var(--tellian-band-ink-dunkel)"
+        : "var(--tellian-station-label)";
+    const ruheFarbe = griff
+      ? "transparent"
+      : schicht === "bild"
+        ? "var(--tellian-band-dim-bild)"
+        : aufDunkel
+          ? "var(--tellian-band-dim-dunkel)"
+          : "var(--tellian-station-inactive)";
+
+    return sektionen.map((section, i) => {
+      const isActive = activeIndex === i;
+      return (
+        <button
+          key={section.key}
+          ref={
+            griff
+              ? (el) => {
+                  buttonsRef.current[i] = el;
+                }
+              : undefined
+          }
+          onClick={() => griff && onNavigate(i)}
+          aria-current={griff && isActive ? "page" : undefined}
+          aria-hidden={!griff}
+          tabIndex={griff ? undefined : -1}
+          className="tellian-station-ziel"
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: "10px",
+            padding: 0,
+            border: "none",
+            background: "transparent",
+            cursor: griff ? "pointer" : "default",
+            outline: "none",
+            whiteSpace: "nowrap",
+            minWidth: 0,
+          }}
+        >
+          {/* Ziffer — Mushroom, auch im aktiven Zustand. */}
+          <span
+            aria-hidden
+            style={{
+              fontFamily: sans,
+              fontSize: "var(--tellian-station-size)",
+              color: ziffer,
+              fontVariantNumeric: "tabular-nums",
+              flexShrink: 0,
+            }}
+          >
+            {sectionOrdinal(i)}
+          </span>
+
+          <span
+            style={{
+              fontFamily: sans,
+              fontSize: "var(--tellian-station-size)",
+              letterSpacing: "0.01em",
+              lineHeight: 1.2,
+              userSelect: "none",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              color: isActive ? aktivFarbe : ruheFarbe,
+              transition: `color ${durationMs}ms ${EASE.standard}`,
+            }}
+          >
+            {kurz ? section.labelKurz : section.label}
+          </span>
+        </button>
+      );
+    });
+  };
+
+  const schichtStil = (schicht: Schicht): React.CSSProperties => {
+    const maske = schicht === "griff" ? undefined : zonenMaske(zonen, schicht as BandSchicht);
+    return {
+      position: "absolute",
+      inset: 0,
+      paddingLeft: "var(--tellian-band-pad-x)",
+      paddingRight: "var(--tellian-band-pad-x)",
+      boxSizing: "border-box",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "clamp(12px, 2vw, 32px)",
+      pointerEvents: schicht === "griff" ? "auto" : "none",
+      ...(maske ? { WebkitMaskImage: maske, maskImage: maske } : null),
+    };
+  };
 
   return (
     <nav
-      aria-label={NAV_ARIA_LABEL[lang]}
+      ref={navRef}
+      aria-label={ariaLabel}
+      className="tellian-stationsleiste"
       style={{
         position: "fixed",
-        bottom: "clamp(16px, 2.5vh, 24px)",
-        left: "50%",
-        transform: "translateX(-50%)",
+        bottom: 0,
+        left: 0,
+        right: 0,
         zIndex: 150,
-        height: "36px",
-        padding: "0 20px",
-        borderRadius: "18px",
-        background: V.bg,
-        backdropFilter: "blur(16px) saturate(120%)",
-        WebkitBackdropFilter: "blur(16px) saturate(120%)",
-        border: `0.5px solid ${V.border}`,
-        display: "flex",
-        alignItems: "center",
-        gap: "clamp(16px, 2.5vw, 24px)",
-        pointerEvents: "auto",
+        height: "var(--tellian-station-height)",
+        /* Keine eigene Fläche, keine Trennlinie. */
+        background: "transparent",
+        border: "none",
+        pointerEvents: "none",
       }}
     >
-      {SECTIONS.map((section, i) => {
-        const isActive = activeIndex === i;
-        const label = section.labels[lang];
-        return (
-          <button
-            key={i}
-            onClick={() => onNavigate(section.target)}
-            aria-label={label}
-            aria-current={isActive ? "page" : undefined}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "4px",
-              padding: 0,
-              border: "none",
-              background: "transparent",
-              cursor: "pointer",
-              outline: "none",
-            }}
-          >
-            {/* Indicator */}
-            <span
-              aria-hidden
-              style={{
-                display: "block",
-                width: isActive ? "12px" : "4px",
-                height: isActive ? "1.5px" : "4px",
-                borderRadius: isActive ? "1px" : "50%",
-                backgroundColor: isActive ? V.indicator : V.indicatorInactive,
-                transition: "all 200ms ease",
-              }}
-            />
+      {(["hell", "dunkel", "bild"] as const).map((schicht) =>
+        hatZone(zonen, schicht) ? (
+          <div key={schicht} aria-hidden style={schichtStil(schicht)}>
+            {reihe(schicht)}
+          </div>
+        ) : null,
+      )}
+      <div style={schichtStil("griff")}>{reihe("griff")}</div>
 
-            {/* Label */}
-            <span
-              className="hidden sm:block"
-              style={{
-                fontFamily: sans,
-                fontSize: "8px",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                lineHeight: 1,
-                userSelect: "none",
-                color: isActive ? V.text : V.textInactive,
-                fontWeight: isActive ? 500 : 400,
-                transition: "color 200ms ease",
-              }}
-            >
-              {label}
-            </span>
-          </button>
-        );
-      })}
-
-      {/* Fallback for browsers without backdrop-filter */}
       <style>{`
-        @supports not (backdrop-filter: blur(24px)) {
-          nav[aria-label="${NAV_ARIA_LABEL.de}"],
-          nav[aria-label="${NAV_ARIA_LABEL.en}"] {
-            background: rgba(255, 255, 255, 0.8) !important;
-          }
+        .tellian-station-ziel:focus-visible {
+          outline: 2px solid var(--tellian-muted);
+          outline-offset: 4px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .tellian-stationsleiste, .tellian-stationsleiste * { transition: none !important; }
         }
       `}</style>
     </nav>

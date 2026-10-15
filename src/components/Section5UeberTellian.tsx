@@ -497,6 +497,7 @@ export function Section5UeberTellian({
         gap: "24px",
         backgroundColor: C.bg,
       }}
+      data-tellian-station="4"
     >
       {/* Text column — absolute, covers leftmost 56vw, vertically centered */}
       <div

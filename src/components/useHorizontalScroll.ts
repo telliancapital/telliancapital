@@ -7,7 +7,21 @@ const WHEEL_MULTIPLIER = 1.0;
 interface UseHorizontalScrollOptions {
   /** When true the hook becomes a no-op (vertical mode) */
   disabled?: boolean;
+  /**
+   * Liefert zur Trackposition (px) die aktive Station. Wird je Frame
+   * aufgerufen, darf also nichts messen — nur rechnen. Fehlt sie,
+   * bleibt activeIndex 0.
+   */
+  indexAt?: (scrollX: number, maxScroll: number) => number;
 }
+
+/* ── PERFORMANCE (14.10.) ──
+   Vorher schrieb die Lerp-Schleife JEDEN Frame drei React-States
+   (scrollX, scrollProgress, scrollDirection). Damit renderte HomeClient
+   samt allen sechs Stationen 60-mal pro Sekunde neu — gemessen rund
+   90 ms je Frame bei vierfach gedrosselter CPU, also Dauer-Ruckeln auf
+   mittleren Geräten. Jetzt lebt die Position in Refs; nach aussen geht
+   nur noch der Stationsindex, und der nur, wenn er sich ändert. */
 
 export function useHorizontalScroll(opts?: UseHorizontalScrollOptions) {
   const disabled = opts?.disabled ?? false;
@@ -16,14 +30,22 @@ export function useHorizontalScroll(opts?: UseHorizontalScrollOptions) {
   const targetScroll = useRef(0);
   const currentScroll = useRef(0);
   const rafId = useRef<number>(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [scrollX, setScrollX] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
   const maxScroll = useRef(0);
   const touchStartX = useRef(0);
   const touchStartScroll = useRef(0);
   const [scrollDirection, setScrollDirection] = useState<"forward" | "backward" | "idle">("idle");
+  const directionRef = useRef<"forward" | "backward" | "idle">("idle");
   const prevScroll = useRef(0);
   const directionTimer = useRef<number>(0);
+
+  /* Immer die jüngste indexAt-Funktion, ohne die Schleife neu zu bauen. */
+  const indexAt = opts?.indexAt;
+  const indexAtRef = useRef(indexAt);
+  useEffect(() => {
+    indexAtRef.current = indexAt;
+  }, [indexAt]);
 
   // Scroll-lock: when true, wheel/touch/key events skip updating targetScroll.
   const scrollLockRef = useRef(false);
@@ -48,25 +70,37 @@ export function useHorizontalScroll(opts?: UseHorizontalScrollOptions) {
       currentScroll.current = targetScroll.current;
     }
 
-    if (containerRef.current) {
+    /* Nur schreiben, wenn sich die Position wirklich bewegt — ein
+       scrollLeft-Schreibzugriff im Stillstand kostet trotzdem Arbeit. */
+    const delta = currentScroll.current - prevScroll.current;
+    const bewegt = Math.abs(delta) > 0.01;
+    if (bewegt && containerRef.current) {
       containerRef.current.scrollLeft = currentScroll.current;
     }
 
-    // Update progress
     if (maxScroll.current > 0) {
-      setScrollProgress(currentScroll.current / maxScroll.current);
-      setScrollX(currentScroll.current);
+      /* Aktive Station: React erfährt nur den Wechsel. */
+      const idx = indexAtRef.current ? indexAtRef.current(currentScroll.current, maxScroll.current) : 0;
+      if (idx !== activeIndexRef.current) {
+        activeIndexRef.current = idx;
+        setActiveIndex(idx);
+      }
 
       // Track scroll direction with a small threshold to avoid jitter
-      const delta = currentScroll.current - prevScroll.current;
       if (Math.abs(delta) > 0.3) {
         const dir = delta > 0 ? "forward" : "backward";
-        setScrollDirection(dir);
+        if (dir !== directionRef.current) {
+          directionRef.current = dir;
+          setScrollDirection(dir);
+        }
         clearTimeout(directionTimer.current);
-        directionTimer.current = window.setTimeout(() => setScrollDirection("idle"), 400);
+        directionTimer.current = window.setTimeout(() => {
+          directionRef.current = "idle";
+          setScrollDirection("idle");
+        }, 400);
       }
-      prevScroll.current = currentScroll.current;
     }
+    prevScroll.current = currentScroll.current;
 
     rafId.current = requestAnimationFrame(loop);
   }, []);
@@ -154,8 +188,8 @@ export function useHorizontalScroll(opts?: UseHorizontalScrollOptions) {
 
   return {
     containerRef,
-    scrollProgress,
-    scrollX,
+    /** Aktive Station — wechselt nur, wenn sich der Index ändert. */
+    activeIndex,
     scrollTo,
     scrollDirection,
     scrollLockRef,

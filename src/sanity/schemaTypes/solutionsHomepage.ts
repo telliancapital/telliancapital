@@ -21,6 +21,7 @@ export const solutionsHomepageType = defineType({
     { name: "services", title: "2. Dienstleistungen" },
     { name: "team", title: "3. Team" },
     { name: "contact", title: "4. Kontakt" },
+    { name: "footer", title: "5. Fussband" },
   ],
 
   fieldsets: [
@@ -39,12 +40,12 @@ export const solutionsHomepageType = defineType({
     },
     {
       name: "heroTaglineSet",
-      title: "Tagline (3 lines)",
+      title: "Headline (the lines are joined into one heading)",
       options: { collapsible: true, collapsed: false },
     },
     {
       name: "heroBodySet",
-      title: "Lead sentence + closing line",
+      title: "Lead paragraph",
       options: { collapsible: true, collapsed: false },
     },
 
@@ -57,6 +58,16 @@ export const solutionsHomepageType = defineType({
     {
       name: "servicesIntroSet",
       title: "Intro paragraph",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "servicesStatementSet",
+      title: "Statement (short serif line under the headline)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "servicesCredoSet",
+      title: "Credo (italic line under the intro)",
       options: { collapsible: true, collapsed: false },
     },
     {
@@ -101,6 +112,18 @@ export const solutionsHomepageType = defineType({
     {
       name: "contactCompanySet",
       title: "Company / address",
+      options: { collapsible: true, collapsed: false },
+    },
+
+    /* Footer */
+    {
+      name: "footerLineSet",
+      title: "Footer line (bottom left)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "footerLinksSet",
+      title: "Footer links (bottom right)",
       options: { collapsible: true, collapsed: false },
     },
   ],
@@ -157,40 +180,42 @@ export const solutionsHomepageType = defineType({
     }),
     defineField({
       name: "heroTaglineLine1",
-      title: "Tagline — Line 1",
-      description: 'Example: "Die richtige Gelegenheit."',
+      title: "Headline — Line 1",
+      description:
+        'Big serif heading of the first station. Lines 1–3 are joined with a space; the browser wraps them to at most two lines. Example: "Wir denken in Chancen,"',
       type: "triLocaleString",
       group: "hero",
       fieldset: "heroTaglineSet",
     }),
     defineField({
       name: "heroTaglineLine2",
-      title: "Tagline — Line 2",
-      description: 'Example: "Der richtige Emittent."',
+      title: "Headline — Line 2",
+      description: 'Example: "nicht Produkte."',
       type: "triLocaleString",
       group: "hero",
       fieldset: "heroTaglineSet",
     }),
     defineField({
       name: "heroTaglineLine3",
-      title: "Tagline — Line 3",
-      description: 'Example: "Der richtige Zeitpunkt."',
+      title: "Headline — Line 3 (optional)",
+      description: "Leave empty if the heading fits in two lines.",
       type: "triLocaleString",
       group: "hero",
       fieldset: "heroTaglineSet",
     }),
     defineField({
       name: "heroLeadSentence",
-      title: "Lead sentence",
-      description: "One sentence under the tagline.",
+      title: "Lead paragraph",
+      description: "Paragraph under the headline.",
       type: "triLocaleText",
       group: "hero",
       fieldset: "heroBodySet",
     }),
     defineField({
       name: "heroClosingLine",
-      title: "Closing line (italic serif)",
-      description: 'Example: "Wir beschaffen Gelegenheiten, keine Produkte."',
+      title: "Closing line (legacy)",
+      description:
+        "Not shown in the current design. Used as the headline only while all three headline lines above are empty.",
       type: "triLocaleText",
       group: "hero",
       fieldset: "heroBodySet",
@@ -229,6 +254,24 @@ export const solutionsHomepageType = defineType({
       type: "triLocaleText",
       group: "services",
       fieldset: "servicesIntroSet",
+    }),
+    defineField({
+      name: "servicesStatement",
+      title: "Statement",
+      description:
+        'Short serif line between the headline and the intro paragraph. Example: "Kein Emittent ist in allem und zu jeder Zeit der Beste."',
+      type: "triLocaleText",
+      group: "services",
+      fieldset: "servicesStatementSet",
+    }),
+    defineField({
+      name: "servicesCredo",
+      title: "Credo",
+      description:
+        'Italic serif line at the end of the text block. Example: "Die richtige Opportunität. Der richtige Emittent. Das richtige Timing."',
+      type: "triLocaleText",
+      group: "services",
+      fieldset: "servicesCredoSet",
     }),
     defineField({
       name: "servicesColumns",
@@ -311,7 +354,7 @@ export const solutionsHomepageType = defineType({
       name: "teamMembers",
       title: "Team members",
       description:
-        "Add one entry per person. Each card shows: photo, name, role, LinkedIn icon (if set), and a Send-Message link.",
+        "Add one entry per person. The card shows photo, name and role; clicking it opens the portrait with the text, e-mail and LinkedIn link.",
       type: "array",
       group: "team",
       fieldset: "teamMembersSet",
@@ -343,6 +386,13 @@ export const solutionsHomepageType = defineType({
               title: "LinkedIn profile URL",
               description: "Optional. When filled in, a LinkedIn icon appears next to the name.",
               type: "url",
+            },
+            {
+              name: "bio",
+              title: "Portrait text (shown in the popup)",
+              description:
+                "Opens when the card is clicked. Separate paragraphs with an empty line (two line breaks) — e.g. 2–3 short paragraphs as in the design.",
+              type: "triLocaleText",
             },
             {
               name: "image",
@@ -537,6 +587,77 @@ export const solutionsHomepageType = defineType({
       type: "triLocaleString",
       group: "contact",
       fieldset: "contactCompanySet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       5. FUSSBAND (bottom of the Kontakt station)
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "footerBrand",
+      title: "Brand name",
+      description: 'Left part of the footer line. Example: "Tellian Capital Solutions".',
+      type: "string",
+      group: "footer",
+      fieldset: "footerLineSet",
+    }),
+    defineField({
+      name: "footerLegalLine",
+      title: "Legal / copyright suffix",
+      description: 'Right part of the footer line. Example: "FINMA-lizenziert · © 2026".',
+      type: "triLocaleString",
+      group: "footer",
+      fieldset: "footerLineSet",
+    }),
+    defineField({
+      name: "footerLinks",
+      title: "Links (before LinkedIn)",
+      description:
+        'Example: "FAQ" → https://telliancapital.ch/faq, "Solutions" → /. The LinkedIn icon link and the legal pages (Datenschutz, Kundeninformation) follow automatically.',
+      type: "array",
+      validation: (Rule) => Rule.max(4),
+      group: "footer",
+      fieldset: "footerLinksSet",
+      of: [
+        {
+          type: "object",
+          name: "solutionsFooterLink",
+          title: "Footer link",
+          fields: [
+            { name: "label", title: "Label", type: "triLocaleString" },
+            {
+              name: "href",
+              title: "Target (URL or path)",
+              description: 'Full URL (opens in a new tab) or a path on this site such as "/".',
+              type: "string",
+            },
+          ],
+          preview: { select: { title: "label.de", subtitle: "href" } },
+        },
+      ],
+    }),
+    defineField({
+      name: "linkedinUrl",
+      title: "LinkedIn company page URL",
+      description: "Target of the LinkedIn icon link in the footer.",
+      type: "url",
+      group: "footer",
+      fieldset: "footerLinksSet",
+    }),
+    defineField({
+      name: "legalDatenschutzLinkLabel",
+      title: "Label — Datenschutz link",
+      description: 'Example: "Datenschutz" / "Privacy Policy".',
+      type: "triLocaleString",
+      group: "footer",
+      fieldset: "footerLinksSet",
+    }),
+    defineField({
+      name: "legalKundeninformationLinkLabel",
+      title: "Label — Kundeninformation link",
+      description: 'Example: "Kundeninformation" / "Client Information".',
+      type: "triLocaleString",
+      group: "footer",
+      fieldset: "footerLinksSet",
     }),
   ],
 

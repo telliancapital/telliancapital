@@ -1,33 +1,24 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
-import localFont from "next/font/local";
+import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { draftMode } from "next/headers";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { SITE_URL, BUSINESS } from "@/lib/seo";
 
+/* Schriften (1:1 zum Redesign, DesignTellian/src/styles/fonts.css):
+   Lustria (plus echte Kursive aus Cormorant Garamond Italic) und die
+   Inter-Variable laufen über @font-face in src/styles/fonts.css.
+   Cormorant Garamond bezieht die Vorlage per Google-Import; Next.js
+   streift externe @import-Regeln aus dem CSS, deshalb liefert next/font
+   dieselben Schnitte selbst gehostet — registriert unter dem echten
+   Familiennamen, den die Inline-Stile (tokens.ts) verwenden. */
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-cormorant",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-// Brand Guidelines 2026 — display/title typeface, not distributed via Google Fonts.
-const lustria = localFont({
-  src: "../fonts/Lustria-Regular.ttf",
-  display: "swap",
-  variable: "--font-lustria",
-  declarations: [{ prop: "font-family", value: "'Lustria'" }],
 });
 
 const DEFAULT_TITLE = "Tellian Capital | Unabhängige Vermögensverwaltung Zürich";
@@ -91,7 +82,7 @@ export default async function RootLayout({
   const showVisualEditing = isEnabled || process.env.NODE_ENV === "development";
 
   return (
-    <html lang="de" className={`h-full ${cormorant.variable} ${inter.variable} ${lustria.variable}`}>
+    <html lang="de" className={`h-full ${cormorant.variable}`}>
       <body className="h-full">
         <LanguageProvider>{children}</LanguageProvider>
         {showVisualEditing && <VisualEditing />}

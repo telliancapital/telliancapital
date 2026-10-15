@@ -16,6 +16,9 @@ export interface SubpageModeApi {
   isDetail: boolean;
   openDetail: () => void;
   closeDetail: () => void;
+  /** Schliesst ohne History-Eintrag — für den Wechsel zur
+      Schwester-Unterseite (Mandat ↔ Advisory). */
+  closeSilently: () => void;
 }
 
 /**
@@ -51,5 +54,9 @@ export function useSubpageMode(path: string): SubpageModeApi {
     setMode("overview");
   }, [mode]);
 
-  return { mode, isDetail: mode === "detail", openDetail, closeDetail };
+  const closeSilently = useCallback(() => {
+    setMode("overview");
+  }, []);
+
+  return { mode, isDetail: mode === "detail", openDetail, closeDetail, closeSilently };
 }

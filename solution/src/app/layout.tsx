@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter } from "next/font/google";
-import localFont from "next/font/local";
+import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { draftMode } from "next/headers";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { ZweiZeilen } from "@/components/ZweiZeilen";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -13,20 +14,8 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-// Brand Guidelines 2026 — display/title typeface, not distributed via Google Fonts.
-const lustria = localFont({
-  src: "../fonts/Lustria-Regular.ttf",
-  display: "swap",
-  variable: "--font-lustria",
-  declarations: [{ prop: "font-family", value: "'Lustria'" }],
-});
+/* Lustria (mit echter Kursive) und Inter-Variable laufen über
+   @font-face in src/styles/fonts.css — 1:1 wie die Hauptseite. */
 
 export const metadata: Metadata = {
   title: "Tellian Capital Solutions",
@@ -40,9 +29,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const showVisualEditing = isEnabled || process.env.NODE_ENV === "development";
 
   return (
-    <html lang="de" className={`${cormorant.variable} ${inter.variable} ${lustria.variable}`}>
-      <body>
-        {children}
+    <html lang="de" className={`h-full ${cormorant.variable}`}>
+      <body className="h-full">
+        <LanguageProvider>{children}</LanguageProvider>
+        <ZweiZeilen />
         {showVisualEditing && <VisualEditing />}
       </body>
     </html>

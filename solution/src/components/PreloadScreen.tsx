@@ -1,54 +1,53 @@
-import { useState, useEffect } from "react";
-import { C } from "../tokens";
-import logoWhite from "../assets/logo/Tellian__archive white logo horizontal.svg";
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+
+import { C } from "@/tokens";
+/* Vertikales Lockup (Monogramm oben, Wortzug darunter), Silver Mist
+   auf Imperial Purple. */
+import preloadLogo from "@/assets/logo/tellian-logo-vertikal-hell.svg";
 
 /* ═══════════════════════════════════════════════════════════
-   PRELOAD SCREEN — Branded intro, mirrored from main site.
-   Timeline: 500ms logo fade-in → 2200ms hold → 800ms slide-up → onComplete
+   PRELOAD SCREEN — die Lade-Animation der Marke
+
+   Imperial-Purple-Fläche, das vertikale Logo blendet auf, die Fläche
+   schiebt nach oben aus dem Bild. Zeiten: 500 / 2700 / 3500 ms.
    ═══════════════════════════════════════════════════════════ */
 
-interface Props {
-  onComplete: () => void;
-}
-
-export function PreloadScreen({ onComplete }: Props) {
-  const [phase, setPhase] = useState<"logo-in" | "hold" | "exit">("logo-in");
+export function PreloadScreen({ onComplete }: { onComplete: () => void }) {
+  const [textVisible, setTextVisible] = useState(false);
+  const [sliding, setSliding] = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("hold"), 500);
-    const t2 = setTimeout(() => setPhase("exit"), 2700);
+    const t1 = setTimeout(() => setTextVisible(true), 500);
+    const t2 = setTimeout(() => setSliding(true), 2700);
     const t3 = setTimeout(() => onComplete(), 3500);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
+    return () => [t1, t2, t3].forEach(clearTimeout);
   }, [onComplete]);
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 200,
-        backgroundColor: C.purple,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transform: phase === "exit" ? "translateY(-100%)" : "translateY(0)",
-        transition: phase === "exit" ? "transform 0.8s cubic-bezier(0.76, 0, 0.24, 1)" : "none",
-      }}
+    <motion.div
+      className="fixed inset-0 z-[200] flex items-center justify-center"
+      style={{ backgroundColor: C.purple }}
+      animate={{ y: sliding ? "-100%" : "0%" }}
+      transition={sliding ? { duration: 0.8, ease: [0.76, 0, 0.24, 1] } : { duration: 0 }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={logoWhite.src}
-        alt="Tellian Capital Solutions"
+        src={preloadLogo.src}
+        alt="Tellian Capital"
         style={{
-          width: "clamp(240px, 70vw, 680px)",
-          opacity: phase === "logo-in" ? 0 : 1,
-          transition: "opacity 0.6s ease-out",
+          /* Hochformat: bemessen wird die HÖHE, nicht die Breite. Der
+             Breitendeckel greift nur auf sehr schmalen Fenstern. */
+          height: "clamp(220px, 38vh, 380px)",
+          width: "auto",
+          maxWidth: "72vw",
+          opacity: textVisible ? 1 : 0,
+          transition: textVisible ? "opacity 0.6s ease-out" : "none",
+          userSelect: "none",
+          pointerEvents: "none",
         }}
       />
-    </div>
+    </motion.div>
   );
 }
