@@ -10,8 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import type { Locale } from "../content";
-import type { LocaleValue } from "../i18n/types";
+import type { Locale, LocaleValue } from "../i18n/types";
 import { pickLocale } from "../i18n/types";
 
 const DEFAULT_LANG: Locale = "de";

@@ -1,8 +1,62 @@
-/* Fonts are loaded via next/font/google + next/font/local in layout.tsx.
-   These CSS variable fallbacks ensure inline styles using 'Lustria',
-   'Cormorant Garamond' and 'Inter' by name resolve to the self-hosted
-   next/font versions. */
+/* ── Schriften — 1:1 aus dem Redesign (DesignTellian/src/styles/fonts.css) ──
+   Alle Flächen laufen über echte @font-face-Regeln unter ihrem
+   Markennamen ('Lustria', 'Inter', 'Cormorant Garamond'), damit die
+   Inline-Stile der Komponenten (tokens.ts: serif/sans/cormorant) exakt
+   dieselben Schnitte treffen wie in der Vorlage. */
 
+/* ── Cormorant Garamond — Editorial/Values display font ──
+   Die Vorlage lädt sie per Google-Import (0,300–600 / 1,300–500 mit
+   Kursivschnitten). Next.js entfernt externe @import-Regeln aus dem
+   CSS, darum kommt dieselbe Familie über next/font/google in
+   src/app/layout.tsx — selbst gehostet, unter dem Namen
+   'Cormorant Garamond'. */
+
+/* ── Lustria — Display/Title font (Brand Guidelines 2026) ── */
+@font-face {
+  font-family: 'Lustria';
+  src: url('../fonts/Lustria-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Lustria kursiv → Cormorant Garamond Italic (12.10., Variante B) ──
+   Lustria hat keinen Kursivschnitt; der Browser stellte die Akzentwörter
+   (Das «Team», «Ihre Vorteile», «mit Erfahrung» …) bisher nur schräg.
+   Diese Fläche gibt der Familie Lustria eine echte Kursive: alle
+   kursiven Lustria-Stellen zeichnen automatisch in Cormorant Garamond
+   Italic, ohne Änderung in den Komponenten. size-adjust gleicht die
+   kleinere x-Höhe von Cormorant an (x-Höhe 0.386 gegen 0.504,
+   Versalhöhe 0.625 gegen 0.704 der Lustria); Gewicht 500 trifft die
+   Strichstärke der Lustria. Quelle: Google Fonts, SIL Open Font
+   License, Latin-Subset. */
+@font-face {
+  font-family: 'Lustria';
+  src: url('../fonts/CormorantGaramond-Italic-latin.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+  size-adjust: 118%;
+}
+
+/* ── Inter — Body font (Variable, all weights) ── */
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Grundschrift für alles, was keinen eigenen Stil setzt. */
 :root {
-  font-family: var(--font-inter), "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
