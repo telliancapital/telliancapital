@@ -3,5 +3,6 @@ import { redirect } from "next/navigation";
 
 export async function GET() {
   (await draftMode()).disable();
-  redirect("/de");
+  /* basePath: redirect() in a route handler is not prefixed. */
+  redirect("/solutions/de");
 }

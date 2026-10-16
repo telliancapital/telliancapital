@@ -2,13 +2,12 @@ import { defineLocations, defineDocuments } from "sanity/presentation";
 
 /**
  * The Solutions app (Tellian Capital Solutions) is a *separate* Next.js
- * project/deployment — its preview locations below use an absolute URL
- * (a different origin than this Studio), which is how the Presentation
- * tool supports previewing more than one frontend from a single Studio.
- * Locally this defaults to the Solutions app's own dev server port; in
- * production it should be set to the real solutions.telliancapital.ch URL.
+ * project/deployment, but it is served on this domain under /solutions
+ * (Multi-Zones rewrite in next.config.ts). The preview locations below
+ * therefore use the same-origin path by default; set
+ * NEXT_PUBLIC_SOLUTIONS_URL to an absolute URL to preview another origin.
  */
-const SOLUTIONS_URL = process.env.NEXT_PUBLIC_SOLUTIONS_URL || "http://localhost:3100";
+const SOLUTIONS_URL = process.env.NEXT_PUBLIC_SOLUTIONS_URL || "/solutions";
 
 /**
  * The homepage now lives under `/[lang]` (`/de` is the default). The Studio

@@ -14,5 +14,6 @@ export async function GET(request: Request) {
   (await draftMode()).enable();
   // Redirect straight to the localized homepage so the Studio's preview
   // iframe lands on a real page (no `/` → `/de` redirect chain).
-  redirect("/de");
+  /* basePath: redirect() in a route handler is not prefixed. */
+  redirect("/solutions/de");
 }

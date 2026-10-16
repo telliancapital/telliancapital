@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "Tellian Capital Solutions",
   description:
     "Unabhängig aus Prinzip — Tellian Capital Solutions verschafft Zugang zu Anlagelösungen auf Aktien, Zinsen, Credit, Währungen, Rohstoffe und Fonds.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/solutions/favicon.svg" },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

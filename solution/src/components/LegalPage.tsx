@@ -59,7 +59,8 @@ export function useLegalRoute() {
   }, []);
 
   const close = useCallback(() => {
-    window.history.pushState({}, "", "/");
+    /* basePath: history.pushState is not prefixed — back to the app root. */
+    window.history.pushState({}, "", "/solutions");
     setActivePath(null);
   }, []);
 
