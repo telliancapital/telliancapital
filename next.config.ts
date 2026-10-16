@@ -5,7 +5,14 @@ import type { NextConfig } from "next";
    Solutions Vercel project. SOLUTIONS_URL = that project's own URL,
    e.g. https://solution-telliancapital.vercel.app (local: http://localhost:3100).
    Unset → no rewrite, /solutions simply does not exist here. */
-const SOLUTIONS_URL = process.env.SOLUTIONS_URL?.replace(/\/$/, "");
+const SOLUTIONS_URL = (() => {
+  /* Vercel stores the dashboard value literally: strip stray quotes and a
+     trailing slash, and add https:// if the scheme was left out — Next
+     refuses rewrite destinations that don't start with "/" or http(s)://. */
+  const raw = (process.env.SOLUTIONS_URL ?? "").trim().replace(/^["']|["']$/g, "").replace(/\/+$/, "");
+  if (!raw) return undefined;
+  return /^https?:\/\//.test(raw) ? raw : `https://${raw}`;
+})();
 
 const nextConfig: NextConfig = {
   output: "standalone",
