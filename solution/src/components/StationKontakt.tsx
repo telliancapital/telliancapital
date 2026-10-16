@@ -376,7 +376,8 @@ function Formular({
         const nachricht = felder.telefon.trim()
           ? `${felder.nachricht.trim()}\n\n—\nTelefon: ${felder.telefon.trim()}`
           : felder.nachricht.trim();
-        const res = await fetch("/api/contact", {
+        /* basePath: hand-written fetch paths need the /solutions prefix. */
+        const res = await fetch("/solutions/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -651,7 +652,8 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
       ? cmsFussLinks
       : [
           { text: "FAQ", href: `${mainSiteUrl.replace(/\/$/, "")}/faq` },
-          { text: "Solutions", href: "/" },
+          /* basePath: a plain <a href="/"> would leave for the main site. */
+          { text: "Solutions", href: "/solutions" },
         ];
   const FUSS_RECHTS: readonly FussVerweis[] = [
     ...fussLinks,
