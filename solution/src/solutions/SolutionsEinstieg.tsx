@@ -20,9 +20,10 @@ import { SOLUTIONS_INHALT } from "./inhalt";
    heroClosingLine, dann der Wortlaut der Vorlage.
    ═══════════════════════════════════════════════════════════ */
 
-const HERO_FALLBACK = "/img/hero-solutions/hero-solutions-1058.jpg";
+/* Plain <img> paths get no basePath prefix — written out with /solutions. */
+const HERO_FALLBACK = "/solutions/img/hero-solutions/hero-solutions-1058.jpg";
 const HERO_FALLBACK_SRCSET = [414, 782, 1058]
-  .map((w) => `/img/hero-solutions/hero-solutions-${w}.jpg ${w}w`)
+  .map((w) => `/solutions/img/hero-solutions/hero-solutions-${w}.jpg ${w}w`)
   .join(", ");
 
 interface Props {

@@ -14,14 +14,14 @@ export const readToken = process.env.SANITY_API_READ_TOKEN;
 export const previewSecret = process.env.SANITY_STUDIO_PREVIEW_SECRET;
 
 /**
- * Base URL of the Tellian Capital Solutions site (separate Next.js
- * deployment) — used for the public "Tellian Capital Solutions" links in
- * Navigation.tsx and Section6Kontakt.tsx. Defaults to the deployed Vercel
- * URL; override with NEXT_PUBLIC_SOLUTIONS_URL in .env.local (e.g. a local
- * dev port) when running both apps side by side.
+ * Public URL of the Tellian Capital Solutions site — used for the
+ * "Solutions" links in Navigation.tsx, Section6Kontakt.tsx, StationKontakt.tsx
+ * and HomeClient.tsx. Since the Multi-Zones setup (next.config.ts rewrites)
+ * Solutions is served on THIS domain under /solutions, so the default is the
+ * relative path. Override with NEXT_PUBLIC_SOLUTIONS_URL only if Solutions
+ * should open on another origin again.
  */
-export const solutionsSiteUrl =
-  process.env.NEXT_PUBLIC_SOLUTIONS_URL || "https://solution-telliancapital.vercel.app";
+export const solutionsSiteUrl = process.env.NEXT_PUBLIC_SOLUTIONS_URL || "/solutions";
 
 /**
  * URL of the Tellian Capital client portal login page — used by the
