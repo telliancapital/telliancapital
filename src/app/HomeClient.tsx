@@ -60,33 +60,9 @@ import { ParteiDreieck } from "@/components/ParteiDreieck";
 import { LAYOUT, TEXT_COLUMN_STYLE, getLayout, getTextColumnStyle, SPACING } from "@/layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
-import heroImg from "@/assets/f68e696a94d5501be4f500478f5085490ea6351a.webp";
-import strategyImg from "@/assets/868d6afdf0335422ce32d497da0c82ae30b6012c.webp";
-import notebookImg from "@/assets/29fb6897d14923649548800503cc773b55cb5083.webp";
-import teamPhotoImg from "@/assets/b4ed6cb147950f15472091157e857a2d7f1ce0e8.webp";
-import philosophyImg from "@/assets/a44e63e47eecf6c5811f4525d593bd929e31be63.webp";
 import { C, serif, sans } from "../tokens";
 import { EASE } from "../styles/motion";
 
-/* ═══════════════════════════════════════════════════════════
-   SWISS IMAGERY
-   ═══════════════════════════════════════════════════════════ */
-const IMG = {
-  hero: heroImg,
-  alps: "https://images.unsplash.com/photo-1588231055738-da5e3a717644?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzd2lzcyUyMGFscHMlMjBtb3VudGFpbiUyMGZvZyUyMGRhd24lMjBjaW5lbWF0aWN8ZW58MXx8fHwxNzczNjk2OTU2fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  forest:
-    "https://images.unsplash.com/photo-1627314827715-204d1002dde5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzd2lzcyUyMGZvcmVzdCUyMG1pc3R5JTIwbW9ybmluZyUyMHBpbmUlMjB0cmVlc3xlbnwxfHx8fDE3NzM2NTc0ODd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  lake: "https://images.unsplash.com/photo-1682244097336-673f4db39c13?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYWxtJTIwc3dpc3MlMjBsYWtlJTIwcmVmbGVjdGlvbiUyMG1vdW50YWlucyUyMG1pc3R8ZW58MXx8fHwxNzczNjU3NDg4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  zurich:
-    "https://images.unsplash.com/photo-1661506743970-79ff97200aa1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx6dXJpY2glMjBvbGQlMjB0b3duJTIwc3RvbmUlMjBhcmNoaXRlY3R1cmUlMjBtb3JuaW5nfGVufDF8fHx8MTc3MzY1NzQ4OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  bridge: strategyImg,
-  teamPhoto: teamPhotoImg,
-  alpine:
-    "https://images.unsplash.com/photo-1706997185842-d45feced14d2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzd2lzcyUyMG1vdW50YWluJTIwcGFub3JhbWElMjBjYWxtJTIwbW9ybmluZyUyMGxpZ2h0fGVufDF8fHx8MTc3MzY3NjI2OXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  strategy:
-    "https://images.unsplash.com/photo-1716124095942-c6ff3ad0541c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBTd2lzcyUyMGFyY2hpdGVjdHVyZSUyMHN0b25lJTIwZ2xhc3MlMjBtaW5pbWFsJTIwYnVpbGRpbmd8ZW58MXx8fHwxNzczNzMzODU5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-  notebook: notebookImg,
-};
 // const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 /* ══════════════════════════════════════════════════════════
@@ -1488,7 +1464,7 @@ function Section4Anlagestrategien({
 /* ═══════════════════════════════════════════════════════════
    MAIN APP COMPONENT
    ═══════════════════════════════════════════════════════════ */
-export default function HomeClient({ homepage }: { homepage: any }) {
+export default function HomeClient({ homepage, outline }: { homepage: any; outline?: React.ReactNode }) {
   const [introComplete, setIntroComplete] = useState(false);
   const { breakpoint, isVertical } = useBreakpoint();
   const layout = getLayout(breakpoint);
@@ -1690,8 +1666,15 @@ export default function HomeClient({ homepage }: { homepage: any }) {
 
   const preload = !introComplete && <PreloadScreen onComplete={handleIntroComplete} />;
 
+  /* `outline` = server-rendered text of this route (app/_site/SeoOutline),
+     covered by the preload screen and replaced once mounted. */
   if (!mounted) {
-    return <>{preload}</>;
+    return (
+      <>
+        {preload}
+        {outline}
+      </>
+    );
   }
 
   /* ═══ Unterseiten Mandat / Advisory (beide Zweige) ═══ */

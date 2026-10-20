@@ -2,7 +2,12 @@
    Alle Flächen laufen über echte @font-face-Regeln unter ihrem
    Markennamen ('Lustria', 'Inter', 'Cormorant Garamond'), damit die
    Inline-Stile der Komponenten (tokens.ts: serif/sans/cormorant) exakt
-   dieselben Schnitte treffen wie in der Vorlage. */
+   dieselben Schnitte treffen wie in der Vorlage.
+
+   Dateien: public/fonts/ — WOFF2, auf Latin + Latin Extended-A plus
+   Typografie-Zeichen (– — „ “ → ≥ …) reduziert, Achsen unverändert.
+   Der Hash im Namen erlaubt Cache-Control immutable (next.config.ts);
+   bei neuer Datei neuen Hash vergeben. Vorgeladen in der Root-Layout-Shell. */
 
 /* ── Cormorant Garamond — Editorial/Values display font ──
    Die Vorlage lädt sie per Google-Import (0,300–600 / 1,300–500 mit
@@ -14,7 +19,7 @@
 /* ── Lustria — Display/Title font (Brand Guidelines 2026) ── */
 @font-face {
   font-family: 'Lustria';
-  src: url('../fonts/Lustria-Regular.ttf') format('truetype');
+  src: url('/solutions/fonts/lustria-latin.95760a39.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -32,7 +37,7 @@
    License, Latin-Subset. */
 @font-face {
   font-family: 'Lustria';
-  src: url('../fonts/CormorantGaramond-Italic-latin.woff2') format('woff2');
+  src: url('/solutions/fonts/cormorant-garamond-italic-latin.b0fa095e.woff2') format('woff2');
   font-weight: 500;
   font-style: italic;
   font-display: swap;
@@ -42,7 +47,7 @@
 /* ── Inter — Body font (Variable, all weights) ── */
 @font-face {
   font-family: 'Inter';
-  src: url('../fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+  src: url('/solutions/fonts/inter-latin.5ce82690.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -50,7 +55,7 @@
 
 @font-face {
   font-family: 'Inter';
-  src: url('../fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  src: url('/solutions/fonts/inter-italic-latin.b1962a98.woff2') format('woff2');
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;

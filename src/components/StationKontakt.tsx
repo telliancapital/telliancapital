@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 
-import { stegaClean } from "next-sanity";
+/* Direct subpath: the next-sanity barrel pulled live-preview code into the visitor bundle. */
+import { stegaClean } from "@sanity/client/stega";
 
 import { cormorant, sans } from "@/tokens";
 import { Aufgang, Kapitelmarke } from "./MobilSektion";
 import { SECTION_WIDTH_LAST, type Sprache } from "@/sections";
-import { MapOverlay } from "./Section6Kontakt";
+import { MapOverlay } from "./MapOverlay";
 import type { LegalPath } from "@/data/legalPages";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { solutionsSiteUrl } from "@/sanity/env";
@@ -798,7 +799,7 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
                 className="tellian-k6-still"
                 style={{ ...fussStil, textDecoration: "none", gap: v.marke ? "var(--tellian-k6-marke-gap)" : undefined }}
               >
-                {v.marke && <img src={v.marke} alt="" aria-hidden style={{ height: "var(--tellian-k6-marke-size)", width: "auto", display: "block", flexShrink: 0 }} />}
+                {v.marke && <img src={v.marke} width={inBugWeiss.width} height={inBugWeiss.height} alt="" aria-hidden style={{ height: "var(--tellian-k6-marke-size)", width: "auto", display: "block", flexShrink: 0 }} />}
                 {v.text}
               </a>
             )}

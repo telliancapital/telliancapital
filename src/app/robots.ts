@@ -6,18 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: [
-          "/",
-          "/en",
-          "/de",
-          "/impressum",
-          "/datenschutz",
-          "/anlagestrategien",
-          "/kontakt",
-          "/kundeninformation",
-          "/vermoegensverwaltung",
-        ],
-        disallow: ["/studio", "/api"],
+        allow: "/",
+        disallow: ["/studio", "/api", "/solutions/api"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

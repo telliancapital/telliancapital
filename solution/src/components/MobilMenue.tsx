@@ -176,6 +176,8 @@ export function MobilMenue({
       >
         <img
           src={logoDunkel.src}
+          width={logoDunkel.width}
+          height={logoDunkel.height}
           alt="Tellian Capital"
           style={{ height: "var(--tellian-kopf-logo-h)", width: "auto", display: "block" }}
         />
