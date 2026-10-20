@@ -70,7 +70,7 @@ export const metadata: Metadata = {
       ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
       : undefined,
   },
-  icons: { icon: "/TellianCapital-Logo.png" },
+  icons: { icon: { url: "/tellian-monogramm-dunkel.svg", type: "image/svg+xml" } },
 };
 
 export default async function RootLayout({
