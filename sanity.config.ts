@@ -17,11 +17,13 @@ import { presentationTool } from "sanity/presentation";
 
 import { resolve } from "@/sanity/lib/resolve";
 
-// The Solutions app is a separate Next.js deployment (different origin/port
-// in dev). The Presentation tool's preview iframe only allows same-origin
-// frontends by default — any other origin used in `resolve.ts` locations
-// must be explicitly allowlisted here, or the preview silently refuses to load.
-const SOLUTIONS_URL = process.env.NEXT_PUBLIC_SOLUTIONS_URL || "http://localhost:3100";
+// The Solutions app is a separate Next.js deployment, normally served on this
+// domain under /solutions (Multi-Zones rewrite), so it is same-origin and needs
+// no allowlisting. Only when NEXT_PUBLIC_SOLUTIONS_URL is an absolute URL (a
+// different origin) must that origin be allowlisted — `allowOrigins` is parsed
+// with `new URLPattern()`, which throws on relative paths like "/solutions".
+const SOLUTIONS_URL = process.env.NEXT_PUBLIC_SOLUTIONS_URL || "/solutions";
+const SOLUTIONS_ORIGIN = /^https?:\/\//.test(SOLUTIONS_URL) ? new URL(SOLUTIONS_URL).origin : undefined;
 
 export default defineConfig({
   basePath: "/studio",
@@ -33,7 +35,7 @@ export default defineConfig({
     structureTool({ structure }),
     presentationTool({
       resolve,
-      allowOrigins: [SOLUTIONS_URL],
+      ...(SOLUTIONS_ORIGIN && { allowOrigins: [SOLUTIONS_ORIGIN] }),
       previewUrl: {
         draftMode: {
           enable: "/api/draft-mode?secret=tellian-preview-secret-2026",
