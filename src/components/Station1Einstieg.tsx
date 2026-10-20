@@ -1,6 +1,7 @@
 "use client";
 
 import { HeroEditorial } from "./HeroEditorial";
+import { HERO_BILD_VERHAELTNIS, heroBild } from "./heroBild";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { LocaleValue } from "@/i18n/types";
 import type { Sprache } from "@/sections";
@@ -37,13 +38,6 @@ const INHALT: Readonly<Record<Sprache, HeroInhalt>> = {
   },
 };
 
-/* Bündel-Rückfall fürs Hero-Motiv (Opernhaus Zürich) — greift nur,
-   wenn im CMS kein Bild hinterlegt ist. */
-const HERO_FALLBACK = "/img/hero-tellian/hero-tellian-1536.jpg";
-const HERO_FALLBACK_SRCSET = [432, 768, 1080, 1536]
-  .map((w) => `/img/hero-tellian/hero-tellian-${w}.jpg ${w}w`)
-  .join(", ");
-
 interface Props {
   isVertical?: boolean;
   /** Schmal: erst wenn der Ladebildschirm weg ist, läuft der Eintritt. */
@@ -74,9 +68,8 @@ export function Station1Einstieg({
     .filter((p) => p.length > 0);
   const lead: readonly string[] = cmsLead.length > 0 ? cmsLead : inhalt.lead;
 
-  const cmsBild: string | undefined = homepage?.startImageAsset?.url || homepage?.startImageUrl;
-  const imageSrc = cmsBild || HERO_FALLBACK;
-  const imageSrcSet = cmsBild ? undefined : HERO_FALLBACK_SRCSET;
+  /* Bild-URLs aus heroBild.ts — dieselben, die app/_site/home.tsx vorlädt. */
+  const { src: imageSrc, srcSet: imageSrcSet } = heroBild(homepage);
   const imageAlt = t(homepage?.startImageAlt, "Opernhaus Zürich zur blauen Stunde");
 
   const titel = (
@@ -112,7 +105,7 @@ export function Station1Einstieg({
       hairline={false}
       imageSrc={imageSrc}
       imageSrcSet={imageSrcSet}
-      bildVerhaeltnis={1.5}
+      bildVerhaeltnis={HERO_BILD_VERHAELTNIS}
       imageAlt={imageAlt}
       fokus="center 42%"
       lang={sprache === "EN" ? "en" : "de"}

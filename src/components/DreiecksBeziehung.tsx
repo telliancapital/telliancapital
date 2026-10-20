@@ -464,7 +464,7 @@ export function DreiecksBeziehung({ sprache = "DE", inhalt: inhaltProp, onMandat
           {kreisKompakt(
             KD.tellian,
             C.purple,
-            <img src={monogramm.src} alt="" aria-hidden style={{ width: "35%", height: "auto", display: "block" }} />,
+            <img src={monogramm.src} width={monogramm.width} height={monogramm.height} alt="" aria-hidden style={{ width: "35%", height: "auto", display: "block" }} />,
             KONTUR_HELL,
           )}
           {kreisKompakt(KD.bank, C.muted, <span aria-hidden style={rasterMotiv(bankgebaeudeIcon.src, "31.5%", C.purple)} />)}
@@ -630,7 +630,7 @@ export function DreiecksBeziehung({ sprache = "DE", inhalt: inhaltProp, onMandat
           K.tellian,
           C.purple,
           KONTUR_HELL,
-          <img src={monogramm.src} alt="" aria-hidden style={{ width: "35%", height: "auto", display: "block" }} />,
+          <img src={monogramm.src} width={monogramm.width} height={monogramm.height} alt="" aria-hidden style={{ width: "35%", height: "auto", display: "block" }} />,
           inhalt.tellian,
         )}
         {knoten("bank", K.bank, C.muted, null, <span aria-hidden style={rasterMotiv(bankgebaeudeIcon.src, "31.5%", C.purple)} />, inhalt.bank)}

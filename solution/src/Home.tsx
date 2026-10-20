@@ -97,7 +97,7 @@ function kontaktDaten(cms: any, t: (v: any, f?: string) => string) {
   };
 }
 
-export default function Home({ homepage }: { homepage: any }) {
+export default function Home({ homepage, outline }: { homepage: any; outline?: React.ReactNode }) {
   const [introComplete, setIntroComplete] = useState(false);
   const { isVertical } = useBreakpoint();
   const { t, lang, setLang } = useLanguage();
@@ -229,7 +229,15 @@ export default function Home({ homepage }: { homepage: any }) {
   const kontakt = useMemo(() => kontaktDaten(homepage, t), [homepage, t]);
   const isDetailMode = teamDetailOffen || !!legal.activePath;
 
-  if (!mounted) return <>{preload}</>;
+  /* `outline` = server-rendered text (src/SeoOutline), covered by the
+     preload screen and replaced once mounted. */
+  if (!mounted)
+    return (
+      <>
+        {preload}
+        {outline}
+      </>
+    );
 
   const kopf = (vertical: boolean) => (
     <KopfzeileBand

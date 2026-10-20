@@ -16,6 +16,14 @@ const SOLUTIONS_URL = (() => {
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  experimental: {
+    /* The one global stylesheet (~11 KB) goes into the HTML instead of a
+       render-blocking <link>; first-time visitors (and crawlers) are the
+       ones that matter for first paint. */
+    inlineCss: true,
+    /* Two root layouts ((de)/(en) for <html lang>) → app/global-not-found.tsx. */
+    globalNotFound: true,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
@@ -27,6 +35,26 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [{ source: "/", destination: "/de", permanent: true }];
+  },
+  async headers() {
+    /* Same as the Solutions app: keep the vercel.app / preview addresses out
+       of search results — only telliancapital.ch is public. */
+    return [
+      {
+        /* Content-hashed font files (src/styles/fonts.css). */
+        source: "/fonts/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        /* Only the *.vercel.app deployment addresses — never localhost, the
+           real domain (with or without www), or requests the main site
+           forwards for telliancapital.ch/solutions (Multi-Zones rewrite). */
+        source: "/:path*",
+        has: [{ type: "host", value: "(?<deployment>.+)\\.vercel\\.app" }],
+        missing: [{ type: "header", key: "x-forwarded-host", value: "(www\\.)?telliancapital\\.ch" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+    ];
   },
   async rewrites() {
     if (!SOLUTIONS_URL) return { beforeFiles: [] };

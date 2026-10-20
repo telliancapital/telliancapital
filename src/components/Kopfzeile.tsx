@@ -224,6 +224,8 @@ export function Kopfzeile({
               {!griff && (
                 <img
                   src={aufDunkel ? logoHell.src : logoDunkel.src}
+                  width={logoDunkel.width}
+                  height={logoDunkel.height}
                   alt=""
                   style={{ width: "100%", height: "100%", display: "block" }}
                 />
@@ -239,6 +241,8 @@ export function Kopfzeile({
               {!griff && (
                 <img
                   src={aufDunkel ? monoHell.src : monoDunkel.src}
+                  width={monoDunkel.width}
+                  height={monoDunkel.height}
                   alt=""
                   style={{ width: "100%", height: "100%", display: "block" }}
                 />

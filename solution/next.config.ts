@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
      own vercel.app root answers 404 by design — use .../solutions there. */
   basePath: "/solutions",
   experimental: {
+    /* Global stylesheet inline instead of a render-blocking <link>. */
+    inlineCss: true,
+    /* Root layout under [lang] (server-side <html lang>) → app/global-not-found.tsx. */
+    globalNotFound: true,
     serverActions: {
       allowedOrigins: ["telliancapital.ch", "www.telliancapital.ch"],
     },
@@ -25,8 +29,17 @@ const nextConfig: NextConfig = {
        address out of search results — only telliancapital.ch is public. */
     return [
       {
+        /* Content-hashed font files (src/styles/fonts.css). */
+        source: "/fonts/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        /* Only the *.vercel.app deployment addresses — never localhost, the
+           real domain (with or without www), or requests the main site
+           forwards for telliancapital.ch/solutions (Multi-Zones rewrite). */
         source: "/:path*",
-        missing: [{ type: "host", value: "telliancapital.ch" }],
+        has: [{ type: "host", value: "(?<deployment>.+)\\.vercel\\.app" }],
+        missing: [{ type: "header", key: "x-forwarded-host", value: "(www\\.)?telliancapital\\.ch" }],
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ];
