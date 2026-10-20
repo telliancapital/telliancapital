@@ -35,6 +35,8 @@ export function PreloadScreen({ onComplete }: { onComplete: () => void }) {
     >
       <img
         src={preloadLogo.src}
+        width={preloadLogo.width}
+        height={preloadLogo.height}
         alt="Tellian Capital"
         style={{
           /* Hochformat: bemessen wird die HÖHE, nicht die Breite. Der

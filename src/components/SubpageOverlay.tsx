@@ -87,7 +87,7 @@ export function SubpageOverlay({ isOpen, onClose, eyebrow, headline, children }:
           transition: `opacity 300ms ease-out ${isOpen ? "900ms" : "0ms"}`,
         }}
       >
-        <img src={logoHorizontal.src} alt="Tellian Capital" style={{ width: "112px", height: "auto", display: "block" }} />
+        <img src={logoHorizontal.src} width={logoHorizontal.width} height={logoHorizontal.height} alt="Tellian Capital" style={{ width: "112px", height: "auto", display: "block" }} />
         <button
           onClick={onClose}
           style={{

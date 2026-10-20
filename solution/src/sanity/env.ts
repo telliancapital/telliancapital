@@ -23,6 +23,13 @@ export const previewSecret = process.env.SANITY_STUDIO_PREVIEW_SECRET;
 export const mainSiteUrl = process.env.NEXT_PUBLIC_MAIN_SITE_URL || "https://telliancapital.ch";
 
 /**
+ * Public production domain for SEO (canonical, hreflang, OG). Kept separate
+ * from mainSiteUrl, which may point at a preview deployment for UI links.
+ * Same variable as the main site's src/lib/seo.ts.
+ */
+export const publicSiteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://telliancapital.ch").replace(/\/+$/, "");
+
+/**
  * The main Tellian Capital site's Studio lives in the other project — this
  * app has no Studio of its own, so stega click-to-edit links point there.
  */

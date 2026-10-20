@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 
-export const SITE_URL = "https://telliancapital.vercel.app";
+/* Production domain — canonical, hreflang, sitemap, robots, OG and JSON-LD
+   URLs all derive from it. Override with NEXT_PUBLIC_SITE_URL (no trailing
+   slash) only for a staging domain. */
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://telliancapital.ch").replace(/\/+$/, "");
 
 export const BUSINESS = {
   name: "Tellian Capital",
@@ -37,7 +40,10 @@ interface PageMetaInput {
   noindex?: boolean;
 }
 
-const DEFAULT_IMAGE = "/TellianCapital-Logo.png";
+/* 1200×630 share card (logo on Imperial Purple) and a square logo that
+   reads on white, as Google requires for Organization logos. */
+const DEFAULT_IMAGE = "/og-image.png";
+const LOGO = "/logo.png";
 
 export function buildMetadata({
   title,
@@ -57,7 +63,9 @@ export function buildMetadata({
     : { url: image, width: 1200, height: 630, alt: BUSINESS.name };
 
   return {
-    title,
+    /* Titles that already name the brand skip the layout's
+       "%s | Tellian Capital" template, which would repeat it. */
+    title: title.includes(BUSINESS.name) ? { absolute: title } : title,
     description,
     keywords: keywords && keywords.length > 0 ? keywords : undefined,
     alternates: {
@@ -189,16 +197,45 @@ export function faqJsonLd(items: readonly FaqJsonLdItem[]): Record<string, unkno
   };
 }
 
-/** LocalBusiness / FinancialService JSON-LD for the homepage. */
-export function localBusinessJsonLd(): Record<string, unknown> {
-  return {
-    "@context": "https://schema.org",
+/**
+ * Serialize JSON-LD for a `<script type="application/ld+json">`. CMS text
+ * containing "</script>" would otherwise close the tag early, so `<` is
+ * escaped (Next.js JSON-LD guide).
+ */
+export function jsonLdScript(data: Record<string, unknown>): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+const ORG_ID = `${SITE_URL}/#organization`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
+
+const ORG_DESCRIPTION: Record<Lang, string> = {
+  de: "Unabhängige Vermögensverwaltung in Zürich seit 1996: persönliche Betreuung, individuelle Portfoliolösungen mit Core/Satelliten-Struktur und ein strukturierter Anlageprozess für Privatpersonen, Unternehmerfamilien und Stiftungen.",
+  en: "Independent wealth management in Zurich since 1996: personal advisory, bespoke portfolio solutions with a core/satellite structure and a structured investment process for private clients, entrepreneurial families and foundations.",
+};
+
+/** Team member as stored in the homepage document (name + localized role). */
+export interface JsonLdTeamMember {
+  name: string;
+  role?: string;
+}
+
+/**
+ * Homepage JSON-LD graph: the firm (FinancialService, a LocalBusiness
+ * subtype) and the WebSite. Descriptive fields matter for AI assistants
+ * (GEO) as much as for Google: what the firm does, where, in which
+ * languages, and who works there.
+ */
+export function localBusinessJsonLd(lang: Lang = "de", team: readonly JsonLdTeamMember[] = []): Record<string, unknown> {
+  const address = `${BUSINESS.street}, ${BUSINESS.postalCode} ${BUSINESS.city}`;
+  const organization = {
     "@type": "FinancialService",
-    "@id": `${SITE_URL}/#organization`,
+    "@id": ORG_ID,
     name: BUSINESS.legalName,
     alternateName: BUSINESS.name,
+    description: ORG_DESCRIPTION[lang],
     url: SITE_URL,
-    logo: `${SITE_URL}${DEFAULT_IMAGE}`,
+    logo: { "@type": "ImageObject", url: `${SITE_URL}${LOGO}`, width: 512, height: 512 },
     image: `${SITE_URL}${DEFAULT_IMAGE}`,
     telephone: BUSINESS.phone,
     email: BUSINESS.email,
@@ -216,7 +253,21 @@ export function localBusinessJsonLd(): Record<string, unknown> {
       latitude: BUSINESS.geo.latitude,
       longitude: BUSINESS.geo.longitude,
     },
+    hasMap: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${BUSINESS.legalName}, ${address}`)}`,
     areaServed: { "@type": "Country", name: "Switzerland" },
+    knowsLanguage: ["de", "en"],
+    knowsAbout:
+      lang === "de"
+        ? ["Vermögensverwaltung", "Anlagestrategien", "Portfolio Management", "Anlageberatung"]
+        : ["Wealth management", "Investment strategies", "Portfolio management", "Investment advisory"],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      telephone: BUSINESS.phone,
+      email: BUSINESS.email,
+      availableLanguage: ["German", "English"],
+      areaServed: "CH",
+    },
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
@@ -225,6 +276,73 @@ export function localBusinessJsonLd(): Record<string, unknown> {
         closes: "18:00",
       },
     ],
+    employee: team
+      .filter((m) => m.name.trim())
+      .map((m) => ({ "@type": "Person", name: m.name.trim(), jobTitle: m.role?.trim() || undefined, worksFor: { "@id": ORG_ID } })),
     sameAs: BUSINESS.sameAs,
   };
+  const website = {
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    url: SITE_URL,
+    name: BUSINESS.name,
+    inLanguage: ["de-CH", "en"],
+    publisher: { "@id": ORG_ID },
+  };
+  return { "@context": "https://schema.org", "@graph": [organization, website] };
+}
+
+/**
+ * WebPage + BreadcrumbList for a subpage, tied to the homepage graph by
+ * @id. `trail` excludes the home crumb, which is added here.
+ */
+export function pageJsonLd({
+  path,
+  title,
+  description,
+  lang = "de",
+  trail,
+}: {
+  path: string;
+  title: string;
+  description: string;
+  lang?: Lang;
+  trail: readonly { name: string; path: string }[];
+}): Record<string, unknown> {
+  const url = `${SITE_URL}${path}`;
+  const crumbs = [{ name: BUSINESS.name, path: lang === "en" ? "/en" : "/de" }, ...trail];
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: title,
+        description,
+        inLanguage: lang === "en" ? "en" : "de-CH",
+        isPartOf: { "@id": WEBSITE_ID },
+        about: { "@id": ORG_ID },
+        breadcrumb: { "@id": `${url}#breadcrumb` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: crumbs.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: c.name,
+          item: `${SITE_URL}${c.path}`,
+        })),
+      },
+    ],
+  };
+}
+
+/** Title/description strings out of a resolved Metadata object (as built by buildMetadata). */
+export function metadataText(meta: Metadata): { title: string; description: string } {
+  const t = meta.title;
+  const title = typeof t === "string" ? t : t && "absolute" in t ? t.absolute : t && "default" in t ? t.default : "";
+  const full = !title ? BUSINESS.name : title.includes(BUSINESS.name) ? title : `${title} | ${BUSINESS.name}`;
+  return { title: full, description: meta.description ?? "" };
 }
