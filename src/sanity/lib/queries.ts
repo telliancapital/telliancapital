@@ -338,6 +338,8 @@ export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepa
   heroTaglineLine3,
   heroLeadSentence,
   heroClosingLine,
+  heroImage{ asset->{ _id, url }, hotspot, crop },
+  heroImageAlt,
 
   servicesEyebrow,
   servicesHeadingLine1,

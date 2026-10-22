@@ -33,7 +33,8 @@ interface Props {
   absaetze: readonly string[];
   /** 50/50 statt 42/58. */
   haelften?: boolean;
-  imageSrc: string;
+  /** Leer: kein Bild im Panel. */
+  imageSrc?: string;
   imageSrcSet?: string;
   imageAlt: string;
   /** Breite/Höhe der BILDDATEI (für sizes). */
@@ -189,18 +190,20 @@ export function HeroEditorial({
     </div>
   );
 
-  const bild = (sizes: string, stil: React.CSSProperties) => (
-    <img
-      src={imageSrc}
-      srcSet={imageSrcSet}
-      sizes={imageSrcSet ? sizes : undefined}
-      alt={imageAlt}
-      decoding="async"
-      loading="eager"
-      fetchPriority="high"
-      style={{ objectFit: "cover", objectPosition: fokus, ...stil }}
-    />
-  );
+  /* Ohne Bild (im CMS keins hinterlegt) bleibt das Panel leer. */
+  const bild = (sizes: string, stil: React.CSSProperties) =>
+    imageSrc ? (
+      <img
+        src={imageSrc}
+        srcSet={imageSrcSet}
+        sizes={imageSrcSet ? sizes : undefined}
+        alt={imageAlt}
+        decoding="async"
+        loading="eager"
+        fetchPriority="high"
+        style={{ objectFit: "cover", objectPosition: fokus, ...stil }}
+      />
+    ) : null;
 
   /* ── SCHMAL: Text zuerst, Bild darunter volle Breite ── */
   if (isVertical) {
