@@ -9,7 +9,7 @@ import { C, sans, serif } from "@/tokens";
 
 export const metadata: Metadata = {
   title: "Seite nicht gefunden | Tellian Capital Solutions",
-  icons: { icon: "/solutions/favicon.svg" },
+  icons: { icon: { url: "/solutions/tellian-monogramm-dunkel.svg", type: "image/svg+xml" } },
 };
 
 export default function GlobalNotFound() {

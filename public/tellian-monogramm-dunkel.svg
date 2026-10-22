@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Fuer HELLE Stationen. Inhalt unveraendert aus Tellian__Imperial purple monogram.svg; nur die Leinwand ist auf das Motiv beschnitten (546.08x342.3 -> 188.53 108.44 164.52 144.42). Eingefaerbt wird nichts. -->
-<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="188.53 108.44 164.52 144.42">
+<!-- Favicon (Haupt- und Solutions-Seite). Inhalt unveraendert aus Tellian__Imperial purple monogram.svg; Leinwand mit Rand um das Motiv (viewBox 160 80 220 200), damit das Zeichen im Browser-Tab nicht zu gross wirkt. Eingefaerbt wird nichts. -->
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="160 80 220 200">
   <!-- Generator: Adobe Illustrator 30.5.1, SVG Export Plug-In . SVG Version: 2.1.4 Build 3)  -->
   <defs>
     <style>

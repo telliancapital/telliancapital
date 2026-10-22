@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       follow: true,
       googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
     },
-    icons: { icon: "/solutions/favicon.svg" },
+    icons: { icon: { url: "/solutions/tellian-monogramm-dunkel.svg", type: "image/svg+xml" } },
     /* Same geo tags as the main site (Löwenstrasse 1, Zürich). */
     other: {
       "geo.region": "CH-ZH",
