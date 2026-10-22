@@ -48,6 +48,11 @@ export const solutionsHomepageType = defineType({
       title: "Lead paragraph",
       options: { collapsible: true, collapsed: false },
     },
+    {
+      name: "heroImageSet",
+      title: "Right-side hero image",
+      options: { collapsible: true, collapsed: false },
+    },
 
     /* Services */
     {
@@ -219,6 +224,24 @@ export const solutionsHomepageType = defineType({
       type: "triLocaleText",
       group: "hero",
       fieldset: "heroBodySet",
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Photo (upload)",
+      description:
+        "Hero image. Desktop: fills the right half of the first station. Mobile/Tablet: appears below the text. Recommended: wide landscape photo, at least 4000 px wide (≈ 1.84 : 1). Without an upload, the bundled Zürich panorama is shown.",
+      type: "image",
+      options: { hotspot: true },
+      group: "hero",
+      fieldset: "heroImageSet",
+    }),
+    defineField({
+      name: "heroImageAlt",
+      title: "Photo alt text",
+      description: 'Short description for screen readers and SEO. Example: "Zürich an der Limmat".',
+      type: "triLocaleString",
+      group: "hero",
+      fieldset: "heroImageSet",
     }),
 
     /* ──────────────────────────────────────────────────────────

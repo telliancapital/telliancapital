@@ -23,15 +23,12 @@ import { urlFor } from "./image";
    für unbekannte Personen bleibt der Ausschnitt oben angeschlagen,
    der Kopf wird nie beschnitten.
 
-   FARBE: Die Vorlage zeigt retuschierte Fassungen derselben Aufnahmen
-   (gemessen ~10 % heller, leicht gesättigter); im CMS liegen die
-   unbearbeiteten Originale. TEAM_BILD_FILTER gleicht das mild an.
-   Sobald die retuschierten Fotos im CMS liegen
-   (scripts/upload-team-photos.mjs), den Filter auf "none" setzen.
+   FARBE: Im CMS liegen seit 22.10.2026 die retuschierten Fotos der
+   Vorlage (src/assets/team ohne «OLD_») — kein Ausgleichsfilter mehr.
    ═══════════════════════════════════════════════════════════ */
 
 /** CSS-Filter für alle Teamporträts (Kachel, Detail, Vollansicht). */
-export const TEAM_BILD_FILTER = "brightness(1.08) saturate(1.08)";
+export const TEAM_BILD_FILTER = "none";
 
 /* Augenlinie als Anteil der Quellhöhe, aus den Kachelzuschnitten der
    Vorlage (scripts/optimize-images.mjs: oben + 0.22 × 0.738; Pons:
@@ -48,14 +45,28 @@ const AUGENLINIEN: Readonly<Record<string, number>> = {
   pons: 0.314,
 };
 
-const augenlinieAusName = (name: string | undefined): number | null => {
-  if (!name) return null;
-  const woerter = name
+/* Eigene Ausschnitte der Vorlage, wo die Augenlinie nicht greift —
+   Wilhelm Tell ist eine Statue (scripts/optimize-images.mjs: links 0,
+   oben 15.3 %, 96 % der Breite); mit der Augenlinienregel war der
+   Sockel halb abgeschnitten. Anteile der Quelle, Schlüssel = Nachname. */
+const AUSSCHNITTE: Readonly<Record<string, { left: number; top: number; width: number }>> = {
+  tell: { left: 0, top: 0.153, width: 0.96 },
+};
+
+const nachnamen = (name: string | undefined): string[] =>
+  (name ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .split(/[^a-z]+/);
-  for (const w of woerter) if (w in AUGENLINIEN) return AUGENLINIEN[w];
+
+const augenlinieAusName = (name: string | undefined): number | null => {
+  for (const w of nachnamen(name)) if (w in AUGENLINIEN) return AUGENLINIEN[w];
+  return null;
+};
+
+const ausschnittAusName = (name: string | undefined) => {
+  for (const w of nachnamen(name)) if (w in AUSSCHNITTE) return AUSSCHNITTE[w];
   return null;
 };
 
@@ -105,6 +116,18 @@ function kachelRechteck(
   const width = right - left;
   const height = Math.min(unten - oben, Math.round(width / TEAM_TILE_RATIO));
   if (width <= 0 || height <= 0) return null;
+  /* Fester Ausschnitt der Vorlage, solange im Studio kein Hotspot/Crop
+     gesetzt ist. */
+  const fest = !image.hotspot && !image.crop ? ausschnittAusName(name) : null;
+  if (fest) {
+    const w = Math.round(masse.w * fest.width);
+    return {
+      left: Math.round(masse.w * fest.left),
+      top: Math.round(masse.h * fest.top),
+      width: w,
+      height: Math.round(w / TEAM_TILE_RATIO),
+    };
+  }
   let top = oben;
   const augenAnteil = image.hotspot?.y ?? augenlinieAusName(name);
   if (augenAnteil !== null && augenAnteil !== undefined) {
