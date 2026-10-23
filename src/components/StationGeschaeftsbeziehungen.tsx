@@ -14,10 +14,11 @@ import { useLanguage } from "@/i18n/LanguageContext";
    Links die Textzone (Titel + drei Absätze, 52ch), rechts die
    Dreiecksgrafik als visueller Anker. Beide vertikal zentriert.
 
-   INHALTE aus Sanity: die drei Parteien, ihre Erklärtexte und die
-   Kantenwörter kommen aus den bisherigen Feldern der Methode-Sektion
-   (methodParty*Label/Prosa, methodEdgeLabel*). Titel und Absätze
-   haben im CMS kein Feld — Wortlaut aus dem Redesign-Briefing.
+   INHALTE aus Sanity (homepage → «4b. Geschäftsbeziehungen»): Titel =
+   relationshipsHeadingLine1/2, Absätze = relationshipsParagraphs; die
+   drei Parteien, ihre Erklärtexte und die Kantenwörter aus
+   methodParty*Label/Prosa und methodEdgeLabel*. Ohne CMS-Werte greift
+   der Wortlaut des Redesign-Briefings.
    ═══════════════════════════════════════════════════════════ */
 
 interface StationInhalt {
@@ -69,7 +70,17 @@ export function StationGeschaeftsbeziehungen({
   const entered = useSectionEntered();
   const reducedMotion = usePrefersReducedMotion();
   const shown = entered || reducedMotion || isVertical;
-  const inhalt = INHALT[sprache];
+  const basisStation = INHALT[sprache];
+  const cmsAbsaetze: string[] = (homepage?.relationshipsParagraphs ?? [])
+    .map((a: unknown) => t(a as Parameters<typeof t>[0], ""))
+    .filter((a: string) => a.trim().length > 0);
+  const inhalt: StationInhalt = {
+    titel: [
+      t(homepage?.relationshipsHeadingLine1, basisStation.titel[0]),
+      t(homepage?.relationshipsHeadingLine2, basisStation.titel[1]),
+    ],
+    absaetze: cmsAbsaetze.length > 0 ? cmsAbsaetze : basisStation.absaetze,
+  };
 
   /* Dreieck: Sanity-Felder der Parteien, Rückfall je Sprache. */
   const basis = DREIECK_INHALT[sprache];
@@ -88,7 +99,7 @@ export function StationGeschaeftsbeziehungen({
     ) as unknown as DreieckInhalt["kantenZeilen"],
     prosa: {
       sie: t(homepage?.methodPartyKundeProsa, basis.prosa.sie),
-      tellian: basis.prosa.tellian,
+      tellian: t(homepage?.methodPartyTellianProsa, basis.prosa.tellian),
       bank: t(homepage?.methodPartyBankenProsa, basis.prosa.bank),
     },
   };

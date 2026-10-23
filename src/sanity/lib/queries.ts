@@ -39,6 +39,21 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   methodHeadingLine3,
   methodParagraphs,
   methodCtaLabel,
+  methodPathsTitle,
+  methodPathsLead,
+  methodPathsMandat{ eyebrow, name, text, audience, buttonLabel },
+  methodPathsAdvisory{ eyebrow, name, text, audience, buttonLabel },
+
+  // 03b — Ihre Vorteile (Station 03)
+  advantagesHeadingLine1,
+  advantagesHeadingLine2,
+  advantagesSubtitle,
+  advantagesItems[]{ title, text },
+
+  // 04b — Geschäftsbeziehungen (Station 04)
+  relationshipsHeadingLine1,
+  relationshipsHeadingLine2,
+  relationshipsParagraphs,
   methodDetailEyebrow,
   methodDetailHeadingLine1,
   methodDetailHeadingLine2,
@@ -178,6 +193,13 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   navLoginButtonLabel,
   navKundenportalLabel,
   navKundenportalCaption,
+  loginOverlayTitleLine1,
+  loginOverlayTitleLine2,
+  loginOverlayPortals[]{ label, subtitle, url },
+  loginOverlayHint,
+  loginOverlaySupportQuestion,
+  loginOverlaySupportLinkLabel,
+  loginOverlayCloseLabel,
 
   // 10 — Portfolio Management
   pmDetailEyebrow,
