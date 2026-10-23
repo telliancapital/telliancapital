@@ -129,9 +129,10 @@ export function StationVermoegensverwaltung({
     </div>
   );
 
-  /* Lead des Auswahlbereichs: dritter CMS-Absatz; fehlt er, der
-     Wortlaut des Redesigns, damit der Bereich nicht ohne Einleitung steht. */
-  const lead = absaetze[2] ?? inhalt.absaetze[2];
+  /* Lead des Auswahlbereichs: eigenes CMS-Feld (methodPathsLead); fehlt
+     es, der dritte Absatz; fehlt auch der, der Wortlaut des Redesigns,
+     damit der Bereich nicht ohne Einleitung steht. */
+  const lead = t(homepage?.methodPathsLead, "") || (absaetze[2] ?? inhalt.absaetze[2]);
 
   /* ── SCHMAL ── */
   if (isVertical) {
@@ -164,6 +165,7 @@ export function StationVermoegensverwaltung({
             aufDunkel
             lead={lead}
             sprache={sprache}
+            homepage={homepage}
             onMandat={onMandat}
             onAdvisory={onAdvisory}
           />
@@ -219,6 +221,7 @@ export function StationVermoegensverwaltung({
             aufDunkel
             lead={lead}
             sprache={sprache}
+            homepage={homepage}
             onMandat={onMandat}
             onAdvisory={onAdvisory}
           />

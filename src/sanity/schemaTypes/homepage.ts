@@ -20,6 +20,8 @@ export const homepageType = defineType({
     { name: "start", title: "1. Start  ·  Hero", default: true },
     { name: "philosophy", title: "2. Haltung  ·  Anlagephilosophie" },
     { name: "method", title: "3. Methode  ·  Vermögensverwaltung" },
+    { name: "advantages", title: "3b. Vorteile  ·  Ihre Vorteile (Station 03)" },
+    { name: "relationships", title: "4b. Geschäftsbeziehungen  ·  Banking Relationships (Station 04)" },
     { name: "strategy", title: "4. Strategie  ·  Anlagestrategien" },
     { name: "team", title: "5. Team  ·  Über uns" },
     { name: "contact", title: "6. Kontakt" },
@@ -108,6 +110,35 @@ export const homepageType = defineType({
       options: { collapsible: true, collapsed: false },
     },
     {
+      name: "methodPathsSet",
+      title: "Two paths (Mandat / Advisory cards)",
+      options: { collapsible: true, collapsed: false },
+    },
+
+    /* Station 03 — Ihre Vorteile */
+    {
+      name: "advantagesHeaderSet",
+      title: "Header (Headline + Subtitle)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "advantagesItemsSet",
+      title: "Wheel items (4 positions on the ring)",
+      options: { collapsible: true, collapsed: false },
+    },
+
+    /* Station 04 — Geschäftsbeziehungen */
+    {
+      name: "relationshipsHeaderSet",
+      title: "Headline",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "relationshipsBodySet",
+      title: "Body paragraphs (left column)",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
       name: "methodDetailSet",
       title: "Detail Page (Anlageprozess overlay)",
       options: { collapsible: true, collapsed: true },
@@ -119,7 +150,7 @@ export const homepageType = defineType({
     },
     {
       name: "methodPartiesSet",
-      title: "Right-side relationship diagram (Sie · Tellian Capital · Banken)",
+      title: "Relationship diagram (Sie · Tellian Capital · Depotbank)",
       options: { collapsible: true, collapsed: false },
     },
     {
@@ -285,6 +316,11 @@ export const homepageType = defineType({
     {
       name: "navPortalSet",
       title: "Login / Kundenportal",
+      options: { collapsible: true, collapsed: false },
+    },
+    {
+      name: "navLoginOverlaySet",
+      title: "Kundenportal popup (opens on click)",
       options: { collapsible: true, collapsed: false },
     },
 
@@ -656,6 +692,208 @@ export const homepageType = defineType({
       group: "method",
       fieldset: "methodCtaSet",
     }),
+
+    /* ── Two paths (ProzessGabelung) ──
+       The right-hand block of the Vermögensverwaltung station: a title,
+       an optional lead and the two cards Mandat / Advisory. Falls back to
+       the redesign wording when empty. */
+    defineField({
+      name: "methodPathsTitle",
+      title: "Section title",
+      description: 'Serif title above the two cards. Example: "Zwei Wege, ein Anspruch".',
+      type: "localeString",
+      group: "method",
+      fieldset: "methodPathsSet",
+    }),
+    defineField({
+      name: "methodPathsLead",
+      title: "Lead text",
+      description:
+        "Paragraph between the title and the cards. If empty, the 3rd body paragraph above is used (previous behaviour).",
+      type: "localeText",
+      group: "method",
+      fieldset: "methodPathsSet",
+    }),
+    defineField({
+      name: "methodPathsMandat",
+      title: "Card 1 — Mandat",
+      type: "object",
+      fields: [
+        {
+          name: "eyebrow",
+          title: "Eyebrow",
+          description: 'Small line above the card name. Example: "Wir verwalten".',
+          type: "localeString",
+        },
+        {
+          name: "name",
+          title: "Card name",
+          description: 'Serif title of the card. Example: "Mandat".',
+          type: "localeString",
+        },
+        {
+          name: "text",
+          title: "Description",
+          description: "Main paragraph of the card.",
+          type: "localeText",
+        },
+        {
+          name: "audience",
+          title: "Target audience (italic line)",
+          description: 'Italic line under the description. Example: "Für Kunden, die …".',
+          type: "localeText",
+        },
+        {
+          name: "buttonLabel",
+          title: "Button label",
+          description: 'Label of the button at the bottom of the card. Example: "Mehr zum Mandat".',
+          type: "localeString",
+        },
+      ],
+      group: "method",
+      fieldset: "methodPathsSet",
+    }),
+    defineField({
+      name: "methodPathsAdvisory",
+      title: "Card 2 — Advisory",
+      type: "object",
+      fields: [
+        {
+          name: "eyebrow",
+          title: "Eyebrow",
+          description: 'Small line above the card name. Example: "Sie entscheiden".',
+          type: "localeString",
+        },
+        {
+          name: "name",
+          title: "Card name",
+          description: 'Serif title of the card. Example: "Advisory".',
+          type: "localeString",
+        },
+        {
+          name: "text",
+          title: "Description",
+          description: "Main paragraph of the card.",
+          type: "localeText",
+        },
+        {
+          name: "audience",
+          title: "Target audience (italic line)",
+          description: 'Italic line under the description. Example: "Für Kunden, die …".',
+          type: "localeText",
+        },
+        {
+          name: "buttonLabel",
+          title: "Button label",
+          description: 'Label of the button at the bottom of the card. Example: "Mehr zu Advisory".',
+          type: "localeString",
+        },
+      ],
+      group: "method",
+      fieldset: "methodPathsSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       03b — IHRE VORTEILE (Station 03, StationVorteile.tsx)
+       Headline, subtitle and the four points on the ring. The ring has
+       exactly four positions; each CMS item replaces the point at the
+       same position, missing items keep the redesign wording.
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "advantagesHeadingLine1",
+      title: "Headline — line 1",
+      description: 'First line of the serif headline. Example: "Tellian".',
+      type: "localeString",
+      group: "advantages",
+      fieldset: "advantagesHeaderSet",
+    }),
+    defineField({
+      name: "advantagesHeadingLine2",
+      title: "Headline — line 2 (italic)",
+      description: 'Second line, rendered in italics. Example: "Ihre Vorteile".',
+      type: "localeString",
+      group: "advantages",
+      fieldset: "advantagesHeaderSet",
+    }),
+    defineField({
+      name: "advantagesSubtitle",
+      title: "Subtitle",
+      description: 'Line under the headline. Example: "Was Sie von uns erwarten dürfen."',
+      type: "localeString",
+      group: "advantages",
+      fieldset: "advantagesHeaderSet",
+    }),
+    defineField({
+      name: "advantagesItems",
+      title: "Wheel items (1 – 4)",
+      description:
+        "The four points on the ring, clockwise from the top. Numbers (01–04) are rendered automatically. Exactly four positions exist: a 5th item is ignored, a missing one keeps the original wording.",
+      type: "array",
+      validation: (Rule) => Rule.max(4),
+      of: [
+        {
+          type: "object",
+          name: "advantageItem",
+          title: "Wheel item",
+          fields: [
+            {
+              name: "title",
+              title: "Title",
+              description: 'Label on the ring and heading of the text. Example: "Expertise" / "Unabhängigkeit".',
+              type: "localeString",
+            },
+            {
+              name: "text",
+              title: "Text",
+              description: "Paragraph shown when the item is active.",
+              type: "localeText",
+            },
+          ],
+          preview: {
+            select: { title: "title.de", subtitle: "text.de" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Wheel item (untitled)",
+                subtitle: subtitle ? String(subtitle).slice(0, 80) : "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "advantages",
+      fieldset: "advantagesItemsSet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       04b — GESCHÄFTSBEZIEHUNGEN (Station 04, StationGeschaeftsbeziehungen.tsx)
+       Headline and the three paragraphs of the left column. The diagram on
+       the right uses the methodParty… and methodEdge… fields below (same tab).
+       ────────────────────────────────────────────────────────── */
+    defineField({
+      name: "relationshipsHeadingLine1",
+      title: "Headline — line 1",
+      description: 'First line of the serif headline. Example: "Bewährte".',
+      type: "localeString",
+      group: "relationships",
+      fieldset: "relationshipsHeaderSet",
+    }),
+    defineField({
+      name: "relationshipsHeadingLine2",
+      title: "Headline — line 2 (italic)",
+      description: 'Second line, rendered in italics. Example: "Geschäftsbeziehungen".',
+      type: "localeString",
+      group: "relationships",
+      fieldset: "relationshipsHeaderSet",
+    }),
+    defineField({
+      name: "relationshipsParagraphs",
+      title: "Body paragraphs",
+      description: "One entry per paragraph in the left column. Order is preserved. The design shows three.",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "relationships",
+      fieldset: "relationshipsBodySet",
+    }),
     defineField({
       name: "methodDetailEyebrow",
       title: "Detail — Eyebrow",
@@ -748,7 +986,7 @@ export const homepageType = defineType({
       title: "Diagram caption",
       description: 'Small uppercase label above the diagram. Example: "Die Struktur bewährter Geschäftsbeziehungen".',
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -756,7 +994,7 @@ export const homepageType = defineType({
       title: '"Sie" — label',
       description: 'Top circle. Example: "Sie".',
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -764,7 +1002,7 @@ export const homepageType = defineType({
       title: '"Sie" — description text',
       description: "Shown when this circle is active/tapped.",
       type: "localeText",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -772,7 +1010,7 @@ export const homepageType = defineType({
       title: '"Tellian Capital" — label',
       description: "Bottom-left circle (also the call-to-action circle).",
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -781,7 +1019,7 @@ export const homepageType = defineType({
       description:
         'Shown when this circle is active/tapped — acts as a link into the Vermögensverwaltung detail. Example: "Unsere Leistungen für Sie →".',
       type: "localeText",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -789,7 +1027,7 @@ export const homepageType = defineType({
       title: '"Banken" — label',
       description: 'Bottom-right circle. Example: "Banken".',
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -797,7 +1035,7 @@ export const homepageType = defineType({
       title: '"Banken" — description text',
       description: "Shown when this circle is active/tapped.",
       type: "localeText",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -805,7 +1043,7 @@ export const homepageType = defineType({
       title: "Edge label — Sie ↔ Tellian Capital",
       description: 'Example: "Vermögensverwaltungsauftrag".',
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -813,7 +1051,7 @@ export const homepageType = defineType({
       title: "Edge label — Sie ↔ Banken",
       description: 'Example: "Depot-/Kontobeziehung".',
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
     defineField({
@@ -821,7 +1059,7 @@ export const homepageType = defineType({
       title: "Edge label — Tellian Capital ↔ Banken",
       description: 'Example: "Vermögensverwaltungsvollmacht".',
       type: "localeString",
-      group: "method",
+      group: "relationships",
       fieldset: "methodPartiesSet",
     }),
 
@@ -2026,6 +2264,105 @@ export const homepageType = defineType({
       type: "localeString",
       group: "navigation",
       fieldset: "navPortalSet",
+    }),
+
+    /* ── Kundenportal popup (LoginOverlay) ──
+       The modal that opens when the Kundenportal button in the header,
+       sidebar or mobile menu is clicked. Falls back to the original German
+       copy when a field is empty. */
+    defineField({
+      name: "loginOverlayTitleLine1",
+      title: "Popup title — line 1",
+      description: 'First line of the big serif headline. Example: "Ihr Zugang,".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayTitleLine2",
+      title: "Popup title — line 2 (italic)",
+      description: 'Second line, rendered in italics. Example: "persönlich".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayPortals",
+      title: "Portal links",
+      description:
+        "The rows listed in the popup. Each opens its URL in a new tab. Leave empty to show the default Kunde portal link from the environment config.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "loginOverlayPortal",
+          title: "Portal link",
+          fields: [
+            {
+              name: "label",
+              title: "Label",
+              description: 'Uppercase row label. Example: "Kunde" / "Partner" / "Mitarbeiter".',
+              type: "localeString",
+            },
+            {
+              name: "subtitle",
+              title: "Subtitle",
+              description: 'Small grey line under the label. Example: "Portfolio, Reporting, Dokumente".',
+              type: "localeString",
+            },
+            {
+              name: "url",
+              title: "Link URL",
+              description: "Full URL of the portal login page, e.g. https://portal.telliancapital.ch/login",
+              type: "url",
+              validation: (Rule) => Rule.uri({ scheme: ["http", "https"] }),
+            },
+          ],
+          preview: {
+            select: { title: "label.de", subtitle: "url" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Portal link (untitled)",
+                subtitle: subtitle || "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayHint",
+      title: "Hint under the links",
+      description: 'Small note below the portal rows. Example: "Der Klick öffnet das Portal in einem neuen Tab."',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlaySupportQuestion",
+      title: "Support line — question",
+      description: 'Grey text before the support link. Example: "Probleme beim Anmelden?"',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlaySupportLinkLabel",
+      title: "Support line — link label",
+      description: 'Dark clickable text that scrolls to the contact section. Example: "Support kontaktieren".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayCloseLabel",
+      title: "Close button label (screen readers)",
+      description: 'Accessible label of the × button. Example: "Overlay schliessen".',
+      type: "localeString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
     }),
 
     /* ──────────────────────────────────────────────────────────
