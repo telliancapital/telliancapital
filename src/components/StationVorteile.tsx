@@ -7,6 +7,8 @@ import { Aufgang, Kapitelmarke } from "./MobilSektion";
 import { useSectionEntered } from "./SectionEntry";
 import { useTitelHoehe } from "./useTitelHoehe";
 import type { Sprache } from "@/sections";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ═══════════════════════════════════════════════════════════
    STATION 03 — IHRE VORTEILE (hell)
@@ -15,8 +17,10 @@ import type { Sprache } from "@/sections";
    auf einem gemeinsamen Radius; die Segmente zeichnen sich am
    Scroll (breit) bzw. reisen ins Dock (schmal).
 
-   INHALTE wörtlich aus dem Redesign — im CMS gibt es für diese
-   Station noch keine Felder.
+   INHALTE aus Sanity (homepage → «3b. Vorteile»: advantagesHeading-
+   Line1/2, advantagesSubtitle, advantagesItems[]). Der Ring hat fest
+   vier Positionen; CMS-Punkte ersetzen den Punkt an derselben Stelle.
+   Ohne CMS-Werte greift der Wortlaut des Redesigns.
    ═══════════════════════════════════════════════════════════ */
 
 interface Punkt {
@@ -76,10 +80,19 @@ function bogen(i: number, luecke: number) {
   return `M ${a.x.toFixed(2)} ${a.y.toFixed(2)} A ${RADIUS} ${RADIUS} 0 0 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
 }
 
+export interface StationVorteileCms {
+  advantagesHeadingLine1?: LocaleValue;
+  advantagesHeadingLine2?: LocaleValue;
+  advantagesSubtitle?: LocaleValue;
+  advantagesItems?: { title?: LocaleValue; text?: LocaleValue }[] | null;
+}
+
 interface Props {
   isVertical?: boolean;
   domId?: string;
   sprache?: Sprache;
+  /** CMS-Dokument (homepage) für Titel, Untertitel und die vier Punkte. */
+  homepage?: StationVorteileCms | null;
   /** Steht die Station gerade im Bild? Beim Eintreten fällt das Rad
       auf den Ruhepunkt zurück. */
   istAktiv?: boolean;
@@ -94,8 +107,23 @@ export function StationVorteile({
   sprache = "DE",
   istAktiv = false,
   marke,
+  homepage,
 }: Props) {
-  const inhalt = INHALT[sprache];
+  const { t } = useLanguage();
+  const basis = INHALT[sprache];
+  const cmsPunkte = homepage?.advantagesItems ?? [];
+  const inhalt: StationInhalt = {
+    titel: [
+      t(homepage?.advantagesHeadingLine1, basis.titel[0]),
+      t(homepage?.advantagesHeadingLine2, basis.titel[1]),
+    ],
+    untertitel: t(homepage?.advantagesSubtitle, basis.untertitel),
+    /* Je Ringposition: CMS-Punkt an derselben Stelle, sonst Redesign. */
+    punkte: basis.punkte.map((p, i) => ({
+      titel: t(cmsPunkte[i]?.title, p.titel),
+      text: t(cmsPunkte[i]?.text, p.text),
+    })),
+  };
   const PUNKTE = inhalt.punkte;
   const [aktiv, setAktiv] = useState<number>(RUHE);
   const knopfRefs = useRef<(HTMLButtonElement | null)[]>([]);

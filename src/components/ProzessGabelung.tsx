@@ -2,14 +2,17 @@
 
 import { C, cormorant, sans, serif } from "@/tokens";
 import type { Sprache } from "@/sections";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ═══════════════════════════════════════════════════════════
    ZWEI WEGE — Auswahlbereich der Station Vermögensverwaltung
 
    Ein Titel über zwei gleichrangigen Karten (Mandat / Advisory).
    EIN Bedienelement je Karte: die ganze Karte ist die Klickfläche.
-   Die Kartentexte stammen wörtlich aus dem Redesign-Briefing — im
-   CMS gibt es dafür (noch) keine Felder.
+   Titel und Kartentexte kommen aus Sanity (homepage → Methode →
+   «Two paths»: methodPathsTitle, methodPathsMandat, methodPathsAdvisory).
+   Ohne CMS-Werte greift der Wortlaut des Redesign-Briefings.
    ═══════════════════════════════════════════════════════════ */
 
 interface Karte {
@@ -76,7 +79,23 @@ const INHALT: Readonly<Record<Sprache, GabelungInhalt>> = {
   },
 };
 
+interface CmsKarte {
+  eyebrow?: LocaleValue;
+  name?: LocaleValue;
+  text?: LocaleValue;
+  audience?: LocaleValue;
+  buttonLabel?: LocaleValue;
+}
+
+export interface ProzessGabelungCms {
+  methodPathsTitle?: LocaleValue;
+  methodPathsMandat?: CmsKarte | null;
+  methodPathsAdvisory?: CmsKarte | null;
+}
+
 interface Props {
+  /** CMS-Dokument (homepage) für Titel und Kartentexte. */
+  homepage?: ProzessGabelungCms | null;
   /** Karten untereinander. */
   gestapelt?: boolean;
   /** Station liegt auf Imperial Purple: Titel hell, Fokusring hell. */
@@ -93,11 +112,30 @@ export function ProzessGabelung({
   aufDunkel = false,
   lead,
   sprache = "DE",
+  homepage,
   onMandat,
   onAdvisory,
 }: Props) {
   const handler = { mandat: onMandat, advisory: onAdvisory } as const;
-  const inhalt = INHALT[sprache];
+  const { t } = useLanguage();
+  const basis = INHALT[sprache];
+
+  /* CMS-Werte je Feld, Fallback = Wortlaut des Redesigns. */
+  const cmsKarten = { mandat: homepage?.methodPathsMandat, advisory: homepage?.methodPathsAdvisory } as const;
+  const inhalt: GabelungInhalt = {
+    wegeTitel: t(homepage?.methodPathsTitle, basis.wegeTitel),
+    karten: basis.karten.map((k) => {
+      const c = cmsKarten[k.id];
+      return {
+        ...k,
+        eyebrow: t(c?.eyebrow, k.eyebrow),
+        name: t(c?.name, k.name),
+        text: t(c?.text, k.text),
+        fuer: t(c?.audience, k.fuer),
+        knopf: t(c?.buttonLabel, k.knopf),
+      };
+    }) as unknown as readonly [Karte, Karte],
+  };
 
   return (
     <div

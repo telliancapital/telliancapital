@@ -1794,6 +1794,7 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
             domId={SECTIONS[2].domId}
             sprache={sprache}
             marke={marke(2)}
+            homepage={homepage}
             istAktiv={SECTIONS[activeIndex]?.key === "strategien"}
           />
 
@@ -1858,7 +1859,12 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
         <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
         {pmOverlay}
 
-        <LoginOverlay open={loginOpen} onClose={() => setLoginOpen(false)} onSupportClick={navigateToContact} />
+        <LoginOverlay
+          open={loginOpen}
+          onClose={() => setLoginOpen(false)}
+          onSupportClick={navigateToContact}
+          homepage={homepage}
+        />
       </div>
     );
   }
@@ -1935,6 +1941,7 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
           <StationVorteileM
             domId={SECTIONS[2].domId}
             sprache={sprache}
+            homepage={homepage}
             istAktiv={SECTIONS[activeIndex]?.key === "strategien"}
           />
         </SectionEnteredProvider>
@@ -1993,7 +2000,12 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
       <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
       {pmOverlay}
 
-      <LoginOverlay open={loginOpen} onClose={() => setLoginOpen(false)} onSupportClick={navigateToContact} />
+      <LoginOverlay
+          open={loginOpen}
+          onClose={() => setLoginOpen(false)}
+          onSupportClick={navigateToContact}
+          homepage={homepage}
+        />
     </div>
   );
 }
