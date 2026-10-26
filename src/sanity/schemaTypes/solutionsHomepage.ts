@@ -637,7 +637,7 @@ export const solutionsHomepageType = defineType({
       description:
         'Example: "FAQ" → https://telliancapital.ch/faq, "Solutions" → /. The LinkedIn icon link and the legal pages (Datenschutz, Kundeninformation) follow automatically.',
       type: "array",
-      validation: (Rule) => Rule.max(4),
+      validation: (Rule) => Rule.max(6),
       group: "footer",
       fieldset: "footerLinksSet",
       of: [

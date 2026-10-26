@@ -31,18 +31,14 @@ import inBugWeiss from "@/assets/logo/InBug-White.png";
    bisher über /api/contact.
    ═══════════════════════════════════════════════════════════ */
 
+/* Nur Bedienungs-Microcopy ohne CMS-Feld. Die Inhalte der Station (Titel,
+   Lead, Telefon, E-Mail, Öffnungszeiten, Firma, Adresse, Fusszeile, Dank)
+   kommen ausschliesslich aus Sanity — leere Felder bleiben leer. */
 interface StationTexte {
-  titel: readonly [string, string];
-  lead: readonly [string, string];
-  oeffnung: string;
   wegAnrufen: string;
   wegMail: string;
   wegSchreiben: string;
-  karte: string;
-  fussZusatz: string;
   fussAria: string;
-  dankeTitel: string;
-  dankeText: string;
   sendefehler: readonly [string, string];
   eilt: string;
   oder: string;
@@ -50,17 +46,10 @@ interface StationTexte {
 
 const STATION_TEXTE: Readonly<Record<"DE" | "EN", StationTexte>> = {
   DE: {
-    titel: ["Sprechen", "wir"],
-    lead: ["Ein erstes Gespräch ist unverbindlich.", "Persönlich an der Beethovenstrasse, oder digital."],
-    oeffnung: "Montag bis Freitag, 8 bis 18 Uhr",
     wegAnrufen: "Anrufen",
     wegMail: "E-Mail",
     wegSchreiben: "Schreiben Sie uns",
-    karte: "Auf Karte anzeigen",
-    fussZusatz: "FINMA-lizenziert · © 2026",
     fussAria: "Rechtliches und weitere Seiten",
-    dankeTitel: "Vielen Dank.",
-    dankeText: "Ihre Anfrage ist bei uns. Wir melden uns bei Ihnen, in der Regel innerhalb eines Arbeitstages.",
     sendefehler: [
       "Das Absenden hat nicht geklappt. Ihre Eingaben sind erhalten — versuchen Sie es nochmals, oder erreichen Sie uns direkt unter",
       ".",
@@ -69,17 +58,10 @@ const STATION_TEXTE: Readonly<Record<"DE" | "EN", StationTexte>> = {
     oder: "oder",
   },
   EN: {
-    titel: ["Let’s", "talk"],
-    lead: ["A first conversation is entirely without obligation.", "In person at Beethovenstrasse, or digitally."],
-    oeffnung: "Monday to Friday, 8 am to 6 pm",
     wegAnrufen: "Call us",
     wegMail: "E-mail",
     wegSchreiben: "Write to us",
-    karte: "Show on map",
-    fussZusatz: "FINMA-licensed · © 2026",
     fussAria: "Legal and further pages",
-    dankeTitel: "Thank you.",
-    dankeText: "Your enquiry has reached us. We will get back to you, usually within one working day.",
     sendefehler: ["Sending did not work. Your entries have been kept — please try again, or reach us directly on", "."],
     eilt: "If it is urgent, you can reach us directly on",
     oder: "or",
@@ -313,7 +295,7 @@ function Formular({
   gestapelt?: boolean;
   sprache: Sprache;
   t: FormTexte;
-  st: StationTexte;
+  st: StationTexte & { oeffnung: string };
   telefon: string;
   telefonHref: string;
   mail: string;
@@ -555,13 +537,13 @@ interface Props {
 }
 
 export function StationKontakt({ isVertical = false, domId, sprache = "DE", homepage, marke, onOpenLegal }: Props) {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const cms: any = homepage ?? {};
   const stText = STATION_TEXTE[kern(sprache)];
   const [karteOffen, setKarteOffen] = useState(false);
   const karteBtn = useRef<HTMLButtonElement | null>(null);
 
-  /* ── Sanity-Inhalte (Rückfall: Redesign-Wortlaut) ──
+  /* ── Sanity-Inhalte (kein Wortlaut im Code, leere Felder bleiben leer) ──
      stegaClean: im Vorschau-/Entwurfsmodus hängt Sanity an jeden String
      hunderte unsichtbare Bearbeitungsmarker. Werden solche Strings
      zerlegt (Titel in zwei Wörter, Lead in zwei Sätze) oder als href
@@ -573,30 +555,28 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
         const w = headingCms.replace(/\.$/, "").trim().split(/\s+/);
         return w.length > 1 ? [w.slice(0, -1).join(" "), w[w.length - 1]] : [headingCms, ""];
       })()
-    : stText.titel;
+    : ["", ""];
   const leadCms = stegaClean(t(cms.contactDescription, ""));
   const leadZeilen: readonly [string, string] = leadCms
     ? (() => {
         const i = leadCms.indexOf(". ");
         return i > 0 ? [leadCms.slice(0, i + 1), leadCms.slice(i + 2)] : [leadCms, ""];
       })()
-    : stText.lead;
-  const telefon: string = stegaClean(cms.contactPhone || "+41 44 224 40 24");
+    : ["", ""];
+  const telefon: string = stegaClean(cms.contactPhone || "");
   const telefonHref = `tel:${telefon.replace(/\s+/g, "")}`;
-  const mail: string = stegaClean(cms.contactEmail || "info@telliancapital.ch");
-  const oeffnung = t(cms.contactPhoneHours, stText.oeffnung);
-  const firmaName: string = cms.contactCompanyName || "Tellian Capital AG";
-  const adresse: string = cms.contactAddress || "Beethovenstrasse 7, CH-8002 Zürich";
-  const karteLabel = t(cms.contactMapLinkLabel, stText.karte);
-  /* Fussband (Vorlage SolutionsApp: fussMarke «Tellian Capital Solutions»
-     + «FINMA-lizenziert · © 2026»). Marke und Zusatz aus dem CMS
-     (footerBrand, footerLegalLine), Rückfall: Wortlaut der Vorlage. */
-  const fussMarke: string = stegaClean(cms.footerBrand || "Tellian Capital Solutions");
-  const fussZeile = `${fussMarke} · ${t(cms.footerLegalLine, stText.fussZusatz)}`;
+  const mail: string = stegaClean(cms.contactEmail || "");
+  const oeffnung = t(cms.contactPhoneHours, "");
+  const firmaName: string = cms.contactCompanyName || "";
+  const adresse: string = cms.contactAddress || "";
+  const karteLabel = t(cms.contactMapLinkLabel, "");
+  /* Fussband: Marke und Zusatz aus dem CMS (footerBrand, footerLegalLine). */
+  const fussMarke: string = stegaClean(cms.footerBrand || "");
+  const fussZeile = [fussMarke, t(cms.footerLegalLine, "")].filter(Boolean).join(" · ");
 
   const legalLabels: Record<"/datenschutz" | "/kundeninformation", string> = {
-    "/datenschutz": t(cms.legalDatenschutzLinkLabel, lang === "en" ? "Privacy Policy" : "Datenschutz"),
-    "/kundeninformation": t(cms.legalKundeninformationLinkLabel, lang === "en" ? "Client Information" : "Kundeninformation"),
+    "/datenschutz": t(cms.legalDatenschutzLinkLabel, ""),
+    "/kundeninformation": t(cms.legalKundeninformationLinkLabel, ""),
   };
 
   const privacyPrefix = t(cms.contactPrivacyPrefix, "");
@@ -618,55 +598,40 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
       </a>
       {privacySuffix}
     </>
-  ) : t(cms.contactPrivacyNotice, "") ? (
-    t(cms.contactPrivacyNotice, "")
-  ) : sprache === "EN" ? (
-    "By submitting this form you agree to our privacy policy."
   ) : (
-    "Mit dem Absenden stimmen Sie unseren Datenschutzbestimmungen zu."
+    t(cms.contactPrivacyNotice, "")
   );
 
   const formTexte: FormTexte = {
     ...FEHLER[kern(sprache)],
     feldName: sprache === "EN" ? "Name" : "Name",
-    feldMail: t(cms.contactFormEmail, sprache === "EN" ? "E-mail" : "E-Mail"),
-    feldTelefon: t(cms.contactFormPhone, sprache === "EN" ? "Phone" : "Telefon"),
-    feldNachricht: t(cms.contactFormMessage, sprache === "EN" ? "Your message" : "Ihre Nachricht"),
-    senden: t(cms.contactFormSubmit, sprache === "EN" ? "Send enquiry" : "Anfrage senden"),
+    feldMail: t(cms.contactFormEmail, ""),
+    feldTelefon: t(cms.contactFormPhone, ""),
+    feldNachricht: t(cms.contactFormMessage, ""),
+    senden: t(cms.contactFormSubmit, ""),
     sendet: t(cms.contactFormSendingLabel, FEHLER[kern(sprache)].sendet),
     zustimmung,
-    dankeTitel: t(cms.contactFormThanksTitle, stText.dankeTitel),
-    dankeText: t(cms.contactFormThanksBody, stText.dankeText),
+    dankeTitel: t(cms.contactFormThanksTitle, ""),
+    dankeText: t(cms.contactFormThanksBody, ""),
   };
 
-  /* Fussverweise wie in der Vorlage: FAQ · Solutions · LinkedIn ·
-     Datenschutz · Kundeninformation. Die beiden ersten führen aus der
-     Seite hinaus (FAQ auf die Hauptseite, Solutions auf diese Welt) und
-     kommen aus dem CMS (footerLinks: Label + Ziel), die drei danach sind
-     fest: LinkedIn (Adresse aus linkedinUrl) und die Rechtsseiten. */
+  /* Fussverweise: zuerst die CMS-Verweise (footerLinks: Label + Ziel),
+     dann LinkedIn (Adresse aus linkedinUrl) und die Rechtsseiten (Labels
+     aus dem CMS). Einträge ohne Label bzw. Adresse entfallen. */
   const cmsFussLinks: FussVerweis[] = ((cms.footerLinks ?? []) as { label?: LocaleValue; href?: string }[])
     .map((v) => ({ text: stegaClean(t(v?.label, "")), href: stegaClean(v?.href || "") }))
     .filter((v) => v.text && v.href)
     .map((v) => ({ ...v, extern: /^https?:\/\//.test(v.href) && !v.href.startsWith(mainSiteUrl) }));
-  const fussLinks: readonly FussVerweis[] =
-    cmsFussLinks.length > 0
-      ? cmsFussLinks
-      : [
-          { text: "FAQ", href: `${mainSiteUrl.replace(/\/$/, "")}/faq` },
-          /* basePath: a plain <a href="/"> would leave for the main site. */
-          { text: "Solutions", href: "/solutions" },
-        ];
+  const linkedinHref: string = stegaClean(cms.linkedinUrl || "");
   const FUSS_RECHTS: readonly FussVerweis[] = [
-    ...fussLinks,
-    {
-      text: "LinkedIn",
-      href: stegaClean(cms.linkedinUrl || "https://www.linkedin.com/company/dr-blumer-partner-verm%C3%B6gensverwaltung-z%C3%BCrich-ag/"),
-      extern: true,
-      marke: inBugWeiss.src,
-      vorlesen: "Tellian Capital auf LinkedIn",
-    },
-    { text: legalLabels["/datenschutz"], legal: "/datenschutz" },
-    { text: legalLabels["/kundeninformation"], legal: "/kundeninformation" },
+    ...cmsFussLinks,
+    ...(linkedinHref
+      ? [{ text: "LinkedIn", href: linkedinHref, extern: true, marke: inBugWeiss.src, vorlesen: "Tellian Capital auf LinkedIn" }]
+      : []),
+    ...(legalLabels["/datenschutz"] ? [{ text: legalLabels["/datenschutz"], legal: "/datenschutz" as const }] : []),
+    ...(legalLabels["/kundeninformation"]
+      ? [{ text: legalLabels["/kundeninformation"], legal: "/kundeninformation" as const }]
+      : []),
   ];
 
   const titel = (
@@ -758,17 +723,23 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
 
   const firma = (
     <div>
-      <span style={{ display: "block", fontFamily: sans, fontSize: "var(--tellian-k6-firm-size)", fontWeight: 500, color: "var(--tellian-k6-ink)" }}>{firmaName}</span>
-      <span style={{ display: "block", marginTop: "3px", fontFamily: sans, fontSize: "var(--tellian-k6-firm-size)", lineHeight: 1.5, color: "var(--tellian-k6-dim)" }}>{adresse}</span>
-      <button
-        ref={karteBtn}
-        type="button"
-        onClick={() => window.open(karteHref, "_blank", "noopener")}
-        className="tellian-k6-still"
-        style={{ marginTop: "10px", background: "transparent", border: "none", padding: 0, cursor: "pointer", fontFamily: sans, fontSize: "var(--tellian-k6-meta-size)", color: "var(--tellian-k6-ink)" }}
-      >
-        {karteLabel} <span aria-hidden>→</span>
-      </button>
+      {firmaName && (
+        <span style={{ display: "block", fontFamily: sans, fontSize: "var(--tellian-k6-firm-size)", fontWeight: 500, color: "var(--tellian-k6-ink)" }}>{firmaName}</span>
+      )}
+      {adresse && (
+        <span style={{ display: "block", marginTop: "3px", fontFamily: sans, fontSize: "var(--tellian-k6-firm-size)", lineHeight: 1.5, color: "var(--tellian-k6-dim)" }}>{adresse}</span>
+      )}
+      {adresse && karteLabel && (
+        <button
+          ref={karteBtn}
+          type="button"
+          onClick={() => window.open(karteHref, "_blank", "noopener")}
+          className="tellian-k6-still"
+          style={{ marginTop: "10px", background: "transparent", border: "none", padding: 0, cursor: "pointer", fontFamily: sans, fontSize: "var(--tellian-k6-meta-size)", color: "var(--tellian-k6-ink)" }}
+        >
+          {karteLabel} <span aria-hidden>→</span>
+        </button>
+      )}
     </div>
   );
 
@@ -924,8 +895,8 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
           {lead(false)}
 
           <div style={{ marginTop: "clamp(26px, 3.4vh, 40px)" }}>
-            {weg(telefonHref, stText.wegAnrufen, telefon, oeffnung)}
-            {weg(`mailto:${mail}`, stText.wegMail, mail)}
+            {telefon && weg(telefonHref, stText.wegAnrufen, telefon, oeffnung)}
+            {mail && weg(`mailto:${mail}`, stText.wegMail, mail)}
             <div style={{ borderTop: "1px solid var(--tellian-k6-line)", paddingTop: "clamp(18px, 2.6vh, 26px)" }}>
               <span className="tellian-marker" style={{ display: "block", fontFamily: sans, color: "var(--tellian-k6-dim)" }}>
                 {t(cms.contactFormHeading, stText.wegSchreiben)}
@@ -972,9 +943,9 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
             <div style={{ flex: "1 1 0", minWidth: 0, display: "flex", flexDirection: "column" }}>
               {titel}
               {lead(true)}
-              <div style={{ marginTop: "clamp(22px, 3vh, 40px)" }}>{telefonEl}</div>
-              {oeffnungEl}
-              <div style={{ display: "flex" }}>{mailEl}</div>
+              {telefon && <div style={{ marginTop: "clamp(22px, 3vh, 40px)" }}>{telefonEl}</div>}
+              {oeffnung && oeffnungEl}
+              {mail && <div style={{ display: "flex" }}>{mailEl}</div>}
               <div style={{ marginTop: "auto", paddingTop: "clamp(24px, 3vh, 44px)" }}>{firma}</div>
             </div>
 
