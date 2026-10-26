@@ -155,6 +155,19 @@ export function SubpageMandatAdvisory({
       </div>
 
       <style>{`
+        /* Primärer CTA wie in der Vorlage (dort global .tellian-cta-primaer):
+           Mushroom mit Tinte, Gewicht 500, Hover/Fokus dunkelt auf die
+           Aktivstufe. Hier bewusst nur auf den Unterseiten-Knopf begrenzt. */
+        .tellian-subpage-knopf {
+          background-color: var(--tellian-muted);
+          color: var(--tellian-ink);
+          font-weight: 500;
+          transition: background-color 200ms ease;
+        }
+        .tellian-subpage-knopf:hover,
+        .tellian-subpage-knopf:focus-visible {
+          background-color: var(--tellian-button-hover);
+        }
         .tellian-subpage-knopf:focus-visible {
           outline: 2px solid var(--tellian-accent);
           outline-offset: 3px;
