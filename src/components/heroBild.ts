@@ -24,9 +24,17 @@ export const HERO_SIZES_SCHMAL = `max(100vw, ${Math.round(HERO_BILD_VERHAELTNIS 
 export const HERO_SIZES_BREIT = `max(50vw, ${Math.round(HERO_BILD_VERHAELTNIS * 100)}vh)`;
 export const HERO_SIZES_MEDIA = `(min-width: 1024px) ${HERO_SIZES_BREIT}, ${HERO_SIZES_SCHMAL}`;
 
+/* Breitenstufen des Hero-Motivs — dieselben wie in der Vorlage
+   (public/img/hero-tellian: 432 … 4320). Die allgemeine Stufenliste
+   endet bei 1920 px und q=65; auf einem Retina-Desktop braucht das
+   halbseitige, höhenfüllende Motiv aber rund 2700–3000 Gerätepunkte
+   Breite — die 1920er-Datei wurde hochskaliert und wirkte weich. */
+const HERO_STUFEN = [432, 768, 1080, 1536, 2160, 2496, 3111, 3456, 4320] as const;
+const HERO_QUALITAET = 80;
+
 export function heroBild(homepage: any): { src: string; srcSet: string | undefined } {
   const cmsBild: string | undefined = homepage?.startImageAsset?.url || homepage?.startImageUrl;
   if (!cmsBild) return { src: HERO_FALLBACK, srcSet: HERO_FALLBACK_SRCSET };
-  const { src, srcSet } = responsiveImage(cmsBild);
+  const { src, srcSet } = responsiveImage(cmsBild, HERO_STUFEN, HERO_QUALITAET);
   return { src, srcSet };
 }

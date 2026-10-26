@@ -1,8 +1,11 @@
 "use client";
 
 import { SubpageMandatAdvisory } from "./SubpageMandatAdvisory";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
-/* UNTERSEITE — ADVISORY (nur Inhalt). Wortlaut aus dem Redesign. */
+/* UNTERSEITE — ADVISORY (nur Inhalt). Inhalte aus Sanity (homepage →
+   «3a. Unterseiten» → advisory*), Rückfall = Wortlaut des Redesigns. */
 
 interface Inhalt {
   titel: readonly [string, string];
@@ -42,22 +45,40 @@ interface Props {
   isMobile?: boolean;
   aktiv?: boolean;
   sprache?: "DE" | "EN";
+  homepage?: any;
   onContactClick?: () => void;
   onAndereSeite?: () => void;
 }
 
-export function UnterseiteAdvisory({ isMobile = false, aktiv = true, sprache = "DE", onContactClick, onAndereSeite }: Props) {
-  const inhalt = INHALT[sprache];
+export function UnterseiteAdvisory({ isMobile = false, aktiv = true, sprache = "DE", homepage, onContactClick, onAndereSeite }: Props) {
+  const { t } = useLanguage();
+  const basis = INHALT[sprache];
+  const cmsLead: string[] = (homepage?.advisoryLead ?? [])
+    .map((a: LocaleValue) => t(a, ""))
+    .filter((a: string) => a.trim().length > 0);
+  const cmsSchritte = (homepage?.advisorySteps ?? [])
+    .map((st: { title?: LocaleValue; text?: LocaleValue }) => ({ titel: t(st?.title, ""), zeile: t(st?.text, "") }))
+    .filter((st: { titel: string }) => st.titel.trim().length > 0);
+  const inhalt: Inhalt = {
+    titel: [t(homepage?.advisoryHeadingLine1, basis.titel[0]), t(homepage?.advisoryHeadingLine2, basis.titel[1])],
+    lead: cmsLead.length > 0 ? cmsLead : basis.lead,
+    knopf: t(homepage?.advisoryCtaLabel, basis.knopf),
+    schritte: cmsSchritte.length > 0 ? cmsSchritte : basis.schritte,
+  };
+  /* Im Redesign hat Advisory keinen Vorgehens-Titel; nur wenn das CMS einen liefert. */
+  const vorgehenTitel = t(homepage?.advisoryProcessTitle, "") || undefined;
   return (
     <SubpageMandatAdvisory
       seite="advisory"
       titel={inhalt.titel}
       lead={inhalt.lead}
       knopf={inhalt.knopf}
+      vorgehenTitel={vorgehenTitel}
       schritte={inhalt.schritte}
       isMobile={isMobile}
       aktiv={aktiv}
       sprache={sprache}
+      homepage={homepage}
       onContactClick={onContactClick}
       onAndereSeite={onAndereSeite}
     />

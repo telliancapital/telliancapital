@@ -37,12 +37,15 @@ interface Props {
   isMobile?: boolean;
   aktiv?: boolean;
   sprache?: "DE" | "EN";
+  /** CMS-Dokument (homepage) für die Vergleichstabelle. */
+  homepage?: any;
   onContactClick?: () => void;
   onAndereSeite?: () => void;
 }
 
 export function SubpageMandatAdvisory({
   seite,
+  homepage,
   titel,
   lead,
   knopf,
@@ -148,7 +151,7 @@ export function SubpageMandatAdvisory({
       </div>
 
       <div style={{ ...TRENNER, ...stufe(2) }}>
-        <SubpageVergleich seite={seite} sprache={sprache} isMobile={isMobile} onAndereSeite={onAndereSeite} />
+        <SubpageVergleich seite={seite} sprache={sprache} isMobile={isMobile} homepage={homepage} onAndereSeite={onAndereSeite} />
       </div>
 
       <style>{`

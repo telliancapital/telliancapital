@@ -52,6 +52,15 @@ export const resolve = {
         ],
       }),
     }),
+    subpages: defineLocations({
+      select: { title: "_id" },
+      resolve: () => ({
+        locations: [
+          { title: "Unterseiten Mandat / Advisory (Deutsch)", href: "/de" },
+          { title: "Unterseiten Mandat / Advisory (English)", href: "/en" },
+        ],
+      }),
+    }),
     solutionsHomepage: defineLocations({
       select: { title: "_id" },
       resolve: () => ({

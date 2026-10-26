@@ -1683,6 +1683,7 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
       <SubpageOverlay isOpen={adv.isDetail} onClose={adv.closeDetail} eyebrow="" headline={null}>
         <UnterseiteAdvisory
           isMobile={isVertical}
+          homepage={homepage}
           aktiv={adv.isDetail}
           sprache={sprache}
           onContactClick={navigateToContact}
@@ -1695,6 +1696,7 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
       <SubpageOverlay isOpen={man.isDetail} onClose={man.closeDetail} eyebrow="" headline={null}>
         <UnterseiteMandat
           isMobile={isVertical}
+          homepage={homepage}
           aktiv={man.isDetail}
           sprache={sprache}
           onContactClick={navigateToContact}
