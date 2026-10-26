@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 /* mapbox-gl is dynamic-imported inside ZurichMap below to keep it out of the
    main bundle. The map only renders when the user opens the overlay. */
 import type mapboxgl from "mapbox-gl";
+import { stegaClean } from "@sanity/client/stega";
 import { C, sans } from "@/tokens";
 
 /* Split out of Section6Kontakt.tsx: StationKontakt only needs the map
@@ -15,14 +16,17 @@ import { C, sans } from "@/tokens";
 const MAP_COLORS = { road: "#E8E6E1", water: "#D5DDD8", green: "#E4E8E0" };
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
-const MAP_CENTER: [number, number] = [8.5387, 47.3769];
+/* Beethovenstrasse 7, CH-8002 Zürich — Mapbox-Geocoding «exact» (26.10.2026).
+   Vorher stand hier die Zürcher Innenstadt beim Hauptbahnhof, der Marker
+   lag damit rund 1,3 km von der Adresse entfernt. */
+const MAP_CENTER: [number, number] = [8.5372, 47.3654];
 
 /* ═══════════════════════════════════════════════════════════
    MAPBOX STYLING HELPERS
    ═══════════════════════════════════════════════════════════ */
 type MapboxGL = typeof mapboxgl;
 
-function applyStyleAndMarker(mapboxgl: MapboxGL, map: mapboxgl.Map) {
+function applyStyleAndMarker(mapboxgl: MapboxGL, map: mapboxgl.Map, label: string) {
   const style = map.getStyle();
   if (!style?.layers) return;
 
@@ -89,12 +93,34 @@ function applyStyleAndMarker(mapboxgl: MapboxGL, map: mapboxgl.Map) {
   el.appendChild(dot);
 
   new mapboxgl.Marker({ element: el, anchor: "center" }).setLngLat(MAP_CENTER).addTo(map);
+
+  /* Adresse direkt am Marker. Der Mapbox-Stil blendet den Strassennamen
+     «Beethovenstrasse» bei dieser Zoomstufe oft aus (Kollision mit den
+     Nachbarstrassen) — ohne eigenes Etikett war nicht erkennbar, wo der
+     Punkt liegt. Ein zweiter Marker mit Textfeld, links verankert und
+     neben den Punkt versetzt. */
+  if (label) {
+    const tag = document.createElement("div");
+    tag.textContent = label;
+    tag.style.fontFamily = sans;
+    tag.style.fontSize = "11px";
+    tag.style.letterSpacing = "0.02em";
+    tag.style.lineHeight = "1";
+    tag.style.whiteSpace = "nowrap";
+    tag.style.padding = "7px 10px";
+    tag.style.borderRadius = "999px";
+    tag.style.backgroundColor = C.dark;
+    tag.style.color = "rgba(255, 255, 255, 0.92)";
+    tag.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.18)";
+    tag.style.pointerEvents = "none";
+    new mapboxgl.Marker({ element: tag, anchor: "left", offset: [16, 0] }).setLngLat(MAP_CENTER).addTo(map);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
    ZURICH MAP
    ═══════════════════════════════════════════════════════════ */
-function ZurichMap() {
+function ZurichMap({ label }: { label: string }) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -138,7 +164,7 @@ function ZurichMap() {
 
         mapRef.current = map;
         map.on("load", () => map.resize());
-        map.on("style.load", () => applyStyleAndMarker(mapboxgl, map));
+        map.on("style.load", () => applyStyleAndMarker(mapboxgl, map, label));
         map.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-right");
 
         ro = new ResizeObserver(() => map.resize());
@@ -154,6 +180,7 @@ function ZurichMap() {
       mapRef.current?.remove();
       mapRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Karte wird einmal gebaut; das Etikett ist beim Aufbau bekannt
   }, []);
 
   return (
@@ -326,7 +353,9 @@ export function MapOverlay({ open, onClose, returnFocusRef, address }: MapOverla
             backgroundColor: "#E8E4DC",
           }}
         >
-          <ZurichMap />
+          {/* stegaClean: im Entwurfsmodus hängt Sanity unsichtbare Zeichen an
+              jeden String — im Etikett würden sie die Breite verfälschen. */}
+          <ZurichMap label={stegaClean(address)} />
         </div>
 
         {/* Address bar */}

@@ -1,5 +1,7 @@
 import { defineField, defineType } from "sanity";
 
+import { subpageFields } from "./subpagesFields";
+
 /**
  * Homepage schema — single document representing the entire one-page site.
  *
@@ -20,6 +22,7 @@ export const homepageType = defineType({
     { name: "start", title: "1. Start  ·  Hero", default: true },
     { name: "philosophy", title: "2. Haltung  ·  Anlagephilosophie" },
     { name: "method", title: "3. Methode  ·  Vermögensverwaltung" },
+    { name: "subpages", title: "3a. ⚠ Unterseiten — MOVED, do not edit here (use «Unterseiten · Mandat / Advisory» in the content list)" },
     { name: "advantages", title: "3b. Vorteile  ·  Ihre Vorteile (Station 03)" },
     { name: "relationships", title: "4b. Geschäftsbeziehungen  ·  Banking Relationships (Station 04)" },
     { name: "strategy", title: "4. Strategie  ·  Anlagestrategien" },
@@ -137,6 +140,23 @@ export const homepageType = defineType({
       name: "relationshipsBodySet",
       title: "Body paragraphs (left column)",
       options: { collapsible: true, collapsed: false },
+    },
+
+    /* Unterseiten Mandat / Advisory (open from the two cards in station 02) */
+    {
+      name: "subMandatSet",
+      title: "Mandat subpage — OLD COPY, read only for copying. Saving here fails (document limit).",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "subAdvisorySet",
+      title: "Advisory subpage — OLD COPY, read only for copying. Saving here fails (document limit).",
+      options: { collapsible: true, collapsed: true },
+    },
+    {
+      name: "subCompareSet",
+      title: "Comparison table (shown on both subpages) — OLD COPY, read only for copying. Saving here fails (document limit).",
+      options: { collapsible: true, collapsed: true },
     },
     {
       name: "methodDetailSet",
@@ -893,6 +913,24 @@ export const homepageType = defineType({
       of: [{ type: "localeText" }],
       group: "relationships",
       fieldset: "relationshipsBodySet",
+    }),
+
+    /* ──────────────────────────────────────────────────────────
+       03a — UNTERSEITEN MANDAT / ADVISORY  (moved)
+       These fields now live in the own document «Unterseiten · Mandat /
+       Advisory» (see subpages.ts) because this document is at Sanity's
+       1000-attribute limit. They stay here, marked as deprecated, only so
+       that already entered content remains visible and editable until it
+       has been copied over and cleared. Remove this spread afterwards.
+       ────────────────────────────────────────────────────────── */
+    ...subpageFields({
+      group: () => "subpages",
+      fieldset: (section) =>
+        section === "mandat" ? "subMandatSet" : section === "advisory" ? "subAdvisorySet" : "subCompareSet",
+      deprecated: {
+        reason:
+          "Moved to the document «Unterseiten · Mandat / Advisory» (content list, under Homepage). Copy the value there, then clear this field — the homepage document is at Sanity's 1000-attribute limit.",
+      },
     }),
     defineField({
       name: "methodDetailEyebrow",

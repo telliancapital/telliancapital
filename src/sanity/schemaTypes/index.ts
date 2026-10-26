@@ -6,6 +6,7 @@ import { triLocaleString } from "./triLocaleString";
 import { triLocaleText } from "./triLocaleText";
 import { seoMeta } from "./seoMeta";
 import { faqType } from "./faq";
+import { subpagesType } from "./subpages";
 import { solutionsHomepageType } from "./solutionsHomepage";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
@@ -17,6 +18,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     triLocaleText,
     seoMeta,
     faqType,
+    subpagesType,
     solutionsHomepageType,
   ],
 };

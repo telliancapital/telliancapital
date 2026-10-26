@@ -1,8 +1,11 @@
 "use client";
 
 import { SubpageMandatAdvisory } from "./SubpageMandatAdvisory";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
-/* UNTERSEITE — MANDAT (nur Inhalt). Wortlaut aus dem Redesign. */
+/* UNTERSEITE — MANDAT (nur Inhalt). Inhalte aus Sanity (homepage →
+   «3a. Unterseiten» → mandat*), Rückfall = Wortlaut des Redesigns. */
 
 interface Inhalt {
   titel: readonly [string, string];
@@ -51,12 +54,27 @@ interface Props {
   isMobile?: boolean;
   aktiv?: boolean;
   sprache?: "DE" | "EN";
+  homepage?: any;
   onContactClick?: () => void;
   onAndereSeite?: () => void;
 }
 
-export function UnterseiteMandat({ isMobile = false, aktiv = true, sprache = "DE", onContactClick, onAndereSeite }: Props) {
-  const inhalt = INHALT[sprache];
+export function UnterseiteMandat({ isMobile = false, aktiv = true, sprache = "DE", homepage, onContactClick, onAndereSeite }: Props) {
+  const { t } = useLanguage();
+  const basis = INHALT[sprache];
+  const cmsLead: string[] = (homepage?.mandatLead ?? [])
+    .map((a: LocaleValue) => t(a, ""))
+    .filter((a: string) => a.trim().length > 0);
+  const cmsSchritte = (homepage?.mandatSteps ?? [])
+    .map((st: { title?: LocaleValue; text?: LocaleValue }) => ({ titel: t(st?.title, ""), zeile: t(st?.text, "") }))
+    .filter((st: { titel: string }) => st.titel.trim().length > 0);
+  const inhalt: Inhalt = {
+    titel: [t(homepage?.mandatHeadingLine1, basis.titel[0]), t(homepage?.mandatHeadingLine2, basis.titel[1])],
+    lead: cmsLead.length > 0 ? cmsLead : basis.lead,
+    knopf: t(homepage?.mandatCtaLabel, basis.knopf),
+    vorgehenTitel: t(homepage?.mandatProcessTitle, basis.vorgehenTitel),
+    schritte: cmsSchritte.length > 0 ? cmsSchritte : basis.schritte,
+  };
   return (
     <SubpageMandatAdvisory
       seite="mandat"
@@ -68,6 +86,7 @@ export function UnterseiteMandat({ isMobile = false, aktiv = true, sprache = "DE
       isMobile={isMobile}
       aktiv={aktiv}
       sprache={sprache}
+      homepage={homepage}
       onContactClick={onContactClick}
       onAndereSeite={onAndereSeite}
     />
