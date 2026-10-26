@@ -53,20 +53,3 @@ html[data-eingabe="zeiger"] :is(button, a, [role="button"], [role="dialog"], [ta
 }
 
 html { -webkit-tap-highlight-color: transparent; }
-
-/* ── PRIMÄRER CTA (aus der Vorlage, src/styles/index.css) ──
-   EINE Fläche für alle gefüllten Handlungs-CTAs: Mushroom mit Tinte
-   (8.17:1), Gewicht 500, Hover/Fokus dunkelt auf die Aktivstufe.
-   Die Regel fehlte nach dem Port — die Klasse stand zwar an den
-   Knöpfen (Unterseiten «Gespräch vereinbaren», Tellian-Knoten im
-   Dreieck, Mobilmenü), aber ohne Fläche und Farbe. */
-.tellian-cta-primaer {
-  background-color: var(--tellian-muted);
-  color: var(--tellian-ink);
-  font-weight: 500;
-  transition: background-color 200ms ease;
-}
-.tellian-cta-primaer:hover,
-.tellian-cta-primaer:focus-visible {
-  background-color: var(--tellian-button-hover);
-}
