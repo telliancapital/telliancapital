@@ -20,14 +20,18 @@ const STUFEN = [480, 640, 828, 1080, 1280, 1600, 1920] as const;
  * AVIF/WebP. Non-Sanity URLs (external URL field, bundled fallback) are
  * returned unchanged with no srcSet.
  */
-export function responsiveImage(url: string, widths: readonly number[] = STUFEN): { src: string; srcSet?: string } {
+export function responsiveImage(
+  url: string,
+  widths: readonly number[] = STUFEN,
+  quality = 65,
+): { src: string; srcSet?: string } {
   if (!url.startsWith("https://cdn.sanity.io/images/")) return { src: url };
   const at = (w: number) => {
     const u = new URL(url);
     u.searchParams.set("w", String(w));
     u.searchParams.set("fit", "max");
     u.searchParams.set("auto", "format");
-    u.searchParams.set("q", "65");
+    u.searchParams.set("q", String(quality));
     return u.toString();
   };
   return {

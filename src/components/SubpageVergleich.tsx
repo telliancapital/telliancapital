@@ -1,7 +1,9 @@
 "use client";
 
 import { C, sans, serif } from "@/tokens";
-import { VERGLEICH, type Pfad } from "@/data/mandatAdvisory";
+import { VERGLEICH, type Pfad, type VergleichInhalt } from "@/data/mandatAdvisory";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
 /* ═══════════════════════════════════════════════════════════
    EINORDNUNG — Mandat und Advisory im Vergleich
@@ -15,12 +17,34 @@ const HAARLINIE = "rgba(184, 174, 163, 0.5)";
 interface Props {
   seite: Pfad;
   sprache?: "DE" | "EN";
+  /** CMS-Dokument (homepage → compare*), Rückfall = Wortlaut des Redesigns. */
+  homepage?: any;
   isMobile?: boolean;
   onAndereSeite?: () => void;
 }
 
-export function SubpageVergleich({ seite, sprache = "DE", isMobile = false, onAndereSeite }: Props) {
-  const inhalt = VERGLEICH[sprache];
+export function SubpageVergleich({ seite, sprache = "DE", isMobile = false, homepage, onAndereSeite }: Props) {
+  const { t } = useLanguage();
+  const basis = VERGLEICH[sprache];
+  const cmsZeilen = (homepage?.compareRows ?? [])
+    .map((z: { label?: LocaleValue; mandat?: LocaleValue; advisory?: LocaleValue }) => ({
+      label: t(z?.label, ""),
+      mandat: t(z?.mandat, ""),
+      advisory: t(z?.advisory, ""),
+    }))
+    .filter((z: { label: string }) => z.label.trim().length > 0);
+  const inhalt: VergleichInhalt = {
+    titel: t(homepage?.compareTitle, basis.titel),
+    spalten: {
+      mandat: t(homepage?.compareColumnMandat, basis.spalten.mandat),
+      advisory: t(homepage?.compareColumnAdvisory, basis.spalten.advisory),
+    },
+    wege: {
+      mandat: t(homepage?.compareLinkMandat, basis.wege.mandat),
+      advisory: t(homepage?.compareLinkAdvisory, basis.wege.advisory),
+    },
+    zeilen: cmsZeilen.length > 0 ? cmsZeilen : basis.zeilen,
+  };
   const andere: Pfad = seite === "mandat" ? "advisory" : "mandat";
 
   const titelStil: React.CSSProperties = {
