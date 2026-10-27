@@ -13,7 +13,8 @@ export const HOMEPAGE_QUERY = defineQuery(`*[_type == "homepage"][0]{
   startEyebrow,
   startHeadingLine1,
   startHeadingLine2,
-  startParagraphs,
+  // Lead paragraphs live in the "subpages" document (homepage is at the 1000-attribute limit)
+  "startParagraphs": coalesce(*[_type == "subpages"][0].startParagraphs, startParagraphs),
   startCtaLabel,
   startBottomLabel,
   "startImageAsset": startImage.asset->{ url },
