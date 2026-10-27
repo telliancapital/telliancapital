@@ -3,35 +3,77 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { stegaClean } from "@sanity/client/stega";
+
 import { C, serif, sans } from "@/tokens";
 import { EASE } from "@/styles/motion";
-import { portalKundeUrl, portalPartnerUrl, portalMitarbeiterUrl } from "@/sanity/env";
+import { portalKundeUrl } from "@/sanity/env";
+import { useLanguage } from "@/i18n/LanguageContext";
+import type { LocaleValue } from "@/i18n/types";
 
-const PORTALS = [
+/* ── Copy & links come from Sanity (solutionsHomepage → Sidebar · Navigation
+   → "Kundenportal popup"), same fields as the main site. The built-in copy
+   below is only the fallback for empty fields. ── */
+interface CmsPortal {
+  label?: LocaleValue;
+  subtitle?: LocaleValue;
+  url?: string | null;
+}
+
+export interface LoginOverlayCms {
+  loginOverlayTitleLine1?: LocaleValue;
+  loginOverlayTitleLine2?: LocaleValue;
+  loginOverlayPortals?: CmsPortal[] | null;
+  loginOverlayHint?: LocaleValue;
+  loginOverlaySupportQuestion?: LocaleValue;
+  loginOverlaySupportLinkLabel?: LocaleValue;
+  loginOverlayCloseLabel?: LocaleValue;
+}
+
+interface PortalLink {
+  label: string;
+  subtitle: string;
+  href: string;
+}
+
+const DEFAULT_PORTALS: PortalLink[] = [
   {
     label: "Kunde",
     subtitle: "Portfolio, Reporting, Dokumente",
-    href: portalKundeUrl,
+    href: portalKundeUrl ?? "",
   },
-  // {
-  //   label: "Partner",
-  //   subtitle: "Beraterbereich und Referral",
-  //   href: portalPartnerUrl,
-  // },
-  // {
-  //   label: "Mitarbeiter",
-  //   subtitle: "Internes Backoffice",
-  //   href: portalMitarbeiterUrl,
-  // },
-] as const;
+];
 
 interface LoginOverlayProps {
   open: boolean;
   onClose: () => void;
   onSupportClick: () => void;
+  homepage?: LoginOverlayCms | null;
 }
 
-export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProps) {
+export function LoginOverlay({ open, onClose, onSupportClick, homepage }: LoginOverlayProps) {
+  const { t } = useLanguage();
+  const titleLine1 = t(homepage?.loginOverlayTitleLine1, "Ihr Zugang,");
+  const titleLine2 = t(homepage?.loginOverlayTitleLine2, "persönlich");
+  const hint = t(homepage?.loginOverlayHint, "Der Klick öffnet das Portal in einem neuen Tab.");
+  const supportQuestion = t(homepage?.loginOverlaySupportQuestion, "Probleme beim Anmelden?");
+  const supportLinkLabel = t(homepage?.loginOverlaySupportLinkLabel, "Support kontaktieren");
+  const closeLabel = t(homepage?.loginOverlayCloseLabel, "Overlay schliessen");
+
+  const cmsPortals = homepage?.loginOverlayPortals;
+  const portals: PortalLink[] = (() => {
+    const rows = (Array.isArray(cmsPortals) ? cmsPortals : [])
+      .map((p, i) => ({
+        label: t(p?.label, ""),
+        subtitle: t(p?.subtitle, ""),
+        /* stegaClean: in draft mode Sanity embeds invisible chars in every
+           string; they must not end up in the href. */
+        href: stegaClean(p?.url ?? "").trim() || (i === 0 ? (portalKundeUrl ?? "") : ""),
+      }))
+      .filter((p) => p.label && p.href);
+    return rows.length > 0 ? rows : DEFAULT_PORTALS;
+  })();
+
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const wasOpenRef = useRef(false);
@@ -115,7 +157,7 @@ export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProp
         <button
           ref={closeBtnRef}
           onClick={onClose}
-          aria-label="Overlay schliessen"
+          aria-label={closeLabel}
           style={{
             position: "absolute",
             top: "16px",
@@ -153,14 +195,14 @@ export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProp
             marginBottom: "clamp(28px, 3.5vw, 40px)",
           }}
         >
-          Ihr Zugang,
+          {titleLine1}
           <br />
-          <em style={{ fontStyle: "italic", fontWeight: 400 }}>persönlich</em>
+          <em style={{ fontStyle: "italic", fontWeight: 400 }}>{titleLine2}</em>
         </h2>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {PORTALS.map((p) => (
-            <PortalRow key={p.label} portal={p} />
+          {portals.map((p, i) => (
+            <PortalRow key={`${i}-${p.href}`} portal={p} />
           ))}
         </div>
 
@@ -175,7 +217,7 @@ export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProp
             letterSpacing: "0.02em",
           }}
         >
-          Der Klick öffnet das Portal in einem neuen Tab.
+          {hint}
         </p>
 
         <div
@@ -188,6 +230,8 @@ export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProp
         />
 
         <SupportLink
+          question={supportQuestion}
+          linkLabel={supportLinkLabel}
           onClick={() => {
             onClose();
             onSupportClick();
@@ -199,7 +243,7 @@ export function LoginOverlay({ open, onClose, onSupportClick }: LoginOverlayProp
   );
 }
 
-function PortalRow({ portal }: { portal: (typeof PORTALS)[number] }) {
+function PortalRow({ portal }: { portal: PortalLink }) {
   const [hover, setHover] = useState(false);
   return (
     <a
@@ -277,7 +321,7 @@ function PortalRow({ portal }: { portal: (typeof PORTALS)[number] }) {
   );
 }
 
-function SupportLink({ onClick }: { onClick: () => void }) {
+function SupportLink({ question, linkLabel, onClick }: { question: string; linkLabel: string; onClick: () => void }) {
   const [hover, setHover] = useState(false);
   return (
     <button
@@ -313,14 +357,14 @@ function SupportLink({ onClick }: { onClick: () => void }) {
         }}
       />
       <span>
-        Probleme beim Anmelden?{" "}
+        {question}{" "}
         <span
           style={{
             color: hover ? C.dark : C.charcoal,
             transition: `color 300ms ${EASE.standard}`,
           }}
         >
-          Support kontaktieren
+          {linkLabel}
         </span>
       </span>
     </button>

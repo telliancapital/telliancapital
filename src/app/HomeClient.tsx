@@ -1585,9 +1585,13 @@ export default function HomeClient({ homepage, outline }: { homepage: any; outli
      und DotNavigationBand selbst (siehe oben). */
   const bandAktiv = !isVertical && introComplete;
 
-  const handleWelt = useCallback((ziel: "capital" | "solutions") => {
-    if (ziel === "solutions") window.location.href = solutionsSiteUrl;
-  }, []);
+  /* Weltenwechsel in der aktiven Sprache (statt immer auf /solutions/de). */
+  const handleWelt = useCallback(
+    (ziel: "capital" | "solutions") => {
+      if (ziel === "solutions") window.location.href = `${solutionsSiteUrl.replace(/\/$/, "")}/${lang === "en" ? "en" : "de"}`;
+    },
+    [lang],
+  );
 
   const handleIntroComplete = useCallback(() => setIntroComplete(true), []);
 
