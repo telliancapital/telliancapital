@@ -25,10 +25,23 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-/** First path segment, or null if it's not a supported lang code. */
+/* This app is served under /solutions (basePath in next.config.ts).
+   `usePathname()` strips that prefix, `window.location.pathname` keeps it —
+   both are handled here so the language segment is always the one right
+   after the prefix, never inserted in front of it (/en/solutions/de). */
+const BASE_PATH = "/solutions";
+
+/** Split a pathname into the basePath (if present) and the segments after it. */
+function splitBase(pathname: string): { base: string; rest: string[] } {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts[0] === BASE_PATH.slice(1)) return { base: BASE_PATH, rest: parts.slice(1) };
+  return { base: "", rest: parts };
+}
+
+/** Language segment of a path, or null if it's not a supported lang code. */
 function pathLang(pathname: string | null | undefined): Locale | null {
   if (!pathname) return null;
-  const seg = pathname.split("/").filter(Boolean)[0];
+  const seg = splitBase(pathname).rest[0];
   return SUPPORTED.includes(seg as Locale) ? (seg as Locale) : null;
 }
 
@@ -65,13 +78,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
          not re-render server components, refetch data, or reset scroll. */
       if (typeof window !== "undefined") {
         const url = new URL(window.location.href);
-        const parts = url.pathname.split("/");
-        if (SUPPORTED.includes(parts[1] as Locale)) {
-          parts[1] = next;
+        const { base, rest } = splitBase(url.pathname);
+        if (SUPPORTED.includes(rest[0] as Locale)) {
+          rest[0] = next;
         } else {
-          parts.splice(1, 0, next);
+          rest.unshift(next);
         }
-        url.pathname = parts.join("/") || `/${next}`;
+        url.pathname = `${base}/${rest.join("/")}`;
         window.history.replaceState(window.history.state, "", url.toString());
       }
       return next;

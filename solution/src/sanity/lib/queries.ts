@@ -8,6 +8,14 @@ import { defineQuery } from "next-sanity";
  */
 export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepage"][0]{
   navItems[]{ label, sub },
+  navPortalLabel,
+  loginOverlayTitleLine1,
+  loginOverlayTitleLine2,
+  loginOverlayPortals[]{ label, subtitle, url },
+  loginOverlayHint,
+  loginOverlaySupportQuestion,
+  loginOverlaySupportLinkLabel,
+  loginOverlayCloseLabel,
 
   heroEyebrow,
   heroTaglineLine1,
@@ -31,6 +39,7 @@ export const SOLUTIONS_HOMEPAGE_QUERY = defineQuery(`*[_type == "solutionsHomepa
   teamHeadingLine2,
   teamSendMessageLabel,
   teamCtaLabel,
+  teamReadMoreLabel,
   teamMembers[]{
     name,
     role,

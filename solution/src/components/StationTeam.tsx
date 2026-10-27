@@ -151,6 +151,8 @@ export function StationTeam({
 
   const titelZeile1 = t(homepage?.teamHeadingLine1, TITEL[kern(sprache)][0]);
   const titelZeile2 = t(homepage?.teamHeadingLine2, TITEL[kern(sprache)][1]);
+  /* «Mehr lesen» auf den Kacheln: aus dem CMS (teamReadMoreLabel), Rückfall je Sprache. */
+  const mehrLabel = t(homepage?.teamReadMoreLabel, UI[kern(sprache)].mehr);
 
   const [offenId, setOffenId] = useState<string | null>(null);
   const kachelRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -301,7 +303,7 @@ export function StationTeam({
                       <path d="m13 6 6 6-6 6" />
                     </svg>
                   </span>
-                  {UI[kern(sprache)].mehr}
+                  {mehrLabel}
                 </span>
               )}
             </span>
@@ -329,7 +331,7 @@ export function StationTeam({
         }}
         onClick={() => oeffnen(person)}
         aria-haspopup="dialog"
-        aria-label={`${person.name}${person.rolle ? ", " + person.rolle : ""} — ${UI[kern(sprache)].mehr}`}
+        aria-label={`${person.name}${person.rolle ? ", " + person.rolle : ""} — ${mehrLabel}`}
         className="tellian-t5-kachel"
         style={{
           display: "flex",
