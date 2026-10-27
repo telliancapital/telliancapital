@@ -31,6 +31,11 @@ export const solutionsHomepageType = defineType({
       title: "Nav items (4 sections)",
       options: { collapsible: true, collapsed: false },
     },
+    {
+      name: "navLoginOverlaySet",
+      title: "Kundenportal popup (opens on click)",
+      options: { collapsible: true, collapsed: false },
+    },
 
     /* Hero */
     {
@@ -170,6 +175,112 @@ export const solutionsHomepageType = defineType({
       ],
       group: "navigation",
       fieldset: "navItemsSet",
+    }),
+
+    /* Kundenportal popup — same fields as the main site's homepage
+       (navLoginOverlaySet there), in three languages. The app falls back
+       to its built-in copy when a field is empty. */
+    defineField({
+      name: "navPortalLabel",
+      title: "Header button label",
+      description: 'Label of the portal button in the header and the mobile menu. Example: "Kundenportal" / "Client portal" / "Portail Client".',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayTitleLine1",
+      title: "Popup title — line 1",
+      description: 'First line of the big serif headline. Example: "Ihr Zugang,".',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayTitleLine2",
+      title: "Popup title — line 2 (italic)",
+      description: 'Second line, rendered in italics. Example: "persönlich".',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayPortals",
+      title: "Portal links",
+      description:
+        "The rows listed in the popup. Each opens its URL in a new tab. Leave empty to show the default Kunde portal link from the environment config.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "solutionsLoginOverlayPortal",
+          title: "Portal link",
+          fields: [
+            {
+              name: "label",
+              title: "Label",
+              description: 'Uppercase row label. Example: "Kunde" / "Partner" / "Mitarbeiter".',
+              type: "triLocaleString",
+            },
+            {
+              name: "subtitle",
+              title: "Subtitle",
+              description: 'Small grey line under the label. Example: "Portfolio, Reporting, Dokumente".',
+              type: "triLocaleString",
+            },
+            {
+              name: "url",
+              title: "Link URL",
+              description: "Full URL of the portal login page, e.g. https://portal.telliancapital.ch/login",
+              type: "url",
+              validation: (Rule) => Rule.uri({ scheme: ["http", "https"] }),
+            },
+          ],
+          preview: {
+            select: { title: "label.de", subtitle: "url" },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || "Portal link (untitled)",
+                subtitle: subtitle || "—",
+              };
+            },
+          },
+        },
+      ],
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayHint",
+      title: "Hint under the links",
+      description: 'Small note below the portal rows. Example: "Der Klick öffnet das Portal in einem neuen Tab."',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlaySupportQuestion",
+      title: "Support line — question",
+      description: 'Grey text before the support link. Example: "Probleme beim Anmelden?"',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlaySupportLinkLabel",
+      title: "Support line — link label",
+      description: 'Dark clickable text that scrolls to the contact section. Example: "Support kontaktieren".',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
+    }),
+    defineField({
+      name: "loginOverlayCloseLabel",
+      title: "Close button label (screen readers)",
+      description: 'Accessible label of the × button. Example: "Overlay schliessen".',
+      type: "triLocaleString",
+      group: "navigation",
+      fieldset: "navLoginOverlaySet",
     }),
 
     /* ──────────────────────────────────────────────────────────
@@ -369,6 +480,14 @@ export const solutionsHomepageType = defineType({
       name: "teamCtaLabel",
       title: "Button label",
       description: 'Example: "Gespräch vereinbaren".',
+      type: "triLocaleString",
+      group: "team",
+      fieldset: "teamLabelsSet",
+    }),
+    defineField({
+      name: "teamReadMoreLabel",
+      title: '"Read more" label on the team cards',
+      description: 'Small arrow link on each person card that opens the portrait. Example: "Mehr lesen" / "Read more".',
       type: "triLocaleString",
       group: "team",
       fieldset: "teamLabelsSet",

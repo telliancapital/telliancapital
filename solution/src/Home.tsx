@@ -107,7 +107,11 @@ export default function Home({ homepage, outline }: { homepage: any; outline?: R
   /* Leiste und Menü: CMS-Namen (navItems), Rückfall je Sprache. */
   const cmsNavItems = homepage?.navItems;
   const leisteNamen = useMemo(() => leisteSektionen(sprache, cmsNavItems, t), [sprache, cmsNavItems, t]);
-  const kundenportalLabel = sprache === "FR" ? "Portail Client" : sprache === "EN" ? "Client portal" : "Kundenportal";
+  /* Portal-Knopf: Label aus dem CMS (navPortalLabel), Rückfall je Sprache. */
+  const kundenportalLabel = t(
+    homepage?.navPortalLabel,
+    sprache === "FR" ? "Portail Client" : sprache === "EN" ? "Client portal" : "Kundenportal",
+  );
 
   /* ── Gemessene Stationskanten (Desktop) — je Frame aus dem Ref. ── */
   const [kanten, setKanten] = useState<number[] | null>(null);
@@ -183,10 +187,14 @@ export default function Home({ homepage, outline }: { homepage: any; outline?: R
   );
   const navigateToContact = useCallback(() => navigateToSection(SECTIONS.length - 1), [navigateToSection]);
 
-  /* Weltenwechsel: volle Navigation zur Hauptseite. */
-  const handleWelt = useCallback((ziel: "capital" | "solutions") => {
-    if (ziel === "capital") window.location.href = mainSiteUrl;
-  }, []);
+  /* Weltenwechsel: volle Navigation zur Hauptseite — in der aktiven
+     Sprache (die Hauptseite kennt DE und EN; FR landet auf DE). */
+  const handleWelt = useCallback(
+    (ziel: "capital" | "solutions") => {
+      if (ziel === "capital") window.location.href = `${mainSiteUrl.replace(/\/$/, "")}/${lang === "en" ? "en" : "de"}`;
+    },
+    [lang],
+  );
 
   /* Betretene Stationen — einmal betreten bleibt betreten. */
   const [entered, setEntered] = useState<boolean[]>(() => SECTIONS.map(() => false));
@@ -263,7 +271,7 @@ export default function Home({ homepage, outline }: { homepage: any; outline?: R
 
   const overlays = (
     <>
-      <LoginOverlay open={loginOpen} onClose={() => setLoginOpen(false)} onSupportClick={navigateToContact} />
+      <LoginOverlay open={loginOpen} onClose={() => setLoginOpen(false)} onSupportClick={navigateToContact} homepage={homepage} />
       <LegalPage activePath={legal.activePath} onClose={legal.close} homepage={homepage} />
     </>
   );
