@@ -475,13 +475,17 @@ export const homepageType = defineType({
     }),
     defineField({
       name: "startParagraphs",
-      title: "Lead paragraphs",
+      title: "Lead paragraphs — MOVED, do not edit here",
       description:
-        "Introductory text under the headline (left text column of the hero). Add one entry per paragraph in the order they should appear — the redesign shows two. Leave empty to show the built-in default text.",
+        "Edit the lead paragraphs in the document «Unterseiten · Mandat / Advisory» → tab «Startseite · Hero». Saving them here fails because this document is at Sanity's 1000-attribute limit.",
       type: "array",
       of: [{ type: "localeText" }],
       group: "start",
       fieldset: "startBodySet",
+      readOnly: true,
+      deprecated: {
+        reason: "Moved to the document «Unterseiten · Mandat / Advisory» (tab «Startseite · Hero») — the homepage document is at Sanity's 1000-attribute limit.",
+      },
     }),
     defineField({
       name: "startCtaLabel",

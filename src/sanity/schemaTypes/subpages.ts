@@ -1,4 +1,4 @@
-import { defineType } from "sanity";
+import { defineField, defineType } from "sanity";
 
 import { subpageFields } from "./subpagesFields";
 
@@ -17,10 +17,26 @@ export const subpagesType = defineType({
   type: "document",
   groups: [
     { name: "mandat", title: "Mandat subpage", default: true },
+    { name: "start", title: "Startseite  ·  Hero (Lead paragraphs)" },
     { name: "advisory", title: "Advisory subpage" },
     { name: "compare", title: "Comparison table (both subpages)" },
   ],
-  fields: subpageFields({ group: (s) => s }),
+  fields: [
+    ...subpageFields({ group: (s) => s }),
+
+    /* Startseite · Hero — lives here (not on `homepage`) for the same reason:
+       the homepage document is at the 1000-attribute limit. The site reads
+       this field first and falls back to `homepage.startParagraphs`. */
+    defineField({
+      name: "startParagraphs",
+      title: "Lead paragraphs",
+      description:
+        "Introductory text under the headline (left text column of the hero on the start page). Add one entry per paragraph in the order they should appear — the redesign shows two. Leave empty to show the built-in default text.",
+      type: "array",
+      of: [{ type: "localeText" }],
+      group: "start",
+    }),
+  ],
   preview: {
     prepare() {
       return { title: "Unterseiten  ·  Mandat / Advisory" };
