@@ -562,13 +562,18 @@ export function DreiecksBeziehung({ sprache = "DE", inhalt: inhaltProp, onMandat
             style={{
               alignSelf: "flex-start",
               margin: 0,
-              padding: "13px 20px",
+              padding: "13px 0",
               border: "none",
               borderRadius: 0,
+              /* Kein globales .tellian-cta-primaer vorhanden — ohne explizite
+                 Farben fiel der Knopf auf die Browser-Vorgabe (schwarze Schrift,
+                 graue Fläche) zurück. Wie breit: weisse Schrift auf dem Panel. */
+              background: "transparent",
+              color: C.bg,
               minHeight: "var(--tellian-tippziel)",
               fontFamily: sans,
-              fontSize: "13px",
-              letterSpacing: "var(--tellian-ls-cta-klein)",
+              fontSize: "var(--tellian-lauf-size)",
+              lineHeight: "var(--tellian-lauf-lh)" as unknown as number,
               cursor: "pointer",
               textAlign: "left",
             }}
