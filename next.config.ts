@@ -34,7 +34,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
   },
   async redirects() {
-    return [{ source: "/", destination: "/de", permanent: true }];
+    return [
+      { source: "/", destination: "/de", permanent: true },
+      /* Old URL still known to Google (Search Console, 10.11.2026) — 404 otherwise. */
+      { source: "/investmentstrategies", destination: "/anlagestrategien", permanent: true },
+    ];
   },
   async headers() {
     /* Same as the Solutions app: keep the vercel.app / preview addresses out
