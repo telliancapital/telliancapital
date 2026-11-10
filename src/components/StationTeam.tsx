@@ -89,8 +89,23 @@ const initialen = (name: string) =>
     .map((t) => t[0])
     .join("");
 
-/** mailto-Ziel einer Person: eigene Adresse, sonst Haus + Betreff. */
-function mailZiel(person: Person, sprache: Sprache): string {
+/* Personen ohne E-Mail-Weg in der Detailansicht — Wilhelm Tell ist die
+   Statue am Anfang des Teams, keine ansprechbare Person. Schlüssel =
+   Nachname, klein, ohne Diakritika. */
+const OHNE_MAIL = new Set(["tell"]);
+
+const ohneMail = (name: string): boolean =>
+  name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .some((w) => OHNE_MAIL.has(w));
+
+/** mailto-Ziel einer Person: eigene Adresse, sonst Haus + Betreff;
+    fehlt bei Personen ohne E-Mail-Weg (siehe OHNE_MAIL). */
+function mailZiel(person: Person, sprache: Sprache): string | undefined {
+  if (ohneMail(person.name)) return undefined;
   if (person.mail) return `mailto:${person.mail}`;
   const betreff = sprache === "EN" ? `Enquiry for ${person.name}` : `Anfrage an ${person.name}`;
   return `mailto:${MAIL_FIRMA}?subject=${encodeURIComponent(betreff)}`;
