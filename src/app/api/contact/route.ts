@@ -1,6 +1,4 @@
-import { SendEmailCommand } from "@aws-sdk/client-ses";
-
-import { sesClient } from "@/lib/aws/ses";
+import { sendEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -139,37 +137,29 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, error: "Invalid email address." }, { status: 400 });
   }
 
-  const fromAddress = process.env.SES_FROM_EMAIL;
-  const toAddress = process.env.SES_TO_EMAIL;
+  const toAddress = process.env.EMAIL_TO;
 
-  if (!fromAddress || !toAddress) {
-    console.error("[contact] SES_FROM_EMAIL or SES_TO_EMAIL is not configured.");
+  if (!toAddress || !process.env.EMAIL_FROM || !process.env.BREVO_API_KEY) {
+    console.error("[contact] BREVO_API_KEY, EMAIL_FROM or EMAIL_TO is not configured.");
     return Response.json({ ok: false, error: "Email service is not configured." }, { status: 500 });
   }
 
   const payload = { name, email, subject, message };
 
-  const command = new SendEmailCommand({
-    Source: fromAddress,
-    Destination: { ToAddresses: [toAddress] },
-    ReplyToAddresses: [email],
-    Message: {
-      Subject: { Data: subject, Charset: "UTF-8" },
-      Body: {
-        Html: { Data: renderHtml(payload), Charset: "UTF-8" },
-        Text: { Data: renderText(payload), Charset: "UTF-8" },
-      },
-    },
+  const result = await sendEmail({
+    to: { email: toAddress },
+    replyTo: { email, name },
+    subject,
+    html: renderHtml(payload),
+    text: renderText(payload),
   });
 
-  try {
-    const result = await sesClient.send(command);
-    return Response.json({ ok: true, messageId: result.MessageId }, { status: 200 });
-  } catch (error) {
-    console.error("[contact] SES send failed:", error);
+  if (!result.sent) {
     return Response.json(
       { ok: false, error: "Failed to send email. Please try again later." },
       { status: 502 },
     );
   }
+
+  return Response.json({ ok: true, messageId: result.messageId }, { status: 200 });
 }
