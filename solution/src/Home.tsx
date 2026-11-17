@@ -80,6 +80,7 @@ function kontaktDaten(cms: any, t: (v: any, f?: string) => string) {
     contactCompanyName: cms.contactCompanyName,
     contactAddress: t(cms.contactAddressLine, "") || undefined,
     contactMapLinkLabel: cms.contactMapLink,
+    contactFormName: cms.contactFieldName,
     contactFormEmail: cms.contactFieldEmail,
     contactFormPhone: cms.contactFieldPhone,
     contactFormMessage: cms.contactFieldMessage,

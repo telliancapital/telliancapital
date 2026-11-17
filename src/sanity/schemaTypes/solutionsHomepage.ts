@@ -608,15 +608,9 @@ export const solutionsHomepageType = defineType({
       fieldset: "contactFormSet",
     }),
     defineField({
-      name: "contactFieldFirstName",
-      title: "Field label — First name",
-      type: "triLocaleString",
-      group: "contact",
-      fieldset: "contactFormSet",
-    }),
-    defineField({
-      name: "contactFieldLastName",
-      title: "Field label — Last name",
+      name: "contactFieldName",
+      title: "Field label — Name",
+      description: 'Label of the name field. Example: "Name".',
       type: "triLocaleString",
       group: "contact",
       fieldset: "contactFormSet",
