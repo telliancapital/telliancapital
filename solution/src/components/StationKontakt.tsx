@@ -604,7 +604,7 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
 
   const formTexte: FormTexte = {
     ...FEHLER[kern(sprache)],
-    feldName: sprache === "EN" ? "Name" : "Name",
+    feldName: t(cms.contactFormName, "Name"),
     feldMail: t(cms.contactFormEmail, ""),
     feldTelefon: t(cms.contactFormPhone, ""),
     feldNachricht: t(cms.contactFormMessage, ""),
