@@ -617,19 +617,31 @@ export function StationKontakt({ isVertical = false, domId, sprache = "DE", home
 
   /* Fussverweise: zuerst die CMS-Verweise (footerLinks: Label + Ziel),
      dann LinkedIn (Adresse aus linkedinUrl) und die Rechtsseiten (Labels
-     aus dem CMS). Einträge ohne Label bzw. Adresse entfallen. */
+     aus dem CMS). Einträge ohne Label bzw. Adresse entfallen.
+     Steht eine Rechtsseite oder LinkedIn schon in footerLinks, wird sie
+     nicht ein zweites Mal angehängt; CMS-Verweise auf /datenschutz bzw.
+     /kundeninformation öffnen wie bisher die Rechtsseite im Overlay. */
+  const istLegal = (href: string): href is LegalPath => href === "/datenschutz" || href === "/kundeninformation";
   const cmsFussLinks: FussVerweis[] = ((cms.footerLinks ?? []) as { label?: LocaleValue; href?: string }[])
-    .map((v) => ({ text: stegaClean(t(v?.label, "")), href: stegaClean(v?.href || "") }))
+    .map((v) => ({ text: stegaClean(t(v?.label, "")), href: stegaClean(v?.href || "").trim() }))
     .filter((v) => v.text && v.href)
-    .map((v) => ({ ...v, extern: /^https?:\/\//.test(v.href) && !v.href.startsWith(mainSiteUrl) }));
+    .map((v) =>
+      istLegal(v.href)
+        ? { text: v.text, legal: v.href }
+        : { ...v, extern: /^https?:\/\//.test(v.href) && !v.href.startsWith(mainSiteUrl) },
+    );
+  const imCms = (legal: LegalPath) => cmsFussLinks.some((v) => v.legal === legal);
+  const linkedinImCms = cmsFussLinks.some((v) => v.href?.includes("linkedin.com"));
   const linkedinHref: string = stegaClean(cms.linkedinUrl || "");
   const FUSS_RECHTS: readonly FussVerweis[] = [
     ...cmsFussLinks,
-    ...(linkedinHref
+    ...(linkedinHref && !linkedinImCms
       ? [{ text: "LinkedIn", href: linkedinHref, extern: true, marke: inBugWeiss.src, vorlesen: "Tellian Capital auf LinkedIn" }]
       : []),
-    ...(legalLabels["/datenschutz"] ? [{ text: legalLabels["/datenschutz"], legal: "/datenschutz" as const }] : []),
-    ...(legalLabels["/kundeninformation"]
+    ...(legalLabels["/datenschutz"] && !imCms("/datenschutz")
+      ? [{ text: legalLabels["/datenschutz"], legal: "/datenschutz" as const }]
+      : []),
+    ...(legalLabels["/kundeninformation"] && !imCms("/kundeninformation")
       ? [{ text: legalLabels["/kundeninformation"], legal: "/kundeninformation" as const }]
       : []),
   ];
