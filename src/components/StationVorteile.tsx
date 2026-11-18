@@ -468,6 +468,13 @@ export function StationVorteile({
         outline-offset: 4px;
       }
       .tellian-r4-treffer:focus-visible { stroke: var(--tellian-r4-focus); stroke-opacity: 0.35; }
+      /* Mouse/touch click: no focus frame (the SVG arc's outline draws a box
+         around its bounding rect). Keyboard focus keeps the ring above. */
+      html[data-eingabe="zeiger"] .tellian-r4-punkt:focus,
+      html[data-eingabe="zeiger"] .tellian-r4-treffer:focus {
+        outline: none;
+      }
+      html[data-eingabe="zeiger"] .tellian-r4-treffer:focus { stroke: transparent; }
       .tellian-r4-treffer { cursor: pointer; pointer-events: stroke; }
       @media (prefers-reduced-motion: reduce) {
         .tellian-r4-seg, .tellian-r4-punkt { transition: none !important; }
